@@ -30,19 +30,22 @@
     <div v-if="loading" class="text-center text-gray-500">Loading data...</div>
     <div v-else>
       <ul class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <li v-for="(cafe, index) in paginatedData" :key="index" class="border rounded shadow">
-          <NuxtImg alt="Cafe Image" class="w-full h-48 object-cover rounded-xl mb-4" :src="cafe.photo" />
-          <div class="pt-1 pb-3 px-4 flex flex-col gap-2">
-            <h2 class="text-xl font-semibold">{{ cafe.name }}</h2>
-            <p class="text-gray-500 line-clamp-2">{{ cafe.description }}</p>
-            <div class="flex justify-between mt-3">
-              <button class="bg-blue-500 text-sm text-white px-4 py-2 rounded-full">{{ cafe.city }}</button>
+        <li v-for="(cafe, index) in paginatedData" :key="index" class="border rounded shadow flex flex-col h-full pb-4">
+
+            <NuxtImg alt="Cafe Image" class="w-full h-48 object-cover rounded-xl mb-4" :src="cafe.photo" />
+            <div class="flex-1 flex-col px-4">
+              <h2 class="text-xl font-semibold">{{ cafe.name }}</h2>
+              <p class="text-gray-500 line-clamp-2">{{ cafe.description }}</p>
+            </div>
+            <div class="flex justify-between px-4 mt-8">
+              <button class="text-sm text-gray-500 border border-gray-400 px-4 py-2 rounded-full">{{ cafe.city }}</button>
               <div class="flex items-center gap-1">
                 <img src="/src/assets/img/rating.svg" alt="star" class="w-4 h-4">
                 <p class="text-gray-500 line-clamp-2">{{ cafe.rating }}</p>
               </div>
             </div>
-          </div>
+
+
           <!-- Add more fields as needed -->
         </li>
       </ul>
