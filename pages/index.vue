@@ -1,21 +1,48 @@
 <template>
   <div class="container mx-auto p-4">
     <h1 class="text-3xl font-bold mb-4 text-center">Cafe's Directory</h1>
-    <div class="flex justify-center mb-4">
+    <div class="flex flex-col items-center mx-auto  w-full  justify-center mb-4 py-4">
       <input 
         v-model="searchQuery" 
         type="text" 
         placeholder="Search cafes..." 
-        class="border rounded p-2 w-full max-w-md"
+        class="border w-full max-w-md border-gray-600 rounded-lg p-3"
       />
+      <div class="max-w-[80%] flex flex-wrap gap-2 text-xs text-nowrap my-8">
+        <button 
+          v-for="rating in uniqueRatings" 
+          :key="rating" 
+          @click="toggleFilter('rating', rating)" 
+          :class="{'bg-blue-500 text-white': activeFilters.rating.includes(rating), 'bg-none border border-gray-400': !activeFilters.rating.includes(rating)}"
+          class="px-3 py-2 rounded-full">
+          {{ rating }} Stars
+        </button>
+        <button 
+          v-for="city in uniqueCities" 
+          :key="city" 
+          @click="toggleFilter('city', city)" 
+          :class="{'bg-blue-500 text-white': activeFilters.city.includes(city), 'bg-gray-200': !activeFilters.city.includes(city)}"
+          class="px-4 py-2 rounded-full">
+          {{ city }}
+        </button>
+      </div>
     </div>
     <div v-if="loading" class="text-center text-gray-500">Loading data...</div>
     <div v-else>
       <ul class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <li v-for="(cafe, index) in paginatedData" :key="index" class="p-4 border rounded shadow">
-          <NuxtImg alt="Cafe Image" class="w-full h-48 object-cover rounded mb-4" :src="cafe.photo" />
-          <h2 class="text-xl font-semibold">{{ cafe.name }}</h2>
-          <p class="text-gray-700">{{ cafe.description }}</p>
+        <li v-for="(cafe, index) in paginatedData" :key="index" class="border rounded shadow">
+          <NuxtImg alt="Cafe Image" class="w-full h-48 object-cover rounded-xl mb-4" :src="cafe.photo" />
+          <div class="pt-1 pb-3 px-4 flex flex-col gap-2">
+            <h2 class="text-xl font-semibold">{{ cafe.name }}</h2>
+            <p class="text-gray-500 line-clamp-2">{{ cafe.description }}</p>
+            <div class="flex justify-between mt-3">
+              <button class="bg-blue-500 text-sm text-white px-4 py-2 rounded-full">{{ cafe.city }}</button>
+              <div class="flex items-center gap-1">
+                <img src="/src/assets/img/rating.svg" alt="star" class="w-4 h-4">
+                <p class="text-gray-500 line-clamp-2">{{ cafe.rating }}</p>
+              </div>
+            </div>
+          </div>
           <!-- Add more fields as needed -->
         </li>
       </ul>
@@ -55,14 +82,39 @@ const currentPage = ref(1)
 const itemsPerPage = 12
 const searchQuery = ref('')
 
-const filteredData = computed(() => {
-  if (!searchQuery.value) {
-    return data.value
+const uniqueRatings = ref([1, 2, 3, 4, 5]) // Example data
+const activeFilters = ref({ rating: [], city: [] })
+
+function toggleFilter(type, value) {
+  const index = activeFilters.value[type].indexOf(value)
+  if (index > -1) {
+    activeFilters.value[type].splice(index, 1)
+  } else {
+    activeFilters.value[type].push(value)
   }
-  return data.value.filter(cafe => 
-    cafe.name.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-    cafe.description.toLowerCase().includes(searchQuery.value.toLowerCase())
-  )
+}
+
+console.log('Unique Ratings:', uniqueRatings.value)
+
+const uniqueCities = computed(() => {
+  const cities = data.value.map(cafe => cafe.city)
+  return [...new Set(cities)]
+})
+
+const filteredData = computed(() => {
+  return data.value.filter(cafe => {
+    const matchesSearchQuery = !searchQuery.value || 
+      cafe.name.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+      cafe.description.toLowerCase().includes(searchQuery.value.toLowerCase())
+
+    const matchesRating = !activeFilters.value.rating.length || 
+      activeFilters.value.rating.includes(cafe.rating)
+
+    const matchesCity = !activeFilters.value.city.length || 
+      activeFilters.value.city.includes(cafe.city)
+
+    return matchesSearchQuery && matchesRating && matchesCity
+  })
 })
 
 const paginatedData = computed(() => {
