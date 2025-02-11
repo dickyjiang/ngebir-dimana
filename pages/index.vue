@@ -1,12 +1,12 @@
 <template>
-  <div>
-    <h1>Cafe's Directory</h1>
-    <div v-if="loading">Loading data...</div>
+  <div class="container mx-auto p-4">
+    <h1 class="text-3xl font-bold mb-4">Cafe's Directory</h1>
+    <div v-if="loading" class="text-center text-gray-500">Loading data...</div>
     <div v-else>
-      <ul>
-        <li v-for="(cafe, index) in data" :key="index">
-          <h2>{{ cafe.name }}</h2>
-          <p>{{ cafe.description }}</p>
+      <ul class="space-y-4">
+        <li v-for="(cafe, index) in data" :key="index" class="p-4 border rounded shadow">
+          <h2 class="text-xl font-semibold">{{ cafe.name }}</h2>
+          <p class="text-gray-700">{{ cafe.description }}</p>
           <!-- Add more fields as needed -->
         </li>
       </ul>
