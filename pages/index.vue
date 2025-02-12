@@ -29,7 +29,7 @@
     </div>
     <div v-if="loading" class="text-center text-gray-500">Loading data...</div>
     <div v-else>
-      <ul class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <ul class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <li v-for="(cafe, index) in paginatedData" :key="index" class="border rounded shadow flex flex-col h-full pb-4">
 
             <NuxtImg alt="Cafe Image" class="w-full h-48 object-cover rounded-xl mb-4" :src="cafe.photo" />
@@ -76,7 +76,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useNuxtApp } from '#app'
 
 const data = ref([])
@@ -106,18 +106,14 @@ const uniqueCities = computed(() => {
 
 const filteredData = computed(() => {
   return data.value.filter(cafe => {
-    const matchesSearchQuery = !searchQuery.value || 
-      cafe.name.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-      cafe.description.toLowerCase().includes(searchQuery.value.toLowerCase())
+    return cafe.name.toLowerCase().includes(searchQuery.value.toLowerCase());
+  });
+})
 
-    const matchesRating = !activeFilters.value.rating.length || 
-      activeFilters.value.rating.includes(cafe.rating)
-
-    const matchesCity = !activeFilters.value.city.length || 
-      activeFilters.value.city.includes(cafe.city)
-
-    return matchesSearchQuery && matchesRating && matchesCity
-  })
+// Debugging: Log search query and filtered results
+watch(searchQuery, (newQuery) => {
+  console.log('Search Query:', newQuery)
+  console.log('Filtered Data:', filteredData.value)
 })
 
 const paginatedData = computed(() => {
