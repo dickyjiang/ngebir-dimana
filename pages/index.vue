@@ -29,16 +29,41 @@
     </div>
   </section>
   <section id="main-content" class="flex bg-gray-100">
-    <aside class="sticky top-0 max-w-[20%] p-4" style="height: 100vh; overflow-y: auto;">
-      <div class="flex flex-wrap gap-2 text-xs text-nowrap my-8">
-        <button 
-          v-for="rating in uniqueRatings" 
-          :key="rating" 
-          @click="toggleFilter('rating', rating)" 
-          :class="{'bg-blue-500 text-white': activeFilters.rating.includes(rating), 'bg-none border border-gray-400': !activeFilters.rating.includes(rating)}"
-          class="px-3 py-2 rounded-full">
-          {{ rating }} Stars
-        </button>
+    <aside class="sticky top-0 max-w-[20%] p-4 border-r border-gray-500 bg-gray-50" style="height: 100vh; overflow-y: auto;">
+      <div class="w-full pb-2 border-b border-gray-400 mb-4">
+        <h2 class="text-lg font-medium">Filter</h2>
+      </div>
+      <div>
+        <h3 class="text-sm font-medium">Rating</h3>
+        <div class="flex flex-wrap gap-2 text-xs text-nowrap my-4">
+          <button 
+            v-for="rating in uniqueRatings" 
+            :key="rating" 
+            @click="toggleFilter('rating', rating)" 
+            :class="{'bg-blue-500 text-white': activeFilters.rating.includes(rating), 'bg-none border border-gray-400': !activeFilters.rating.includes(rating)}"
+            class="px-3 py-2 rounded-full">
+            {{ rating }} Stars
+          </button>
+        </div>
+      </div>
+      <div>
+        <h3 class="text-sm font-medium">Price Range</h3>
+        <div class="flex flex-wrap gap-2 text-xs text-nowrap my-4">
+          <button 
+            v-for="range in uniqueRanges" 
+            :key="range" 
+            @click="toggleFilter('range', range)" 
+            :class="{'bg-blue-500 text-white': activeFilters.range.includes(range), 'bg-none border border-gray-400': !activeFilters.range.includes(range)}"
+            class="px-3 py-2 rounded-full">
+            {{ range }}
+          </button>
+        </div>
+      </div>
+
+      <div class="w-full pb-2 border-b border-gray-400">
+      <h2 class="text-lg font-medium">Tags</h2>
+    </div>
+      <div class="flex flex-wrap gap-2 text-xs text-nowrap my-4">
         <button 
           v-for="city in uniqueCities" 
           :key="city" 
@@ -55,7 +80,12 @@
         <ul class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <li v-for="(cafe, index) in paginatedData" :key="index" class="border rounded shadow flex flex-col h-full pb-4">
   
-              <NuxtImg alt="Cafe Image" class="w-full h-48 object-cover rounded-xl mb-4" :src="cafe.photo" />
+              <NuxtImg 
+                alt="Cafe Image" 
+                class="w-full h-48 object-cover rounded-xl mb-4" 
+                :src="cafe.photo" 
+                @error="handleImageError"
+              />
               <div class="flex-1 flex-col px-4">
                 <h2 class="text-xl font-semibold">{{ cafe.name }}</h2>
                 <p class="text-gray-500 line-clamp-2">{{ cafe.description }}</p>
@@ -110,7 +140,8 @@ const itemsPerPage = 12
 const searchQuery = ref('')
 
 const uniqueRatings = ref([1, 2, 3, 4, 5]) // Example data
-const activeFilters = ref({ rating: [], city: [] })
+const uniqueRanges = ref(['$', '$$', '$$$', '$$$$']) // Example data
+const activeFilters = ref({ rating: [], city: [], range: [] })
 
 function toggleFilter(type, value) {
   const index = activeFilters.value[type].indexOf(value)
