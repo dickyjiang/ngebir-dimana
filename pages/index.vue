@@ -1,6 +1,26 @@
 <template>
+  <section class="relative h-[60svh] flex items-center justify-center">
+    <div class="absolute inset-0 w-full h-full">
+      <img
+        class="object-cover object-center w-full h-full"
+        src="/src/assets/img/hero.webp"
+        alt="hero image"
+      />
+      <div class="absolute inset-0 bg-black opacity-55 z-10"></div>
+    </div>
+    <div class="z-20">
+      <h1 class="text-6xl text-white text-center font-medium tracking-wide mb-3">Ngopi Dimana?</h1>
+      <h2 class="text-3xl text-white mb-4 text-center">Cafe's Directory</h2>
+      <input 
+        v-model="searchQuery" 
+        type="text" 
+        placeholder="Search cafes..." 
+        class="border w-full max-w-md border-gray-600 rounded-lg p-3"
+      />
+    </div>
+  </section>
   <div class="container mx-auto p-4">
-    <h1 class="text-3xl font-bold mb-4 text-center">Cafe's Directory</h1>
+    
     <div class="flex flex-col items-center mx-auto  w-full  justify-center mb-4 py-4">
       <input 
         v-model="searchQuery" 
