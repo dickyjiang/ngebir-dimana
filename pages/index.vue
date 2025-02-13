@@ -1,5 +1,5 @@
 <template>
-  <section class="relative h-[60svh] flex items-center justify-center">
+  <section id="hero" class="relative h-[60svh] flex items-center justify-center">
     <div class="absolute inset-0 w-full h-full">
       <img
         class="object-cover object-center w-full h-full"
@@ -8,27 +8,29 @@
       />
       <div class="absolute inset-0 bg-black opacity-55 z-10"></div>
     </div>
-    <div class="z-20">
+    <div class="z-20 flex flex-col items-center w-[80%] mx-auto">
       <h1 class="text-6xl text-white text-center font-medium tracking-wide mb-3">Ngopi Dimana?</h1>
       <h2 class="text-3xl text-white mb-4 text-center">Cafe's Directory</h2>
-      <input 
-        v-model="searchQuery" 
-        type="text" 
-        placeholder="Search cafes..." 
-        class="border w-full max-w-md border-gray-600 rounded-lg p-3"
-      />
+      <div class="mt-4 w-full flex flex-col gap-4 items-center justify-center">
+        <div class="flex items-center gap-2 w-full max-w-lg">
+          <input 
+            v-model="searchQuery" 
+            type="text" 
+            placeholder="Search cafes..." 
+            class="border w-full max-w-md border-gray-600 rounded-lg p-3"
+          />
+          <button class="border border-gray-200 text-white px-7 py-3 rounded-lg">Search</button>
+        </div>
+        <div class="flex items-center gap-2">
+          <button class="border border-gray-200 text-white px-7 py-3 rounded-lg">Filter</button>
+          <button class="border border-gray-200 text-white px-7 py-3 rounded-lg">Sort</button>
+        </div>
+      </div>
     </div>
   </section>
-  <div class="container mx-auto p-4">
-    
-    <div class="flex flex-col items-center mx-auto  w-full  justify-center mb-4 py-4">
-      <input 
-        v-model="searchQuery" 
-        type="text" 
-        placeholder="Search cafes..." 
-        class="border w-full max-w-md border-gray-600 rounded-lg p-3"
-      />
-      <div class="max-w-[80%] flex flex-wrap gap-2 text-xs text-nowrap my-8">
+  <section id="main-content" class="flex bg-gray-100">
+    <aside class="sticky top-0 max-w-[20%] p-4" style="height: 100vh; overflow-y: auto;">
+      <div class="flex flex-wrap gap-2 text-xs text-nowrap my-8">
         <button 
           v-for="rating in uniqueRatings" 
           :key="rating" 
@@ -46,53 +48,55 @@
           {{ city }}
         </button>
       </div>
-    </div>
-    <div v-if="loading" class="text-center text-gray-500">Loading data...</div>
-    <div v-else>
-      <ul class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <li v-for="(cafe, index) in paginatedData" :key="index" class="border rounded shadow flex flex-col h-full pb-4">
-
-            <NuxtImg alt="Cafe Image" class="w-full h-48 object-cover rounded-xl mb-4" :src="cafe.photo" />
-            <div class="flex-1 flex-col px-4">
-              <h2 class="text-xl font-semibold">{{ cafe.name }}</h2>
-              <p class="text-gray-500 line-clamp-2">{{ cafe.description }}</p>
-            </div>
-            <div class="flex justify-between px-4 mt-8">
-              <button class="text-sm text-gray-500 border border-gray-400 px-4 py-2 rounded-full">{{ cafe.city }}</button>
-              <div class="flex items-center gap-1">
-                <img src="/src/assets/img/rating.svg" alt="star" class="w-4 h-4">
-                <p class="text-gray-500 line-clamp-2">{{ cafe.rating }}</p>
+    </aside>
+    <div class="p-4 ">
+      <div v-if="loading" class="text-center text-gray-500">Loading data...</div>
+      <div v-else>
+        <ul class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <li v-for="(cafe, index) in paginatedData" :key="index" class="border rounded shadow flex flex-col h-full pb-4">
+  
+              <NuxtImg alt="Cafe Image" class="w-full h-48 object-cover rounded-xl mb-4" :src="cafe.photo" />
+              <div class="flex-1 flex-col px-4">
+                <h2 class="text-xl font-semibold">{{ cafe.name }}</h2>
+                <p class="text-gray-500 line-clamp-2">{{ cafe.description }}</p>
               </div>
-            </div>
-
-
-          <!-- Add more fields as needed -->
-        </li>
-      </ul>
-      <div class="flex justify-center mt-4 space-x-2">
-        <span 
-          v-if="currentPage > 1" 
-          @click="currentPage--" 
-          class="cursor-pointer text-blue-500 hover:underline">
-          Previous
-        </span>
-        <span 
-          v-for="page in visiblePages" 
-          :key="page" 
-          @click="currentPage = page" 
-          :class="{'font-bold text-blue-500': currentPage === page, 'text-gray-700': currentPage !== page}"
-          class="cursor-pointer hover:underline">
-          {{ page }}
-        </span>
-        <span 
-          v-if="currentPage < totalPages" 
-          @click="currentPage++" 
-          class="cursor-pointer text-blue-500 hover:underline">
-          Next
-        </span>
+              <div class="flex justify-between px-4 mt-8">
+                <button class="text-sm text-gray-500 border border-gray-400 px-4 py-2 rounded-full">{{ cafe.city }}</button>
+                <div class="flex items-center gap-1">
+                  <img src="/src/assets/img/rating.svg" alt="star" class="w-4 h-4">
+                  <p class="text-gray-500 line-clamp-2">{{ cafe.rating }}</p>
+                </div>
+              </div>
+  
+  
+            <!-- Add more fields as needed -->
+          </li>
+        </ul>
+        <div class="flex justify-center mt-4 space-x-2">
+          <span 
+            v-if="currentPage > 1" 
+            @click="currentPage--" 
+            class="cursor-pointer text-blue-500 hover:underline">
+            Previous
+          </span>
+          <span 
+            v-for="page in visiblePages" 
+            :key="page" 
+            @click="currentPage = page" 
+            :class="{'font-bold text-blue-500': currentPage === page, 'text-gray-700': currentPage !== page}"
+            class="cursor-pointer hover:underline">
+            {{ page }}
+          </span>
+          <span 
+            v-if="currentPage < totalPages" 
+            @click="currentPage++" 
+            class="cursor-pointer text-blue-500 hover:underline">
+            Next
+          </span>
+        </div>
       </div>
     </div>
-  </div>
+  </section>
 </template>
 
 <script setup>
