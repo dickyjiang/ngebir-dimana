@@ -5,7 +5,7 @@
       <div class="absolute inset-0 bg-black opacity-55 z-10"></div>
       <div class="absolute z-20 flex flex-col items-center justify-center w-[80%] mx-auto h-full">
         <h1 class="text-6xl text-white text-center font-medium tracking-wide mb-3">Ngopi Dimana?</h1>
-        <h2 class="text-3xl text-white mb-4 text-center">Cafe's Directory</h2>
+        <h2 class="text-2xl tracking-wide text-white mb-4 text-center">Cafe's Directory</h2>
         <div class="mt-4 w-full flex flex-col gap-4 items-center justify-center">
           <div class="flex items-center gap-2 w-full max-w-lg">
             <input v-model="searchQuery" type="text" placeholder="Search cafes..."
@@ -13,40 +13,44 @@
             <button class="border border-gray-200 text-white px-7 py-3 rounded-lg">Search</button>
           </div>
           <div class="flex items-center gap-2">
-            <button class="border border-gray-200 text-white px-7 py-3 rounded-lg">Filter</button>
-            <button class="border border-gray-200 text-white px-7 py-3 rounded-lg">Sort</button>
+            <button @click="toggleFilter('rating', 5)" class="border border-gray-200 text-white px-7 py-3 rounded-lg">5 Stars</button>
+            <button @click="toggleFilter('range', '$$')" class="border border-gray-200 text-white px-7 py-3 rounded-lg">$$</button>
           </div>
         </div>
       </div>
     </div>
   </section>
   <section id="main-content" class="flex px-16">
-    <div class="sticky top-0 w-full max-w-[20%] p-4 border-r-4 border-gray-800" style="height: 100vh; overflow-y: auto;">
-      <Sidebar />
+    <div class="sticky top-0 w-full max-w-[20%] p-4 border-r border-gray-400" style="height: 100vh; overflow-y: auto;">
+      <Sidebar :activeFilters="activeFilters" />
     </div>
     <div class="p-4">
       <div v-if="loading" class="text-center text-gray-500">Loading data...</div>
       <div v-else>
         <ul class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           <li v-for="(cafe, index) in paginatedData" :key="index"
-            class=" rounded-md flex flex-col h-full pb-4 border overflow-hidden">
-            <NuxtImg alt="Cafe Image" class="w-full h-48 object-cover  mb-4" :src="cafe.photo"
+            class="rounded-md flex flex-col h-full pb-4 border overflow-hidden">
+            <NuxtImg alt="Cafe Image" class="w-full h-48 object-cover mb-4" :src="cafe.photo"
               @error="handleImageError" />
             <div class="flex-1 flex-col px-4">
               <h2 class="text-lg text-gray-800 leading-tight line-clamp-2 font-semibold">{{ cafe.name }}</h2>
               <p class="text-sm text-gray-500 line-clamp-2 mt-2">{{ cafe.description }}</p>
             </div>
             <div class="flex justify-between px-4 mt-8">
-              <button class="text-xs text-gray-500 border border-gray-400 px-3 py-1 rounded-full">{{ cafe.city
-                }}</button>
+              <div class="flex items-center gap-1">
+                <img src="/src/assets/img/city.svg" alt="star" class="h-3">
+                <p class="text-gray-500 text-xs">{{ cafe.city }}</p>
+              </div>
+              <div class="flex items-center gap-1 font-semibold">
+                <!-- <img src="/src/assets/img/rating.svg" alt="star" class="h-3"> -->
+                <p class="text-gray-500 text-xs">{{ cafe.range }}</p>
+              </div>
               <div class="flex items-center gap-1">
                 <img src="/src/assets/img/rating.svg" alt="star" class="h-3">
                 <p class="text-gray-500 text-xs">{{ cafe.rating }}</p>
               </div>
+              
             </div>
-
-
-            <!-- Add more fields as needed -->
           </li>
         </ul>
         <div class="flex justify-center mt-4 space-x-2">
@@ -71,7 +75,6 @@
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
 import { useNuxtApp } from '#app'
-import Navbar from '~/components/Navbar.vue'
 import Sidebar from '~/components/Sidebar.vue'
 
 const data = ref([])
@@ -80,9 +83,8 @@ const currentPage = ref(1)
 const itemsPerPage = 12
 const searchQuery = ref('')
 
-const uniqueRatings = ref([1, 2, 3, 4, 5]) // Example data
-const uniqueRanges = ref(['$', '$$', '$$$', '$$$$']) // Example data
-const activeFilters = ref({ rating: [], city: [], range: [] })
+// Initialize activeFilters with all expected properties
+const activeFilters = ref({ rating: [], range: [], city: [] })
 
 function toggleFilter(type, value) {
   const index = activeFilters.value[type].indexOf(value)
@@ -93,20 +95,15 @@ function toggleFilter(type, value) {
   }
 }
 
-console.log('Unique Ratings:', uniqueRatings.value)
-
-const uniqueCities = computed(() => {
-  const cities = data.value.map(cafe => cafe.city)
-  return [...new Set(cities)]
-})
-
 const filteredData = computed(() => {
   return data.value.filter(cafe => {
-    return cafe.name.toLowerCase().includes(searchQuery.value.toLowerCase());
-  });
+    const matchesSearch = cafe.name.toLowerCase().includes(searchQuery.value.toLowerCase())
+    const matchesRating = activeFilters.value.rating.length === 0 || activeFilters.value.rating.includes(Math.round(cafe.rating))
+    const matchesRange = activeFilters.value.range.length === 0 || activeFilters.value.range.includes(cafe.price_range)
+    return matchesSearch && matchesRating && matchesRange
+  })
 })
 
-// Debugging: Log search query and filtered results
 watch(searchQuery, (newQuery) => {
   console.log('Search Query:', newQuery)
   console.log('Filtered Data:', filteredData.value)
@@ -134,6 +131,11 @@ const visiblePages = computed(() => {
   return pages
 })
 
+function handleImageError(event) {
+  event.target.src = '/src/assets/img/noImage_placeholder.webp' // Set a default image
+  console.error('Image failed to load:', event.target.src)
+}
+
 onMounted(async () => {
   const { $supabase } = useNuxtApp()
   const { data: supabaseData, error } = await $supabase
@@ -144,7 +146,6 @@ onMounted(async () => {
     console.error('Error fetching data:', error)
   } else {
     data.value = supabaseData
-    console.log('Cafe photos:', data.value.map(cafe => cafe.photo))
   }
   loading.value = false
 })
