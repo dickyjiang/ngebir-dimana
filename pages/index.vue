@@ -16,7 +16,7 @@
       </div>
     </div>
   </section>
-  <section id="main-content" class="flex sm:px-16">
+  <section id="main-content" class="flex sm:px-4">
     <div class="sticky top-0 w-full max-w-[20%] p-4 border-r border-gray-400 hidden md:block" style="height: 100vh; overflow-y: auto;">
       <Sidebar :activeFilters="activeFilters" :cities="uniqueCities" />
     </div>
