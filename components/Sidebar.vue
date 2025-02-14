@@ -1,0 +1,64 @@
+<template>
+    <aside>
+      <div class="w-full pb-2 border-b border-gray-400 mb-4">
+        <h2 class="text-lg font-medium">Filter</h2>
+      </div>
+      <div class="mb-8">
+        <h3 class="text-sm font-medium">Rating</h3>
+        <div class="flex flex-wrap gap-2 text-xs text-nowrap my-4">
+          <button v-for="rating in uniqueRatings" :key="rating" @click="toggleFilter('rating', rating)"
+            :class="{ 'bg-blue-500 text-white': activeFilters.rating.includes(rating), 'bg-none border border-gray-400': !activeFilters.rating.includes(rating) }"
+            class="px-3 py-2 rounded-full">
+            {{ rating }} Stars
+          </button>
+        </div>
+      </div>
+      <div class="mb-8">
+        <h3 class="text-sm font-medium">Price Range</h3>
+        <div class="flex flex-wrap gap-2 text-xs text-nowrap my-4">
+          <button v-for="range in uniqueRanges" :key="range" @click="toggleFilter('range', range)"
+            :class="{ 'bg-blue-500 text-white': activeFilters.range.includes(range), 'bg-none border border-gray-400 w-14': !activeFilters.range.includes(range) }"
+            class="px-3 py-2 rounded-full">
+            {{ range }}
+          </button>
+        </div>
+      </div>
+  
+      <div class="w-full pb-2 border-b border-gray-400">
+        <h2 class="text-lg font-medium">Tags</h2>
+      </div>
+      <div class="flex flex-wrap gap-2 text-xs text-nowrap my-4">
+        <button v-for="city in uniqueCities" :key="city" @click="toggleFilter('city', city)"
+          :class="{ 'bg-blue-500 text-white': activeFilters.city.includes(city), 'bg-gray-200': !activeFilters.city.includes(city) }"
+          class="px-4 py-2 rounded-full">
+          {{ city }}
+        </button>
+      </div>
+    </aside>
+  </template>
+  
+  <script setup>
+  import { ref, computed } from 'vue'
+  
+  const uniqueRatings = ref([1, 2, 3, 4, 5]) // Example data
+  const uniqueRanges = ref(['$', '$$', '$$$', '$$$$']) // Example data
+  const activeFilters = ref({ rating: [], city: [], range: [] })
+  
+  function toggleFilter(type, value) {
+    const index = activeFilters.value[type].indexOf(value)
+    if (index > -1) {
+      activeFilters.value[type].splice(index, 1)
+    } else {
+      activeFilters.value[type].push(value)
+    }
+  }
+  
+  const uniqueCities = computed(() => {
+    // This should be passed as a prop or computed from a shared state
+    return ['City1', 'City2', 'City3'] // Example data
+  })
+  </script>
+  
+  <style scoped>
+  /* Add any component-specific styles here */
+  </style>

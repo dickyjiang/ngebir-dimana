@@ -21,44 +21,10 @@
     </div>
   </section>
   <section id="main-content" class="flex px-16">
-    <aside class="sticky top-0 max-w-[20%] p-4 border-r-4 border-gray-800"
-      style="height: 100vh; overflow-y: auto;">
-      <div class="w-full pb-2 border-b border-gray-400 mb-4">
-        <h2 class="text-lg font-medium">Filter</h2>
-      </div>
-      <div class="mb-8">
-        <h3 class="text-sm font-medium">Rating</h3>
-        <div class="flex flex-wrap gap-2 text-xs text-nowrap my-4">
-          <button v-for="rating in uniqueRatings" :key="rating" @click="toggleFilter('rating', rating)"
-            :class="{ 'bg-blue-500 text-white': activeFilters.rating.includes(rating), 'bg-none border border-gray-400': !activeFilters.rating.includes(rating) }"
-            class="px-3 py-2 rounded-full">
-            {{ rating }} Stars
-          </button>
-        </div>
-      </div>
-      <div class="mb-8">
-        <h3 class="text-sm font-medium">Price Range</h3>
-        <div class="flex flex-wrap gap-2 text-xs text-nowrap my-4">
-          <button v-for="range in uniqueRanges" :key="range" @click="toggleFilter('range', range)"
-            :class="{ 'bg-blue-500 text-white': activeFilters.range.includes(range), 'bg-none border border-gray-400 w-14': !activeFilters.range.includes(range) }"
-            class="px-3 py-2 rounded-full">
-            {{ range }}
-          </button>
-        </div>
-      </div>
-
-      <div class="w-full pb-2 border-b border-gray-400">
-        <h2 class="text-lg font-medium">Tags</h2>
-      </div>
-      <div class="flex flex-wrap gap-2 text-xs text-nowrap my-4">
-        <button v-for="city in uniqueCities" :key="city" @click="toggleFilter('city', city)"
-          :class="{ 'bg-blue-500 text-white': activeFilters.city.includes(city), 'bg-gray-200': !activeFilters.city.includes(city) }"
-          class="px-4 py-2 rounded-full">
-          {{ city }}
-        </button>
-      </div>
-    </aside>
-    <div class="px-4 py-8">
+    <div class="sticky top-0 w-full max-w-[20%] p-4 border-r-4 border-gray-800" style="height: 100vh; overflow-y: auto;">
+      <Sidebar />
+    </div>
+    <div class="p-4">
       <div v-if="loading" class="text-center text-gray-500">Loading data...</div>
       <div v-else>
         <ul class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -106,6 +72,7 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { useNuxtApp } from '#app'
 import Navbar from '~/components/Navbar.vue'
+import Sidebar from '~/components/Sidebar.vue'
 
 const data = ref([])
 const loading = ref(true)
