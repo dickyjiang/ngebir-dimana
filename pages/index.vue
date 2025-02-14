@@ -99,7 +99,7 @@ const filteredData = computed(() => {
   return data.value.filter(cafe => {
     const matchesSearch = cafe.name.toLowerCase().includes(searchQuery.value.toLowerCase())
     const matchesRating = activeFilters.value.rating.length === 0 || activeFilters.value.rating.includes(Math.round(cafe.rating))
-    const matchesRange = activeFilters.value.range.length === 0 || activeFilters.value.range.includes(cafe.price_range)
+    const matchesRange = activeFilters.value.range.length === 0 || activeFilters.value.range.includes(cafe.range)
     return matchesSearch && matchesRating && matchesRange
   })
 })
