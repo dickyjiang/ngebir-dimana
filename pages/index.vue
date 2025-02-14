@@ -1,27 +1,27 @@
 <template>
-  <section id="hero" class="my-4">
-    <div class="container mx-auto rounded-2xl overflow-clip relative flex items-center justify-center">
-      <img class="object-cover object-center w-full max-h-96" src="/src/assets/img/hero.webp" alt="hero image" />
+  <section id="hero" class="my-4 px-4 h-[25svh] sm:h-[40svh]">
+    <div class="container mx-auto rounded-2xl overflow-clip relative flex items-center justify-center h-full">
+      <img class="object-cover object-center w-full h-full" src="/src/assets/img/hero.webp" alt="hero image" />
       <div class="absolute inset-0 bg-black opacity-55 z-10"></div>
       <div class="absolute z-20 flex flex-col items-center justify-center w-[80%] mx-auto h-full">
-        <h1 class="text-6xl text-white text-center font-medium tracking-wide mb-3">Ngopi di mana?</h1>
-        <h2 class="text-2xl tracking-wide text-white mb-4 text-center">Cafe's Directory</h2>
+        <h1 class="text-3xl sm:text-6xl text-white text-center font-medium tracking-wide mb-3">Ngopi di mana?</h1>
+        <h2 class="text-md sm:text-2xl tracking-wide text-white mb-4 text-center">Cafe's Directory</h2>
         <div class="mt-4 w-full flex flex-col gap-4 items-center justify-center">
           <div class="flex items-center gap-2 w-full max-w-lg">
             <input v-model="searchQuery" type="text" placeholder="Search cafes..."
-              class="border w-full max-w-md border-gray-600 rounded-lg p-3" />
-            <button class="border border-gray-200 text-white px-7 py-3 rounded-lg">Search</button>
+              class="text-sm sm: text-base border w-full max-w-md border-gray-600 rounded-lg p-2 sm:p-3" />
+            <button class="text-sm sm:text-base border border-gray-200 text-white px-7 sm:px-10 py-2 sm:py-3 rounded-lg">Search</button>
           </div>
-          <div class="flex items-center gap-2">
+          <!-- <div class="flex items-center gap-2">
             <button @click="toggleFilter('rating', 5)" class="border border-gray-200 text-white px-7 py-3 rounded-lg">5 Stars</button>
             <button @click="toggleFilter('range', '$$')" class="border border-gray-200 text-white px-7 py-3 rounded-lg">$$</button>
-          </div>
+          </div> -->
         </div>
       </div>
     </div>
   </section>
-  <section id="main-content" class="flex px-16">
-    <div class="sticky top-0 w-full max-w-[20%] p-4 border-r border-gray-400" style="height: 100vh; overflow-y: auto;">
+  <section id="main-content" class="flex sm:px-16">
+    <div class="sticky top-0 w-full max-w-[20%] p-4 border-r border-gray-400 hidden md:block" style="height: 100vh; overflow-y: auto;">
       <Sidebar :activeFilters="activeFilters" />
     </div>
     <div class="p-4">
