@@ -4,7 +4,7 @@
       <img class="object-cover object-center w-full max-h-96" src="/src/assets/img/hero.webp" alt="hero image" />
       <div class="absolute inset-0 bg-black opacity-55 z-10"></div>
       <div class="absolute z-20 flex flex-col items-center justify-center w-[80%] mx-auto h-full">
-        <h1 class="text-6xl text-white text-center font-medium tracking-wide mb-3">Ngopi Dimana?</h1>
+        <h1 class="text-6xl text-white text-center font-medium tracking-wide mb-3">Ngopi di mana?</h1>
         <h2 class="text-2xl tracking-wide text-white mb-4 text-center">Cafe's Directory</h2>
         <div class="mt-4 w-full flex flex-col gap-4 items-center justify-center">
           <div class="flex items-center gap-2 w-full max-w-lg">
@@ -27,7 +27,7 @@
     <div class="p-4">
       <div v-if="loading" class="text-center text-gray-500">Loading data...</div>
       <div v-else>
-        <ul class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <ul class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
           <li v-for="(cafe, index) in paginatedData" :key="index"
             class="rounded-md flex flex-col h-full pb-4 border overflow-hidden">
             <NuxtImg alt="Cafe Image" class="w-full h-48 object-cover mb-4" :src="cafe.photo"
