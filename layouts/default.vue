@@ -1,5 +1,5 @@
 <template>
-    <div class="flex flex-col min-h-screen">
+    <div class="flex flex-col min-h-screen px-2">
         <Nav />
       <div class="flex-1">
         <slot />

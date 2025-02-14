@@ -27,10 +27,10 @@
       <div class="w-full pb-2 border-b border-gray-400">
         <h2 class="text-lg font-medium">Tags</h2>
       </div>
-      <div class="flex flex-wrap gap-2 text-xs text-nowrap my-4">
+      <div class="flex flex-wrap gap-3 text-sm text-gray-500 text-nowrap my-4">
         <button v-for="city in uniqueCities" :key="city" @click="toggleFilter('city', city)"
-          :class="{ 'bg-blue-500 text-white': activeFilters.city.includes(city), 'bg-gray-200': !activeFilters.city.includes(city) }"
-          class="px-4 py-2 rounded-full">
+          :class="{ 'bg-gray-800 text-white': activeFilters.city.includes(city), 'bg-gray-100': !activeFilters.city.includes(city) }"
+          class="px-3 py-1 rounded-full">
           {{ city }}
         </button>
       </div>
@@ -38,10 +38,19 @@
   </template>
   
   <script setup>
-  import { ref, computed } from 'vue'
+  import { ref, computed, onMounted } from 'vue'
   
   const props = defineProps({
-    activeFilters: Object
+    activeFilters: Object,
+    cities: Array // Ensure this is declared
+  })
+  
+  onMounted(() => {
+    if (props.cities) {
+      console.log('Cities prop:', props.cities) // This should log the cities array
+    } else {
+      console.error('Cities prop is undefined')
+    }
   })
   
   const uniqueRatings = ref([1, 2, 3, 4, 5]) // Example data
@@ -57,8 +66,7 @@
   }
   
   const uniqueCities = computed(() => {
-    // This should be passed as a prop or computed from a shared state
-    return ['City1', 'City2', 'City3'] // Example data
+    return props.cities // Use the actual city names passed as a prop
   })
   </script>
   
