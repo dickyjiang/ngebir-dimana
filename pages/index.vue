@@ -4,25 +4,21 @@
       <img class="object-cover object-center w-full h-full" src="/src/assets/img/hero.webp" alt="hero image" />
       <div class="absolute inset-0 bg-black opacity-55 z-10"></div>
       <div class="absolute z-20 flex flex-col items-center justify-center w-[80%] mx-auto h-full">
-        <h1 class="text-3xl sm:text-6xl text-white text-center font-medium tracking-wide mb-3">Ngopi di mana?</h1>
-        <h2 class="text-md sm:text-2xl tracking-wide text-white mb-4 text-center">Cafe's Directory</h2>
+        <h1 class="text-3xl sm:text-6xl text-white text-center font-medium tracking-wide mb-4">Ngopi di mana?</h1>
+        <h2 class="text-md sm:text-xl tracking-wide text-white mb-4 text-center">{{ totalCafes }} Cafe's Directory</h2>
         <div class="mt-4 w-full flex flex-col gap-4 items-center justify-center">
           <div class="flex items-center gap-2 w-full max-w-lg">
             <input v-model="searchQuery" type="text" placeholder="Search cafes..."
               class="text-sm sm: text-base border w-full max-w-md border-gray-600 rounded-lg p-2 sm:p-3" />
-            <button class="text-sm sm:text-base border border-gray-200 text-white px-7 sm:px-10 py-2 sm:py-3 rounded-lg">Search</button>
+            <button @click="performSearch" class="text-sm sm:text-base border border-gray-200 text-white px-7 sm:px-10 py-2 sm:py-3 rounded-lg">Search</button>
           </div>
-          <!-- <div class="flex items-center gap-2">
-            <button @click="toggleFilter('rating', 5)" class="border border-gray-200 text-white px-7 py-3 rounded-lg">5 Stars</button>
-            <button @click="toggleFilter('range', '$$')" class="border border-gray-200 text-white px-7 py-3 rounded-lg">$$</button>
-          </div> -->
         </div>
       </div>
     </div>
   </section>
   <section id="main-content" class="flex sm:px-16">
     <div class="sticky top-0 w-full max-w-[20%] p-4 border-r border-gray-400 hidden md:block" style="height: 100vh; overflow-y: auto;">
-      <Sidebar :activeFilters="activeFilters" />
+      <Sidebar :activeFilters="activeFilters" :cities="uniqueCities" />
     </div>
     <div class="p-4">
       <div v-if="loading" class="text-center text-gray-500">Loading data...</div>
@@ -131,10 +127,22 @@ const visiblePages = computed(() => {
   return pages
 })
 
+// Add a computed property to calculate the total number of cafes
+const totalCafes = computed(() => data.value.length)
+
 function handleImageError(event) {
   event.target.src = '/src/assets/img/noImage_placeholder.webp' // Set a default image
   console.error('Image failed to load:', event.target.src)
 }
+
+function performSearch() {
+  console.log('Performing search with query:', searchQuery.value)
+}
+
+// Extract unique cities
+const uniqueCities = computed(() => {
+  return [...new Set(data.value.map(cafe => cafe.city))]
+})
 
 onMounted(async () => {
   const { $supabase } = useNuxtApp()
