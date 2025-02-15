@@ -26,27 +26,29 @@
         <ul class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
           <li v-for="(cafe, index) in paginatedData" :key="index"
             class="rounded-md flex flex-col h-full pb-4 border overflow-hidden">
-            <NuxtImg alt="Cafe Image" class="w-full h-48 object-cover mb-4" :src="cafe.photo"
-              @error="handleImageError" />
-            <div class="flex-1 flex-col px-4">
-              <h2 class="text-lg text-gray-800 leading-tight line-clamp-2 font-semibold">{{ cafe.name }}</h2>
-              <p class="text-sm text-gray-500 line-clamp-2 mt-2">{{ cafe.description }}</p>
-            </div>
-            <div class="flex justify-between px-4 mt-8">
-              <div class="flex items-center gap-1">
-                <img src="/src/assets/img/city.svg" alt="star" class="h-3">
-                <p class="text-gray-500 text-xs">{{ cafe.city }}</p>
+            <NuxtLink :to="`/cafes/${cafe.id}`">
+              <NuxtImg alt="Cafe Image" class="w-full h-48 object-cover mb-4" :src="cafe.photo"
+                @error="handleImageError" />
+              <div class="flex-1 flex-col px-4">
+                <h2 class="text-lg text-gray-800 leading-tight line-clamp-2 font-semibold">{{ cafe.name }}</h2>
+                <p class="text-sm text-gray-500 line-clamp-2 mt-2">{{ cafe.description }}</p>
               </div>
-              <div class="flex items-center gap-1 font-semibold">
-                <!-- <img src="/src/assets/img/rating.svg" alt="star" class="h-3"> -->
-                <p class="text-gray-500 text-xs">{{ cafe.range }}</p>
+              <div class="flex justify-between px-4 mt-8">
+                <div class="flex items-center gap-1">
+                  <img src="/src/assets/img/city.svg" alt="star" class="h-3">
+                  <p class="text-gray-500 text-xs">{{ cafe.city }}</p>
+                </div>
+                <div class="flex items-center gap-1 font-semibold">
+                  <!-- <img src="/src/assets/img/rating.svg" alt="star" class="h-3"> -->
+                  <p class="text-gray-500 text-xs">{{ cafe.range }}</p>
+                </div>
+                <div class="flex items-center gap-1">
+                  <img src="/src/assets/img/rating.svg" alt="star" class="h-3">
+                  <p class="text-gray-500 text-xs">{{ cafe.rating }}</p>
+                </div>
+                
               </div>
-              <div class="flex items-center gap-1">
-                <img src="/src/assets/img/rating.svg" alt="star" class="h-3">
-                <p class="text-gray-500 text-xs">{{ cafe.rating }}</p>
-              </div>
-              
-            </div>
+            </NuxtLink>
           </li>
         </ul>
         <div class="flex justify-center mt-4 space-x-2">
