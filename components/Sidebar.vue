@@ -25,7 +25,7 @@
       </div>
   
       <div class="w-full pb-2 border-b border-gray-400">
-        <h2 class="text-lg font-medium">Tags</h2>
+        <h2 class="text-lg font-medium">Lokasi</h2>
       </div>
       <div class="flex flex-wrap gap-3 text-sm text-gray-500 text-nowrap my-4">
         <button v-for="city in uniqueCities" :key="city" @click="toggleFilter('city', city)"
