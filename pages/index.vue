@@ -35,11 +35,10 @@
               </div>
               <div class="flex justify-between px-4 mt-8">
                 <div class="flex items-center gap-1">
-                  <img src="/src/assets/img/city.svg" alt="star" class="h-3">
+                  <img src="/src/assets/img/city.svg" alt="location" class="h-3">
                   <p class="text-gray-500 text-xs">{{ cafe.city }}</p>
                 </div>
                 <div class="flex items-center gap-1 font-semibold">
-                  <!-- <img src="/src/assets/img/rating.svg" alt="star" class="h-3"> -->
                   <p class="text-gray-500 text-xs">{{ cafe.range }}</p>
                 </div>
                 <div class="flex items-center gap-1">
