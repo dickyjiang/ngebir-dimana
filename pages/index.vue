@@ -4,7 +4,7 @@
       <img class="object-cover object-center w-full h-full" src="/src/assets/img/hero.webp" alt="hero image" />
       <div class="absolute inset-0 bg-black opacity-55 z-10"></div>
       <div class="absolute z-20 flex flex-col items-center justify-center w-[80%] mx-auto h-full">
-        <h1 class="text-3xl sm:text-6xl text-white text-center font-medium tracking-wide mb-4">Ngopi di mana?</h1>
+        <h1 class="text-3xl sm:text-5xl text-white text-center font-medium tracking-wide mb-4">Ngopi di mana?</h1>
         <h2 class="text-md sm:text-xl tracking-wide text-white mb-4 text-center">{{ totalCafes }} Cafe's Directory</h2>
         <div class="mt-4 w-full flex flex-col gap-4 items-center justify-center">
           <div class="flex items-center gap-2 w-full max-w-lg">
@@ -166,3 +166,18 @@ export default {
   layout: 'default'
 }
 </script>
+
+<style scoped>
+@font-face {
+  font-family: 'Sharp Grotesk';
+  src: url('~assets/fonts/sharp-grotesk-medium-25-regular.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+h1 {
+  font-family: 'Sharp Grotesk', sans-serif; /* Fallback to sans-serif */
+}
+
+/* ... existing styles ... */
+</style>
