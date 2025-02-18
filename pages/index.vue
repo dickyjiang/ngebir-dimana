@@ -156,9 +156,44 @@ onMounted(async () => {
     console.error('Error fetching data:', error)
   } else {
     data.value = supabaseData
+    getUserLocation()
   }
   loading.value = false
 })
+
+function getUserLocation() {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(position => {
+      const userLat = position.coords.latitude
+      const userLng = position.coords.longitude
+      sortCafesByDistance(userLat, userLng)
+    }, error => {
+      console.error('Error getting location:', error)
+    })
+  } else {
+    console.error('Geolocation is not supported by this browser.')
+  }
+}
+
+function sortCafesByDistance(userLat, userLng) {
+  data.value.sort((a, b) => {
+    const distanceA = calculateDistance(userLat, userLng, a.latitude, a.longitude)
+    const distanceB = calculateDistance(userLat, userLng, b.latitude, b.longitude)
+    return distanceA - distanceB
+  })
+}
+
+function calculateDistance(lat1, lon1, lat2, lon2) {
+  const R = 6371 // Radius of the Earth in km
+  const dLat = (lat2 - lat1) * Math.PI / 180
+  const dLon = (lon2 - lon1) * Math.PI / 180
+  const a = 
+    0.5 - Math.cos(dLat)/2 + 
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+    (1 - Math.cos(dLon))/2
+
+  return R * 2 * Math.asin(Math.sqrt(a))
+}
 </script>
 
 <script>
