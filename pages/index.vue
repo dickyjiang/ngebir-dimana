@@ -4,19 +4,23 @@
       <img class="object-cover object-center w-full h-full" src="/src/assets/img/hero.webp" alt="hero image" />
       <div class="absolute inset-0 bg-black opacity-55 z-10"></div>
       <div class="absolute z-20 flex flex-col items-center justify-center w-[80%] mx-auto h-full">
-        <h1 class="text-3xl sm:text-6xl text-white text-center font-medium tracking-wide mb-4">Ngopi di mana?</h1>
+        <h1 class="text-3xl sm:text-5xl text-white text-center font-medium tracking-wide mb-4">Ngopi di mana?</h1>
         <h2 class="text-md sm:text-xl tracking-wide text-white mb-4 text-center">{{ totalCafes }} Cafe's Directory</h2>
         <div class="mt-4 w-full flex flex-col gap-4 items-center justify-center">
           <div class="flex items-center gap-2 w-full max-w-lg">
             <input v-model="searchQuery" type="text" placeholder="Search cafes..."
-              class="text-sm sm: text-base border w-full max-w-md border-gray-600 rounded-lg p-2 sm:p-3" />
-            <button @click="performSearch" class="text-sm sm:text-base border border-gray-200 text-white px-7 sm:px-10 py-2 sm:py-3 rounded-lg">Search</button>
+              class="text-sm sm:text-base border w-full max-w-md border-gray-600 rounded-lg p-2 sm:p-3 pr-10" />
+            <div class="relative">
+              <button @click="performSearch" class="absolute right-6 top-1/2 transform -translate-y-1/2 text-gray-500">
+                <i class="fas fa-search"></i>
+              </button>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </section>
-  <section id="main-content" class="flex sm:px-16">
+  <section id="main-content" class="flex sm:px-4">
     <div class="sticky top-0 w-full max-w-[20%] p-4 border-r border-gray-400 hidden md:block" style="height: 100vh; overflow-y: auto;">
       <Sidebar :activeFilters="activeFilters" :cities="uniqueCities" />
     </div>
@@ -26,27 +30,28 @@
         <ul class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
           <li v-for="(cafe, index) in paginatedData" :key="index"
             class="rounded-md flex flex-col h-full pb-4 border overflow-hidden">
-            <NuxtImg alt="Cafe Image" class="w-full h-48 object-cover mb-4" :src="cafe.photo"
-              @error="handleImageError" />
-            <div class="flex-1 flex-col px-4">
-              <h2 class="text-lg text-gray-800 leading-tight line-clamp-2 font-semibold">{{ cafe.name }}</h2>
-              <p class="text-sm text-gray-500 line-clamp-2 mt-2">{{ cafe.description }}</p>
-            </div>
-            <div class="flex justify-between px-4 mt-8">
-              <div class="flex items-center gap-1">
-                <img src="/src/assets/img/city.svg" alt="star" class="h-3">
-                <p class="text-gray-500 text-xs">{{ cafe.city }}</p>
+            <NuxtLink :to="`/cafes/${cafe.id}`">
+              <NuxtImg alt="Cafe Image" class="w-full h-48 object-cover mb-4" :src="cafe.photo"
+                @error="handleImageError" />
+              <div class="flex-1 flex-col px-4">
+                <h2 class="text-lg text-gray-800 leading-tight line-clamp-2 font-semibold">{{ cafe.name }}</h2>
+                <p class="text-sm text-gray-500 line-clamp-2 mt-2">{{ cafe.description }}</p>
               </div>
-              <div class="flex items-center gap-1 font-semibold">
-                <!-- <img src="/src/assets/img/rating.svg" alt="star" class="h-3"> -->
-                <p class="text-gray-500 text-xs">{{ cafe.range }}</p>
+              <div class="flex justify-between px-4 mt-8">
+                <div class="flex items-center gap-1">
+                  <img src="/src/assets/img/city.svg" alt="location" class="h-3">
+                  <p class="text-gray-500 text-xs">{{ cafe.city }}</p>
+                </div>
+                <div class="flex items-center gap-1 font-semibold">
+                  <p class="text-gray-500 text-xs">{{ cafe.range }}</p>
+                </div>
+                <div class="flex items-center gap-1">
+                  <img src="/src/assets/img/rating.svg" alt="star" class="h-3">
+                  <p class="text-gray-500 text-xs">{{ cafe.rating }}</p>
+                </div>
+                
               </div>
-              <div class="flex items-center gap-1">
-                <img src="/src/assets/img/rating.svg" alt="star" class="h-3">
-                <p class="text-gray-500 text-xs">{{ cafe.rating }}</p>
-              </div>
-              
-            </div>
+            </NuxtLink>
           </li>
         </ul>
         <div class="flex justify-center mt-4 space-x-2">
@@ -72,6 +77,7 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { useNuxtApp } from '#app'
 import Sidebar from '~/components/Sidebar.vue'
+import '@fortawesome/fontawesome-free/css/all.css'
 
 const data = ref([])
 const loading = ref(true)
@@ -96,7 +102,8 @@ const filteredData = computed(() => {
     const matchesSearch = cafe.name.toLowerCase().includes(searchQuery.value.toLowerCase())
     const matchesRating = activeFilters.value.rating.length === 0 || activeFilters.value.rating.includes(Math.round(cafe.rating))
     const matchesRange = activeFilters.value.range.length === 0 || activeFilters.value.range.includes(cafe.range)
-    return matchesSearch && matchesRating && matchesRange
+    const matchesCity = activeFilters.value.city.length === 0 || activeFilters.value.city.includes(cafe.city)
+    return matchesSearch && matchesRating && matchesRange && matchesCity
   })
 })
 
@@ -154,9 +161,44 @@ onMounted(async () => {
     console.error('Error fetching data:', error)
   } else {
     data.value = supabaseData
+    getUserLocation()
   }
   loading.value = false
 })
+
+function getUserLocation() {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(position => {
+      const userLat = position.coords.latitude
+      const userLng = position.coords.longitude
+      sortCafesByDistance(userLat, userLng)
+    }, error => {
+      console.error('Error getting location:', error)
+    })
+  } else {
+    console.error('Geolocation is not supported by this browser.')
+  }
+}
+
+function sortCafesByDistance(userLat, userLng) {
+  data.value.sort((a, b) => {
+    const distanceA = calculateDistance(userLat, userLng, a.latitude, a.longitude)
+    const distanceB = calculateDistance(userLat, userLng, b.latitude, b.longitude)
+    return distanceA - distanceB
+  })
+}
+
+function calculateDistance(lat1, lon1, lat2, lon2) {
+  const R = 6371 // Radius of the Earth in km
+  const dLat = (lat2 - lat1) * Math.PI / 180
+  const dLon = (lon2 - lon1) * Math.PI / 180
+  const a = 
+    0.5 - Math.cos(dLat)/2 + 
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+    (1 - Math.cos(dLon))/2
+
+  return R * 2 * Math.asin(Math.sqrt(a))
+}
 </script>
 
 <script>
@@ -164,3 +206,18 @@ export default {
   layout: 'default'
 }
 </script>
+
+<style scoped>
+@font-face {
+  font-family: 'Sharp Grotesk';
+  src: url('~assets/fonts/sharp-grotesk-medium-25-regular.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+h1 {
+  font-family: 'Sharp Grotesk', sans-serif; /* Fallback to sans-serif */
+}
+
+/* ... existing styles ... */
+</style>
