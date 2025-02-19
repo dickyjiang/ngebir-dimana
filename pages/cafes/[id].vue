@@ -29,7 +29,20 @@
             <p class="text-lg text-gray-700 my-2">{{ cafe.description }}</p>
             <div class="flex flex-col ">
               <p>Working Hours</p>
-              <p class="text-sm text-gray-700 my-2">{{ cafe.working_hours_old_format }}</p>
+              <table class="min-w-full border-collapse border border-gray-300 text-sm mt-2">
+                <thead>
+                  <tr>
+                    <th class="border border-gray-300 px-4 py-2">Day</th>
+                    <th class="border border-gray-300 px-4 py-2">Hours</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="(hours, day) in JSON.parse(cafe.working_hours)" :key="day">
+                    <td class="border border-gray-300 px-4 py-2">{{ day }}</td>
+                    <td class="border border-gray-300 px-4 py-2">{{ hours }}</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
             <div class="flex items-center gap-2 py-2">
               <button class="text-gray-500 border border-gray-500 px-2 py-1 text-sm rounded-full">
