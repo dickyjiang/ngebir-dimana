@@ -9,8 +9,12 @@
         <div class="mt-4 w-full flex flex-col gap-4 items-center justify-center">
           <div class="flex items-center gap-2 w-full max-w-lg">
             <input v-model="searchQuery" type="text" placeholder="Search cafes..."
-              class="text-sm sm: text-base border w-full max-w-md border-gray-600 rounded-lg p-2 sm:p-3" />
-            <button @click="performSearch" class="text-sm sm:text-base border border-gray-200 text-white px-7 sm:px-10 py-2 sm:py-3 rounded-lg">Search</button>
+              class="text-sm sm:text-base border w-full max-w-md border-gray-600 rounded-lg p-2 sm:p-3 pr-10" />
+            <div class="relative">
+              <button @click="performSearch" class="absolute right-6 top-1/2 transform -translate-y-1/2 text-gray-500">
+                <i class="fas fa-search"></i>
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -73,6 +77,7 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { useNuxtApp } from '#app'
 import Sidebar from '~/components/Sidebar.vue'
+import '@fortawesome/fontawesome-free/css/all.css'
 
 const data = ref([])
 const loading = ref(true)
