@@ -10,7 +10,7 @@
           <NuxtImg
             :src="cafe.photo"
             alt="Cafe Image"
-            class="w-full h-64 object-cover mb-4"
+            class="w-full h-64 object-cover mb-4 rounded-lg"
           />
           <div class="px-4">
             <div
@@ -70,18 +70,18 @@
                 </tbody>
               </table>
             </div>
-            <div class="flex items-center gap-2 py-2">
-              <button
-                class="text-gray-500 border border-gray-500 px-2 py-1 text-sm rounded-full"
-              >
-                <p>{{ cafe.borough }}</p>
-              </button>
-              <!-- Repeat buttons for other boroughs if necessary -->
-            </div>
           </div>
         </div>
         <div class="w-1/2">
-          <div>
+          <div class="flex items-center gap-2 py-4 border-b border-gray-500">
+            <button
+              class="text-gray-500 border border-gray-500 px-2 py-1 text-sm rounded-full"
+            >
+              <p>{{ cafe.borough }}</p>
+            </button>
+            <!-- Repeat buttons for other boroughs if necessary -->
+          </div>
+          <div class="py-4">
             <div v-if="about && Object.keys(about).length">
               <div class="flex flex-wrap gap-2">
                 <p
@@ -148,6 +148,46 @@
                     }}
                   </p>
                 </div>
+              <div
+                v-if="about.Highlights['Live music']"
+                class="px-3 py-2 flex text-white text-xs items-center gap-2 border rounded-full border-gray-300 bg-blue-500"
+              >
+                <p>
+                  {{ about.Highlights["Live music"] ? "Live music" : "" }}
+                </p>
+              </div>
+              <div
+                v-if="about.Highlights['Live performances']"
+                class="px-3 py-2 flex text-white text-xs items-center gap-2 border rounded-full border-gray-300 bg-blue-500"
+              >
+                <p>
+                  {{ about.Highlights["Live performances"] ? "Live performances" : "" }}
+                </p>
+              </div>
+              <div
+                v-if="about.Payments['Credit cards']"
+                class="px-3 py-2 flex text-white text-xs items-center gap-2 border rounded-full border-gray-300 bg-blue-500"
+              >
+                <p>
+                  {{ about.Payments["Credit cards"] ? "Credit cards" : "" }}
+                </p>
+              </div>
+              <div
+                v-if="about.Payments['Debit cards']"
+                class="px-3 py-2 flex text-white text-xs items-center gap-2 border rounded-full border-gray-300 bg-blue-500"
+              >
+                <p>
+                  {{ about.Payments["Debit cards"] ? "Debit cards" : "" }}
+                </p>
+              </div>
+              <div
+                v-if="about.Payments['NFC mobile payments']"
+                class="px-3 py-2 flex text-white text-xs items-center gap-2 border rounded-full border-gray-300 bg-blue-500"
+              >
+                <p>
+                  {{ about.Payments["NFC mobile payments"] ? "NFC mobile payments" : "" }}
+                </p>
+              </div>
               </div>
             </div>
             <div v-else>
