@@ -20,6 +20,18 @@
       </div>
     </div>
   </section>
+  <section id="popular-categories">
+    <div class="container mx-auto py-4">
+      <h2 class="text-center text-2xl font-bold">
+        Popular Categories
+      </h2> 
+      <div class="flex items-center justify-center flex-wrap gap-4 py-4">
+        <div v-for="category in popularCategories" :key="category" class="bg-gray-200 px-4 py-2 rounded-full text-sm">
+          {{ category }}
+        </div>
+      </div>
+    </div>
+  </section>
   <section id="main-content" class="flex sm:px-4">
     <div class="sticky top-0 w-full max-w-[20%] p-4 border-r border-gray-400 hidden md:block" style="height: 100vh; overflow-y: auto;">
       <Sidebar :activeFilters="activeFilters" :cities="uniqueCities" />
@@ -147,6 +159,26 @@ function performSearch() {
 // Extract unique cities
 const uniqueCities = computed(() => {
   return [...new Set(data.value.map(cafe => cafe.city))]
+})
+
+// Extract popular categories from the about field
+const popularCategories = computed(() => {
+  const categories = new Set()
+  data.value.forEach(cafe => {
+    if (cafe.about) {
+      const about = typeof cafe.about === 'string' ? JSON.parse(cafe.about) : cafe.about
+      Object.keys(about).forEach(key => {
+        if (typeof about[key] === 'object') {
+          Object.keys(about[key]).forEach(subKey => {
+            if (about[key][subKey]) {
+              categories.add(subKey)
+            }
+          })
+        }
+      })
+    }
+  })
+  return Array.from(categories)
 })
 
 async function fetchCafes(page) {
