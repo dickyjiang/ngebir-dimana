@@ -80,76 +80,75 @@
             </div>
           </div>
         </div>
-        <div class="w-1/2 bg-gray-100">
+        <div class="w-1/2">
           <div>
-            <p>About</p>
             <div v-if="about && Object.keys(about).length">
-              <table class="min-w-full border-collapse border border-gray-300 text-sm mt-2">
-                <thead>
-                  <tr>
-                    <th class="border border-gray-300 px-4 py-2">Property</th>
-                    <th class="border border-gray-300 px-4 py-2">Value</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td class="border border-gray-300 px-4 py-2">Crowd - Groups</td>
-                    <td class="border border-gray-300 px-4 py-2">{{ about.Crowd.Groups ? "Yes" : "No" }}</td>
-                  </tr>
-                  <tr>
-                    <td class="border border-gray-300 px-4 py-2">Children - Good for kids</td>
-                    <td class="border border-gray-300 px-4 py-2">{{ about.Children["Good for kids"] ? "Yes" : "No" }}</td>
-                  </tr>
-                  <tr>
-                    <td class="border border-gray-300 px-4 py-2">Planning - Accepts reservations</td>
-                    <td class="border border-gray-300 px-4 py-2">{{ about.Planning["Accepts reservations"] ? "Yes" : "No" }}</td>
-                  </tr>
-                  <tr>
-                    <td class="border border-gray-300 px-4 py-2">Amenities - Toilets</td>
-                    <td class="border border-gray-300 px-4 py-2">{{ about.Amenities.Toilets ? "Yes" : "No" }}</td>
-                  </tr>
-                  <tr>
-                    <td class="border border-gray-300 px-4 py-2">Service options - Outdoor seating</td>
-                    <td class="border border-gray-300 px-4 py-2">{{ about["Service options"]["Outdoor seating"] ? "Yes" : "No" }}</td>
-                  </tr>
-                  <tr>
-                    <td class="border border-gray-300 px-4 py-2">Service options - Takeaway</td>
-                    <td class="border border-gray-300 px-4 py-2">{{ about["Service options"].Takeaway ? "Yes" : "No" }}</td>
-                  </tr>
-                  <tr>
-                    <td class="border border-gray-300 px-4 py-2">Service options - Dine-in</td>
-                    <td class="border border-gray-300 px-4 py-2">{{ about["Service options"]["Dine-in"] ? "Yes" : "No" }}</td>
-                  </tr>
-                  <tr>
-                    <td class="border border-gray-300 px-4 py-2">Accessibility - Wheelchair-accessible car park</td>
-                    <td class="border border-gray-300 px-4 py-2">{{ about.Accessibility["Wheelchair-accessible car park"] ? "Yes" : "No" }}</td>
-                  </tr>
-                  <tr>
-                    <td class="border border-gray-300 px-4 py-2">Accessibility - Wheelchair-accessible entrance</td>
-                    <td class="border border-gray-300 px-4 py-2">{{ about.Accessibility["Wheelchair-accessible entrance"] ? "Yes" : "No" }}</td>
-                  </tr>
-                  <tr>
-                    <td class="border border-gray-300 px-4 py-2">Accessibility - Wheelchair-accessible seating</td>
-                    <td class="border border-gray-300 px-4 py-2">{{ about.Accessibility["Wheelchair-accessible seating"] ? "Yes" : "No" }}</td>
-                  </tr>
-                  <tr>
-                    <td class="border border-gray-300 px-4 py-2">Offerings - Coffee</td>
-                    <td class="border border-gray-300 px-4 py-2">{{ about.Offerings.Coffee ? "Yes" : "No" }}</td>
-                  </tr>
-                  <tr>
-                    <td class="border border-gray-300 px-4 py-2">Dining options - Seating</td>
-                    <td class="border border-gray-300 px-4 py-2">{{ about["Dining options"].Seating ? "Yes" : "No" }}</td>
-                  </tr>
-                  <tr>
-                    <td class="border border-gray-300 px-4 py-2">Atmosphere - Casual</td>
-                    <td class="border border-gray-300 px-4 py-2">{{ about.Atmosphere.Casual ? "Yes" : "No" }}</td>
-                  </tr>
-                  <tr>
-                    <td class="border border-gray-300 px-4 py-2">Atmosphere - Cosy</td>
-                    <td class="border border-gray-300 px-4 py-2">{{ about.Atmosphere.Cosy ? "Yes" : "No" }}</td>
-                  </tr>
-                </tbody>
-              </table>
+              <div class="flex flex-wrap gap-2">
+                <p
+                  v-if="about.Accessibility['Wheelchair-accessible entrance']"
+                  class="px-3 py-2 flex text-white text-xs items-center gap-2 border rounded-full border-gray-300 bg-blue-500"
+                >
+                  Wheelchair-accessible
+                </p>
+                <p
+                  v-else
+                  class="px-3 py-2 flex text-xs text-center text-red-500 items-center gap-2 rounded-full border border-red-500"
+                >
+                  No Wheelchair-accessible
+                </p>
+                <div
+                  v-if="about.Atmosphere.Casual"
+                  class="px-3 py-2 flex text-white text-xs items-center gap-2 border rounded-full border-gray-300 bg-blue-500"
+                >
+                  Casual
+                </div>
+                <div
+                  v-if="about.Atmosphere.Cosy"
+                  class="px-3 py-2 flex text-white text-xs items-center gap-2 border rounded-full border-gray-300 bg-blue-500"
+                >
+                  Cosy
+                </div>
+                <div
+                  v-if="about['Service options'].Takeaway"
+                  class="px-3 py-2 flex text-white text-xs items-center gap-2 border rounded-full border-gray-300 bg-blue-500"
+                >
+                  Takeaway
+                </div>
+                <div
+                  v-if="about['Service options']['Outdoor seating']"
+                  class="px-3 py-2 flex text-white text-xs items-center gap-2 border rounded-full border-gray-300 bg-blue-500"
+                >
+                  Outdoor seating
+                </div>
+                <div
+                  v-if="about.Children['Good for kids']"
+                  class="px-3 py-2 flex text-white text-xs items-center gap-2 border rounded-full border-gray-300 bg-blue-500"
+                >
+                  <p>
+                    {{ about.Children["Good for kids"] ? "kids Friendly" : "" }}
+                  </p>
+                </div>
+                <div
+                  v-if="about.Offerings.Coffee"
+                  class="px-3 py-2 flex text-white text-xs items-center gap-2 border-b rounded-full border-gray-300 bg-blue-500"
+                >
+                  <p>
+                    {{ about.Offerings.Coffee ? "Coffee" : "" }}
+                  </p>
+                </div>
+                <div
+                  v-if="about.Planning['Accepts reservations']"
+                  class="px-3 py-2 flex text-white text-xs items-center gap-2 border-b rounded-full border-gray-300 bg-blue-500"
+                >
+                  <p>
+                    {{
+                      about.Planning["Accepts reservations"]
+                        ? "Accepts reservations"
+                        : ""
+                    }}
+                  </p>
+                </div>
+              </div>
             </div>
             <div v-else>
               <p>No information available.</p>
@@ -196,7 +195,8 @@ const loading = ref(true);
 const about = ref({});
 
 // New JSON string to be added to the About section
-const additionalAboutData = "{\"Service options\": {\"Outdoor seating\": true, \"Takeaway\": true, \"Dine-in\": true}, \"Accessibility\": {\"Wheelchair-accessible car park\": false, \"Wheelchair-accessible entrance\": false, \"Wheelchair-accessible seating\": false}, \"Offerings\": {\"Coffee\": true}, \"Dining options\": {\"Seating\": true}, \"Amenities\": {\"Toilets\": true}, \"Atmosphere\": {\"Casual\": true, \"Cosy\": true}, \"Crowd\": {\"Groups\": true}, \"Children\": {\"Good for kids\": true}}";
+const additionalAboutData =
+  '{"Service options": {"Outdoor seating": true, "Takeaway": true, "Dine-in": true}, "Accessibility": {"Wheelchair-accessible car park": false, "Wheelchair-accessible entrance": false, "Wheelchair-accessible seating": false}, "Offerings": {"Coffee": true}, "Dining options": {"Seating": true}, "Amenities": {"Toilets": true}, "Atmosphere": {"Casual": true, "Cosy": true}, "Crowd": {"Groups": true}, "Children": {"Good for kids": true}}';
 
 onMounted(async () => {
   console.log("Route ID:", route.params.id);
@@ -214,7 +214,7 @@ onMounted(async () => {
     cafe.value = cafeData;
 
     // Check if cafeData.about is a string and parse it if necessary
-    if (typeof cafeData.about === 'string') {
+    if (typeof cafeData.about === "string") {
       about.value = JSON.parse(cafeData.about);
     } else {
       about.value = cafeData.about; // Assume it's already an object
