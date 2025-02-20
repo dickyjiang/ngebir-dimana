@@ -85,7 +85,7 @@
             <div v-if="about && Object.keys(about).length">
               <div class="flex flex-wrap gap-2">
                 <p
-                  v-if="about.Accessibility['Wheelchair-accessible entrance']"
+                  v-if="about.Accessibility?.['Wheelchair-accessible entrance']"
                   class="px-3 py-2 flex text-white text-xs items-center gap-2 border rounded-full border-gray-300 bg-blue-500"
                 >
                   Wheelchair-accessible
@@ -97,97 +97,97 @@
                   No Wheelchair-accessible
                 </p>
                 <div
-                  v-if="about.Atmosphere.Casual"
+                  v-if="about.Atmosphere?.Casual"
                   class="px-3 py-2 flex text-white text-xs items-center gap-2 border rounded-full border-gray-300 bg-blue-500"
                 >
                   Casual
                 </div>
                 <div
-                  v-if="about.Atmosphere.Cosy"
+                  v-if="about.Atmosphere?.Cosy"
                   class="px-3 py-2 flex text-white text-xs items-center gap-2 border rounded-full border-gray-300 bg-blue-500"
                 >
                   Cosy
                 </div>
                 <div
-                  v-if="about['Service options'].Takeaway"
+                  v-if="about['Service options']?.Takeaway"
                   class="px-3 py-2 flex text-white text-xs items-center gap-2 border rounded-full border-gray-300 bg-blue-500"
                 >
                   Takeaway
                 </div>
                 <div
-                  v-if="about['Service options']['Outdoor seating']"
+                  v-if="about['Service options']?.['Outdoor seating']"
                   class="px-3 py-2 flex text-white text-xs items-center gap-2 border rounded-full border-gray-300 bg-blue-500"
                 >
                   Outdoor seating
                 </div>
                 <div
-                  v-if="about.Children['Good for kids']"
+                  v-if="about.Children?.['Good for kids']"
                   class="px-3 py-2 flex text-white text-xs items-center gap-2 border rounded-full border-gray-300 bg-blue-500"
                 >
                   <p>
-                    {{ about.Children["Good for kids"] ? "kids Friendly" : "" }}
+                    {{ about.Children?.["Good for kids"] ? "kids Friendly" : "" }}
                   </p>
                 </div>
                 <div
-                  v-if="about.Offerings.Coffee"
+                  v-if="about.Offerings?.Coffee"
                   class="px-3 py-2 flex text-white text-xs items-center gap-2 border-b rounded-full border-gray-300 bg-blue-500"
                 >
                   <p>
-                    {{ about.Offerings.Coffee ? "Coffee" : "" }}
+                    {{ about.Offerings?.Coffee ? "Coffee" : "" }}
                   </p>
                 </div>
                 <div
-                  v-if="about.Planning['Accepts reservations']"
+                  v-if="about.Planning?.['Accepts reservations']"
                   class="px-3 py-2 flex text-white text-xs items-center gap-2 border-b rounded-full border-gray-300 bg-blue-500"
                 >
                   <p>
                     {{
-                      about.Planning["Accepts reservations"]
+                      about.Planning?.["Accepts reservations"]
                         ? "Accepts reservations"
                         : ""
                     }}
                   </p>
                 </div>
-              <div
-                v-if="about.Highlights['Live music']"
-                class="px-3 py-2 flex text-white text-xs items-center gap-2 border rounded-full border-gray-300 bg-blue-500"
-              >
-                <p>
-                  {{ about.Highlights["Live music"] ? "Live music" : "" }}
-                </p>
-              </div>
-              <div
-                v-if="about.Highlights['Live performances']"
-                class="px-3 py-2 flex text-white text-xs items-center gap-2 border rounded-full border-gray-300 bg-blue-500"
-              >
-                <p>
-                  {{ about.Highlights["Live performances"] ? "Live performances" : "" }}
-                </p>
-              </div>
-              <div
-                v-if="about.Payments['Credit cards']"
-                class="px-3 py-2 flex text-white text-xs items-center gap-2 border rounded-full border-gray-300 bg-blue-500"
-              >
-                <p>
-                  {{ about.Payments["Credit cards"] ? "Credit cards" : "" }}
-                </p>
-              </div>
-              <div
-                v-if="about.Payments['Debit cards']"
-                class="px-3 py-2 flex text-white text-xs items-center gap-2 border rounded-full border-gray-300 bg-blue-500"
-              >
-                <p>
-                  {{ about.Payments["Debit cards"] ? "Debit cards" : "" }}
-                </p>
-              </div>
-              <div
-                v-if="about.Payments['NFC mobile payments']"
-                class="px-3 py-2 flex text-white text-xs items-center gap-2 border rounded-full border-gray-300 bg-blue-500"
-              >
-                <p>
-                  {{ about.Payments["NFC mobile payments"] ? "NFC mobile payments" : "" }}
-                </p>
-              </div>
+                <div
+                  v-if="about.Highlights?.['Live music']"
+                  class="px-3 py-2 flex text-white text-xs items-center gap-2 border rounded-full border-gray-300 bg-blue-500"
+                >
+                  <p>
+                    {{ about.Highlights?.["Live music"] ? "Live music" : "" }}
+                  </p>
+                </div>
+                <div
+                  v-if="about.Highlights?.['Live performances']"
+                  class="px-3 py-2 flex text-white text-xs items-center gap-2 border rounded-full border-gray-300 bg-blue-500"
+                >
+                  <p>
+                    {{ about.Highlights?.["Live performances"] ? "Live performances" : "" }}
+                  </p>
+                </div>
+                <div
+                  v-if="about.Payments?.['Credit cards']"
+                  class="px-3 py-2 flex text-white text-xs items-center gap-2 border rounded-full border-gray-300 bg-blue-500"
+                >
+                  <p>
+                    {{ about.Payments?.["Credit cards"] ? "Credit cards" : "" }}
+                  </p>
+                </div>
+                <div
+                  v-if="about.Payments?.['Debit cards']"
+                  class="px-3 py-2 flex text-white text-xs items-center gap-2 border rounded-full border-gray-300 bg-blue-500"
+                >
+                  <p>
+                    {{ about.Payments?.["Debit cards"] ? "Debit cards" : "" }}
+                  </p>
+                </div>
+                <div
+                  v-if="about.Payments?.['NFC mobile payments']"
+                  class="px-3 py-2 flex text-white text-xs items-center gap-2 border rounded-full border-gray-300 bg-blue-500"
+                >
+                  <p>
+                    {{ about.Payments?.["NFC mobile payments"] ? "NFC mobile payments" : "" }}
+                  </p>
+                </div>
               </div>
             </div>
             <div v-else>
