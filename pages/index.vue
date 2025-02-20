@@ -55,15 +55,15 @@
           </li>
         </ul>
         <div class="flex justify-center mt-4 space-x-2">
-          <span v-if="currentPage > 1" @click="currentPage--" class="cursor-pointer text-blue-500 hover:underline">
+          <span v-if="currentPage > 1" @click="changePage(currentPage - 1)" class="cursor-pointer text-blue-500 hover:underline">
             Previous
           </span>
-          <span v-for="page in visiblePages" :key="page" @click="currentPage = page"
+          <span v-for="page in visiblePages" :key="page" @click="changePage(page)"
             :class="{ 'font-bold text-blue-500': currentPage === page, 'text-gray-700': currentPage !== page }"
             class="cursor-pointer hover:underline">
             {{ page }}
           </span>
-          <span v-if="currentPage < totalPages" @click="currentPage++"
+          <span v-if="currentPage < totalPages" @click="changePage(currentPage + 1)"
             class="cursor-pointer text-blue-500 hover:underline">
             Next
           </span>
@@ -113,13 +113,11 @@ watch(searchQuery, (newQuery) => {
 })
 
 const paginatedData = computed(() => {
-  const start = (currentPage.value - 1) * itemsPerPage
-  const end = start + itemsPerPage
-  return filteredData.value.slice(start, end)
+  return filteredData.value
 })
 
 const totalPages = computed(() => {
-  return Math.ceil(filteredData.value.length / itemsPerPage)
+  return Math.ceil(totalCafes.value / itemsPerPage)
 })
 
 const visiblePages = computed(() => {
@@ -135,7 +133,7 @@ const visiblePages = computed(() => {
 })
 
 // Add a computed property to calculate the total number of cafes
-const totalCafes = computed(() => data.value.length)
+const totalCafes = ref(0)
 
 function handleImageError(event) {
   event.target.src = '/src/assets/img/noImage_placeholder.webp' // Set a default image
@@ -151,54 +149,36 @@ const uniqueCities = computed(() => {
   return [...new Set(data.value.map(cafe => cafe.city))]
 })
 
-onMounted(async () => {
+async function fetchCafes(page) {
+  loading.value = true
   const { $supabase } = useNuxtApp()
-  const { data: supabaseData, error } = await $supabase
+  const from = (page - 1) * itemsPerPage
+  const to = from + itemsPerPage - 1
+
+  const { data: supabaseData, error, count } = await $supabase
     .from('cafes')
-    .select('*')
+    .select('*', { count: 'exact' })
+    .range(from, to)
 
   if (error) {
     console.error('Error fetching data:', error)
   } else {
     data.value = supabaseData
-    getUserLocation()
+    totalCafes.value = count
   }
   loading.value = false
-})
+}
 
-function getUserLocation() {
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(position => {
-      const userLat = position.coords.latitude
-      const userLng = position.coords.longitude
-      sortCafesByDistance(userLat, userLng)
-    }, error => {
-      console.error('Error getting location:', error)
-    })
-  } else {
-    console.error('Geolocation is not supported by this browser.')
+function changePage(page) {
+  if (page >= 1 && page <= totalPages.value) {
+    currentPage.value = page
+    fetchCafes(page)
   }
 }
 
-function sortCafesByDistance(userLat, userLng) {
-  data.value.sort((a, b) => {
-    const distanceA = calculateDistance(userLat, userLng, a.latitude, a.longitude)
-    const distanceB = calculateDistance(userLat, userLng, b.latitude, b.longitude)
-    return distanceA - distanceB
-  })
-}
-
-function calculateDistance(lat1, lon1, lat2, lon2) {
-  const R = 6371 // Radius of the Earth in km
-  const dLat = (lat2 - lat1) * Math.PI / 180
-  const dLon = (lon2 - lon1) * Math.PI / 180
-  const a = 
-    0.5 - Math.cos(dLat)/2 + 
-    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
-    (1 - Math.cos(dLon))/2
-
-  return R * 2 * Math.asin(Math.sqrt(a))
-}
+onMounted(() => {
+  fetchCafes(currentPage.value)
+})
 </script>
 
 <script>
