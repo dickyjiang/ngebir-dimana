@@ -1,7 +1,10 @@
 <template>
   <div class="container mx-auto p-4">
-    <div v-if="loading" class="text-center text-gray-500">
-      Loading cafe details...
+    <div v-if="loading" class="flex flex-col gap-4">
+      <div class="skeleton skeleton-image"></div>
+      <div class="skeleton skeleton-text"></div>
+      <div class="skeleton skeleton-text"></div>
+      <div class="skeleton skeleton-text"></div>
     </div>
     <div v-else-if="cafe">
       <h1 class="text-4xl font-bold mb-4">{{ cafe.name }}</h1>
@@ -269,3 +272,35 @@ onMounted(async () => {
   loading.value = false;
 });
 </script>
+
+<style scoped>
+.skeleton {
+  background-color: #e0e0e0;
+  border-radius: 4px;
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.skeleton-text {
+  height: 1em;
+  margin-bottom: 0.5em;
+  width: 80%;
+}
+
+.skeleton-image {
+  height: 200px;
+  width: 100%;
+  margin-bottom: 1em;
+}
+</style>
