@@ -20,7 +20,7 @@
       </div>
     </div>
   </section>
-  <section id="popular-categories">
+  <!-- <section id="popular-categories">
     <div class="container mx-auto py-4">
       <h2 class="text-center text-2xl font-bold">
         Popular Categories
@@ -31,13 +31,21 @@
         </div>
       </div>
     </div>
-  </section>
+  </section> -->
   <section id="main-content" class="flex sm:px-4">
     <div class="sticky top-0 w-full max-w-[20%] p-4 border-r border-gray-400 hidden md:block" style="height: 100vh; overflow-y: auto;">
       <Sidebar :activeFilters="activeFilters" :cities="uniqueCities" />
     </div>
-    <div class="p-4">
-      <div v-if="loading" class="text-center text-gray-500">Loading data...</div>
+    <div class="p-4 flex-1">
+      <div v-if="loading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+        <div v-for="n in itemsPerPage" :key="n" class="rounded-md flex flex-col h-full pb-4 border overflow-hidden">
+          <div class="skeleton skeleton-image"></div>
+          <div class="flex-1 flex-col px-4">
+            <div class="skeleton skeleton-text"></div>
+            <div class="skeleton skeleton-text"></div>
+          </div>
+        </div>
+      </div>
       <div v-else>
         <ul class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
           <li v-for="(cafe, index) in paginatedData" :key="index"
@@ -61,7 +69,6 @@
                   <img src="/src/assets/img/rating.svg" alt="star" class="h-3">
                   <p class="text-gray-500 text-xs">{{ cafe.rating }}</p>
                 </div>
-                
               </div>
             </NuxtLink>
           </li>
@@ -232,4 +239,34 @@ h1 {
 }
 
 /* ... existing styles ... */
+
+.skeleton {
+  background-color: #e0e0e0;
+  border-radius: 4px;
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.skeleton-text {
+  height: 1em;
+  margin-bottom: 0.5em;
+  width: 80%; /* Adjust width for better appearance */
+}
+
+.skeleton-image {
+  height: 150px; /* Adjust height to match your design */
+  width: 100%;
+  margin-bottom: 1em;
+}
 </style>
