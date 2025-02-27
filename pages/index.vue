@@ -20,20 +20,9 @@
       </div>
     </div>
   </section>
-  <!-- <section id="popular-categories">
-    <div class="container mx-auto py-4">
-      <h2 class="text-center text-2xl font-bold">
-        Popular Categories
-      </h2> 
-      <div class="flex items-center justify-center flex-wrap gap-4 py-4">
-        <div v-for="category in popularCategories" :key="category" class="bg-gray-200 px-4 py-2 rounded-full text-sm">
-          {{ category }}
-        </div>
-      </div>
-    </div>
-  </section> -->
+  <PopularCategories class="hidden" :categories="popularCategories" />
   <section id="main-content" class="flex sm:px-4">
-    <div class="sticky top-0 w-full max-w-[20%] p-4 border-r border-gray-400 hidden md:block" style="height: 100vh; overflow-y: auto;">
+    <div class="sticky top-4 w-full max-w-[20%] p-4 border border-gray-400 hidden md:block" style="height: 100vh; overflow-y: auto;">
       <Sidebar :activeFilters="activeFilters" :cities="uniqueCities" />
     </div>
     <div class="p-4 flex-1">
@@ -96,6 +85,7 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { useNuxtApp } from '#app'
 import Sidebar from '~/components/Sidebar.vue'
+import PopularCategories from '~/components/PopularCategories.vue'
 import '@fortawesome/fontawesome-free/css/all.css'
 
 const data = ref([])

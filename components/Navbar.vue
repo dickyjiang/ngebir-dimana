@@ -1,7 +1,7 @@
 <template>
-    <div class="flex items-center justify-between w-full p-2 max-w-7xl mx-auto bg-white border-t-4 border-b-4 border-gray-800 my-2">
+    <div class="flex items-center justify-between w-full p-2 max-w-7xl mx-auto bg-white border-t-2 border-b-2 border-gray-800 my-2">
       <a href="/">
-        <img src="/src/assets/img/logo_ndm.svg" alt="logo" class="h-8">
+        <img src="/src/assets/img/logo_ndm.svg" alt="logo" class="h-6">
       </a>
 
 

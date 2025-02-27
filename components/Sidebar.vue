@@ -1,5 +1,5 @@
 <template>
-    <aside>
+    <aside class="w-full">
       <div class="w-full pb-2 border-b border-gray-400 mb-4">
         <h2 class="text-lg font-medium">Filter</h2>
       </div>
