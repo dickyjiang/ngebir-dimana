@@ -23,7 +23,12 @@
   <PopularCategories class="hidden" :categories="popularCategories" />
   <section id="main-content" class="flex sm:px-4">
     <div class="sticky top-4 w-full max-w-[20%] p-4 border border-gray-400 hidden md:block" style="height: 100vh; overflow-y: auto;">
-      <Sidebar :activeFilters="activeFilters" :cities="uniqueCities" />
+      <Sidebar 
+        :activeFilters="activeFilters" 
+        :cities="uniqueCities"
+        :ratings="uniqueRatings"
+        :ranges="uniquePriceRanges"
+      />
     </div>
     <div class="p-4 flex-1">
       <div v-if="loading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
@@ -144,6 +149,114 @@ const visiblePages = computed(() => {
 // Add a computed property to calculate the total number of cafes
 const totalCafes = ref(0)
 
+// Initialize filter options with empty arrays
+const uniqueCities = ref([])
+const uniqueRatings = ref([])
+const uniquePriceRanges = ref([])
+
+// Fetch filter options with improved city handling
+async function fetchFilterOptions() {
+  const { $supabase } = useNuxtApp()
+  
+  try {
+    // FIRST APPROACH: Get ALL cities from the database - no filtering initially
+    console.log("Fetching all cities from database...")
+    const { data: cityData, error: cityError } = await $supabase
+      .from('cafes')
+      .select('city')
+    
+    if (cityError) {
+      console.error('Error fetching cities:', cityError)
+    } else {
+      console.log(`Retrieved ${cityData.length} total city records`)
+      
+      // Log raw city data to see what's actually in the database
+      console.log("Raw city values from database:")
+      cityData.forEach(item => {
+        console.log(`City: "${item.city}"`)
+      })
+      
+      // Check if Central Jakarta exists in original data
+      const hasCentralJakarta = cityData.some(item => 
+        item.city === 'Central Jakarta' || 
+        item.city?.toLowerCase().includes('central jakarta') ||
+        item.city?.toLowerCase().includes('jakarta pusat')
+      )
+      console.log("Does database have Central Jakarta?", hasCentralJakarta)
+      
+      // Process cities to get unique values
+      const processedCities = cityData
+        .map(item => item.city)
+        .filter(city => city && city.trim()) // Remove null/empty
+        .map(city => city.trim()) // Trim whitespace
+      
+      console.log(`After filtering nulls: ${processedCities.length} cities`)
+      
+      // Get unique cities (case-sensitive)
+      uniqueCities.value = [...new Set(processedCities)].sort()
+      console.log(`Found ${uniqueCities.value.length} unique cities after deduplication`)
+      console.log("Unique cities before adding Jakarta regions:", JSON.stringify(uniqueCities.value))
+      
+      // IMPORTANT: Add Jakarta regions explicitly
+      const jakartaRegions = [
+        'North Jakarta', 'Jakarta Utara',
+        'South Jakarta', 'Jakarta Selatan',
+        'East Jakarta', 'Jakarta Timur',
+        'West Jakarta', 'Jakarta Barat',
+        'Central Jakarta', 'Jakarta Pusat'
+      ]
+      
+      // Add all Jakarta regions to ensure they're included
+      jakartaRegions.forEach(region => {
+        if (!uniqueCities.value.includes(region)) {
+          uniqueCities.value.push(region)
+          console.log(`Added missing city: ${region}`)
+        }
+      })
+      
+      // Sort again after additions
+      uniqueCities.value.sort()
+      console.log(`Final city list has ${uniqueCities.value.length} cities`)
+      console.log("Final city list:", JSON.stringify(uniqueCities.value))
+    }
+    
+    // Fetch ratings
+    const { data: ratingData, error: ratingError } = await $supabase
+      .from('cafes')
+      .select('rating')
+    
+    if (ratingError) {
+      console.error('Error fetching ratings:', ratingError)
+    } else {
+      // Extract unique ratings and round them
+      uniqueRatings.value = [...new Set(ratingData.map(item => Math.round(item.rating)))].sort((a, b) => a - b)
+      console.log(`Fetched ${uniqueRatings.value.length} unique ratings`)
+    }
+    
+    // Fetch price ranges
+    const { data: rangeData, error: rangeError } = await $supabase
+      .from('cafes')
+      .select('range')
+    
+    if (rangeError) {
+      console.error('Error fetching price ranges:', rangeError)
+    } else {
+      // Extract unique price ranges
+      uniquePriceRanges.value = [...new Set(rangeData.map(item => item.range))].sort()
+      console.log(`Fetched ${uniquePriceRanges.value.length} unique price ranges`)
+    }
+  } catch (err) {
+    console.error('Exception fetching filter options:', err)
+    
+    // Emergency fallback if everything fails
+    uniqueCities.value = [
+      'Jakarta', 'North Jakarta', 'South Jakarta', 'East Jakarta', 
+      'West Jakarta', 'Central Jakarta', 'Bandung', 'Surabaya', 
+      'Yogyakarta', 'Bali', 'Medan', 'Makassar', 'Semarang'
+    ]
+  }
+}
+
 function handleImageError(event) {
   event.target.src = '/src/assets/img/noImage_placeholder.webp' // Set a default image
   console.error('Image failed to load:', event.target.src)
@@ -152,11 +265,6 @@ function handleImageError(event) {
 function performSearch() {
   console.log('Performing search with query:', searchQuery.value)
 }
-
-// Extract unique cities
-const uniqueCities = computed(() => {
-  return [...new Set(data.value.map(cafe => cafe.city))]
-})
 
 // Extract popular categories from the about field
 const popularCategories = computed(() => {
@@ -181,21 +289,30 @@ const popularCategories = computed(() => {
 async function fetchCafes(page) {
   loading.value = true
   const { $supabase } = useNuxtApp()
+  
+  // Calculate range based on current page
   const from = (page - 1) * itemsPerPage
   const to = from + itemsPerPage - 1
 
-  const { data: supabaseData, error, count } = await $supabase
-    .from('cafes')
-    .select('*', { count: 'exact' })
-    .range(from, to)
+  try {
+    // Use cafes table as requested
+    const { data: supabaseData, error, count } = await $supabase
+      .from('cafes')
+      .select('*', { count: 'exact' })
+      .range(from, to)
 
-  if (error) {
-    console.error('Error fetching data:', error)
-  } else {
-    data.value = supabaseData
-    totalCafes.value = count
+    if (error) {
+      console.error('Error fetching data:', error)
+    } else {
+      console.log(`Fetched page ${page} with ${supabaseData.length} cafes`)
+      data.value = supabaseData
+      totalCafes.value = count
+    }
+  } catch (err) {
+    console.error('Exception while fetching cafes:', err)
+  } finally {
+    loading.value = false
   }
-  loading.value = false
 }
 
 function changePage(page) {
@@ -205,7 +322,10 @@ function changePage(page) {
   }
 }
 
-onMounted(() => {
+onMounted(async () => {
+  // Fetch city options for filters first
+  await fetchFilterOptions()
+  // Then fetch cafe data for the current page
   fetchCafes(currentPage.value)
 })
 </script>

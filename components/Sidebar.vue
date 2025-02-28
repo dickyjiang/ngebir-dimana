@@ -42,19 +42,31 @@
   
   const props = defineProps({
     activeFilters: Object,
-    cities: Array // Ensure this is declared
+    cities: Array, // Ensure this is declared
+    ratings: Array, // Add ratings prop
+    ranges: Array // Renamed from priceRanges to match parent component
   })
   
   onMounted(() => {
-    if (props.cities) {
-      console.log('Cities prop:', props.cities) // This should log the cities array
-    } else {
-      console.error('Cities prop is undefined')
-    }
+    console.log('Filter options received:', {
+      cities: props.cities?.length || 0,
+      ratings: props.ratings?.length || 0, 
+      ranges: props.ranges?.length || 0
+    })
   })
   
-  const uniqueRatings = ref([1, 2, 3, 4, 5]) // Example data
-  const uniqueRanges = ref(['$', '$$', '$$$', '$$$$']) // Example data
+  // Use computed properties to fall back to default values if props are empty
+  const uniqueRatings = computed(() => {
+    return props.ratings && props.ratings.length > 0 
+      ? props.ratings 
+      : [1, 2, 3, 4, 5] // Fallback to defaults
+  })
+  
+  const uniqueRanges = computed(() => {
+    return props.ranges && props.ranges.length > 0 
+      ? props.ranges 
+      : ['$', '$$', '$$$', '$$$$'] // Fallback to defaults
+  })
   
   function toggleFilter(type, value) {
     const index = props.activeFilters[type].indexOf(value)
