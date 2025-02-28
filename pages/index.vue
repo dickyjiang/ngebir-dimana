@@ -159,71 +159,39 @@ async function fetchFilterOptions() {
   const { $supabase } = useNuxtApp()
   
   try {
-    // FIRST APPROACH: Get ALL cities from the database - no filtering initially
-    console.log("Fetching all cities from database...")
+    // Use v_city view to get cities
+    console.log("Fetching cities from v_city view...")
     const { data: cityData, error: cityError } = await $supabase
-      .from('cafes')
-      .select('city')
+      .from('v_city')
+      .select('*')
     
     if (cityError) {
-      console.error('Error fetching cities:', cityError)
+      console.error('Error fetching cities from v_city:', cityError)
     } else {
-      console.log(`Retrieved ${cityData.length} total city records`)
+      console.log(`Retrieved ${cityData.length} cities from v_city view`)
       
-      // Log raw city data to see what's actually in the database
-      console.log("Raw city values from database:")
-      cityData.forEach(item => {
-        console.log(`City: "${item.city}"`)
-      })
-      
-      // Check if Central Jakarta exists in original data
-      const hasCentralJakarta = cityData.some(item => 
-        item.city === 'Central Jakarta' || 
-        item.city?.toLowerCase().includes('central jakarta') ||
-        item.city?.toLowerCase().includes('jakarta pusat')
-      )
-      console.log("Does database have Central Jakarta?", hasCentralJakarta)
-      
-      // Process cities to get unique values
-      const processedCities = cityData
-        .map(item => item.city)
-        .filter(city => city && city.trim()) // Remove null/empty
-        .map(city => city.trim()) // Trim whitespace
-      
-      console.log(`After filtering nulls: ${processedCities.length} cities`)
-      
-      // Get unique cities (case-sensitive)
-      uniqueCities.value = [...new Set(processedCities)].sort()
-      console.log(`Found ${uniqueCities.value.length} unique cities after deduplication`)
-      console.log("Unique cities before adding Jakarta regions:", JSON.stringify(uniqueCities.value))
-      
-      // IMPORTANT: Add Jakarta regions explicitly
-      const jakartaRegions = [
-        'North Jakarta', 'Jakarta Utara',
-        'South Jakarta', 'Jakarta Selatan',
-        'East Jakarta', 'Jakarta Timur',
-        'West Jakarta', 'Jakarta Barat',
-        'Central Jakarta', 'Jakarta Pusat'
-      ]
-      
-      // Add all Jakarta regions to ensure they're included
-      jakartaRegions.forEach(region => {
-        if (!uniqueCities.value.includes(region)) {
-          uniqueCities.value.push(region)
-          console.log(`Added missing city: ${region}`)
-        }
-      })
-      
-      // Sort again after additions
-      uniqueCities.value.sort()
-      console.log(`Final city list has ${uniqueCities.value.length} cities`)
-      console.log("Final city list:", JSON.stringify(uniqueCities.value))
+      // Process cities from v_city
+      if (cityData && cityData.length > 0) {
+        // Get city names from the view (assuming the field is called 'city' or 'name')
+        const cityField = 'city' in cityData[0] ? 'city' : 'name'
+        uniqueCities.value = cityData
+          .map(item => item[cityField]?.trim())
+          .filter(Boolean)
+          .sort()
+        
+        console.log(`Processed ${uniqueCities.value.length} cities from v_city`)
+      } else {
+        console.log("No cities found in v_city view")
+        uniqueCities.value = []
+      }
     }
     
-    // Fetch ratings
+    // Use cafes table for ratings
+    console.log("Fetching ratings from cafes table...")
     const { data: ratingData, error: ratingError } = await $supabase
       .from('cafes')
       .select('rating')
+      .not('rating', 'is', null)
     
     if (ratingError) {
       console.error('Error fetching ratings:', ratingError)
@@ -233,10 +201,13 @@ async function fetchFilterOptions() {
       console.log(`Fetched ${uniqueRatings.value.length} unique ratings`)
     }
     
-    // Fetch price ranges
+    // Use cafes table for price ranges
+    console.log("Fetching price ranges from cafes table...")
     const { data: rangeData, error: rangeError } = await $supabase
       .from('cafes')
       .select('range')
+      .not('range', 'is', null)
+      .order('range')
     
     if (rangeError) {
       console.error('Error fetching price ranges:', rangeError)
@@ -247,13 +218,9 @@ async function fetchFilterOptions() {
     }
   } catch (err) {
     console.error('Exception fetching filter options:', err)
-    
-    // Emergency fallback if everything fails
-    uniqueCities.value = [
-      'Jakarta', 'North Jakarta', 'South Jakarta', 'East Jakarta', 
-      'West Jakarta', 'Central Jakarta', 'Bandung', 'Surabaya', 
-      'Yogyakarta', 'Bali', 'Medan', 'Makassar', 'Semarang'
-    ]
+    uniqueCities.value = []
+    uniqueRatings.value = []
+    uniquePriceRanges.value = []
   }
 }
 
