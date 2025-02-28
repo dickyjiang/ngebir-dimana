@@ -23,7 +23,12 @@
   <PopularCategories class="hidden" :categories="popularCategories" />
   <section id="main-content" class="flex sm:px-4">
     <div class="sticky top-4 w-full max-w-[20%] p-4 border border-gray-400 hidden md:block" style="height: 100vh; overflow-y: auto;">
-      <Sidebar :activeFilters="activeFilters" :cities="uniqueCities" />
+      <Sidebar 
+        :activeFilters="activeFilters" 
+        :cities="uniqueCities"
+        :ratings="uniqueRatings"
+        :ranges="uniquePriceRanges"
+      />
     </div>
     <div class="p-4 flex-1">
       <div v-if="loading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
@@ -75,6 +80,11 @@
             class="cursor-pointer text-blue-500 hover:underline">
             Next
           </span>
+          <span v-if="currentPage < totalPages && !visiblePages.includes(totalPages)" 
+            @click="changePage(totalPages)" 
+            class="cursor-pointer text-blue-500 hover:underline">
+            Last ({{ totalPages }})
+          </span>
         </div>
       </div>
     </div>
@@ -106,23 +116,97 @@ function toggleFilter(type, value) {
   }
 }
 
-const filteredData = computed(() => {
-  return data.value.filter(cafe => {
-    const matchesSearch = cafe.name.toLowerCase().includes(searchQuery.value.toLowerCase())
-    const matchesRating = activeFilters.value.rating.length === 0 || activeFilters.value.rating.includes(Math.round(cafe.rating))
-    const matchesRange = activeFilters.value.range.length === 0 || activeFilters.value.range.includes(cafe.range)
-    const matchesCity = activeFilters.value.city.length === 0 || activeFilters.value.city.includes(cafe.city)
-    return matchesSearch && matchesRating && matchesRange && matchesCity
-  })
-})
+// Change the fetchCafes function to include filter parameters
+async function fetchCafes(page, filters = null) {
+  loading.value = true
+  const { $supabase } = useNuxtApp()
+  
+  // Calculate range based on current page
+  const from = (page - 1) * itemsPerPage
+  const to = from + itemsPerPage - 1
 
+  try {
+    // Start with a query builder
+    let query = $supabase
+      .from('cafes')
+      .select('*', { count: 'exact' })
+    
+    // Apply filters if they exist
+    if (filters) {
+      // City filter
+      if (filters.city && filters.city.length > 0) {
+        query = query.in('city', filters.city)
+        console.log(`Filtering by cities: ${filters.city.join(', ')}`)
+      }
+      
+      // Rating filter - needs to handle the Math.round() issue
+      if (filters.rating && filters.rating.length > 0) {
+        // For ratings, we need a more complex filter because we're rounding in the UI
+        // This is a simplified approach - ideally use a between range for each rating
+        const minRating = Math.min(...filters.rating) - 0.5
+        const maxRating = Math.max(...filters.rating) + 0.49
+        query = query.gte('rating', minRating).lte('rating', maxRating)
+        console.log(`Filtering by ratings between ${minRating} and ${maxRating}`)
+      }
+      
+      // Price range filter
+      if (filters.range && filters.range.length > 0) {
+        query = query.in('range', filters.range)
+        console.log(`Filtering by ranges: ${filters.range.join(', ')}`)
+      }
+    }
+    
+    // Apply search query if it exists
+    if (searchQuery.value) {
+      query = query.ilike('name', `%${searchQuery.value}%`)
+      console.log(`Searching for: ${searchQuery.value}`)
+    }
+    
+    // Finally apply pagination
+    query = query.range(from, to)
+    
+    // Execute the query
+    const { data: supabaseData, error, count } = await query
+    
+    if (error) {
+      console.error('Error fetching data:', error)
+    } else {
+      console.log(`Fetched page ${page} with ${supabaseData.length} cafes (total: ${count})`)
+      data.value = supabaseData
+      totalCafes.value = count || 0
+    }
+  } catch (err) {
+    console.error('Exception while fetching cafes:', err)
+  } finally {
+    loading.value = false
+  }
+}
+
+// Update the watch functionality to apply filters
+watch(
+  () => [
+    JSON.stringify(activeFilters.value.city),
+    JSON.stringify(activeFilters.value.rating),
+    JSON.stringify(activeFilters.value.range)
+  ],
+  () => {
+    console.log('Filters changed, fetching filtered cafes')
+    currentPage.value = 1
+    fetchCafes(currentPage.value, activeFilters.value)
+  }
+)
+
+// Also watch search query to trigger filtering
 watch(searchQuery, (newQuery) => {
   console.log('Search Query:', newQuery)
-  console.log('Filtered Data:', filteredData.value)
+  currentPage.value = 1 // Reset to first page when search changes
+  fetchCafes(currentPage.value, activeFilters.value)
 })
 
+// Remove the filteredData computed property since we're now filtering in the database
+// Instead, use data directly
 const paginatedData = computed(() => {
-  return filteredData.value
+  return data.value
 })
 
 const totalPages = computed(() => {
@@ -144,6 +228,89 @@ const visiblePages = computed(() => {
 // Add a computed property to calculate the total number of cafes
 const totalCafes = ref(0)
 
+// Initialize filter options with empty arrays
+const uniqueCities = ref([])
+const uniqueRatings = ref([])
+const uniquePriceRanges = ref([])
+
+// Fetch filter options with improved city handling
+async function fetchFilterOptions() {
+  const { $supabase } = useNuxtApp()
+  
+  try {
+    // Use v_city view to get cities
+    console.log("Fetching cities from v_city view...")
+    const { data: cityData, error: cityError } = await $supabase
+      .from('v_city')
+      .select('*')
+    
+    if (cityError) {
+      console.error('Error fetching cities from v_city:', cityError)
+    } else {
+      console.log(`Retrieved ${cityData.length} cities from v_city view`)
+      
+      // Process cities from v_city
+      if (cityData && cityData.length > 0) {
+        // Get city names from the view (assuming the field is called 'city' or 'name')
+        const cityField = 'city' in cityData[0] ? 'city' : 'name'
+        uniqueCities.value = cityData
+          .map(item => item[cityField]?.trim())
+          .filter(Boolean)
+          .sort()
+        
+        console.log(`Processed ${uniqueCities.value.length} cities from v_city`)
+      } else {
+        console.log("No cities found in v_city view")
+        uniqueCities.value = []
+      }
+    }
+    
+    // Use cafes table for ratings
+    console.log("Fetching ratings from cafes table...")
+    const { data: ratingData, error: ratingError } = await $supabase
+      .from('cafes')
+      .select('rating')
+      .not('rating', 'is', null)
+    
+    if (ratingError) {
+      console.error('Error fetching ratings:', ratingError)
+    } else {
+      // Extract unique ratings and round them
+      // Filter out any NaN values to prevent "NaN Stars" from appearing
+      uniqueRatings.value = [...new Set(ratingData
+        .map(item => Math.round(item.rating))
+        .filter(rating => !isNaN(rating)) // Filter out NaN values
+      )].sort((a, b) => a - b)
+      console.log(`Fetched ${uniqueRatings.value.length} unique ratings`)
+    }
+    
+    // Use cafes table for price ranges
+    console.log("Fetching price ranges from cafes table...")
+    const { data: rangeData, error: rangeError } = await $supabase
+      .from('cafes')
+      .select('range')
+      .not('range', 'is', null)
+      .order('range')
+    
+    if (rangeError) {
+      console.error('Error fetching price ranges:', rangeError)
+    } else {
+      // Extract unique price ranges
+      // Filter out any empty, null, or undefined values
+      uniquePriceRanges.value = [...new Set(rangeData
+        .map(item => item.range)
+        .filter(range => range && range.trim() !== '') // Remove empty values
+      )].sort()
+      console.log(`Fetched ${uniquePriceRanges.value.length} unique price ranges`)
+    }
+  } catch (err) {
+    console.error('Exception fetching filter options:', err)
+    uniqueCities.value = []
+    uniqueRatings.value = []
+    uniquePriceRanges.value = []
+  }
+}
+
 function handleImageError(event) {
   event.target.src = '/src/assets/img/noImage_placeholder.webp' // Set a default image
   console.error('Image failed to load:', event.target.src)
@@ -152,11 +319,6 @@ function handleImageError(event) {
 function performSearch() {
   console.log('Performing search with query:', searchQuery.value)
 }
-
-// Extract unique cities
-const uniqueCities = computed(() => {
-  return [...new Set(data.value.map(cafe => cafe.city))]
-})
 
 // Extract popular categories from the about field
 const popularCategories = computed(() => {
@@ -178,34 +340,17 @@ const popularCategories = computed(() => {
   return Array.from(categories)
 })
 
-async function fetchCafes(page) {
-  loading.value = true
-  const { $supabase } = useNuxtApp()
-  const from = (page - 1) * itemsPerPage
-  const to = from + itemsPerPage - 1
-
-  const { data: supabaseData, error, count } = await $supabase
-    .from('cafes')
-    .select('*', { count: 'exact' })
-    .range(from, to)
-
-  if (error) {
-    console.error('Error fetching data:', error)
-  } else {
-    data.value = supabaseData
-    totalCafes.value = count
-  }
-  loading.value = false
-}
-
 function changePage(page) {
   if (page >= 1 && page <= totalPages.value) {
     currentPage.value = page
-    fetchCafes(page)
+    fetchCafes(page, activeFilters.value) // Pass the current filters when changing page
   }
 }
 
-onMounted(() => {
+onMounted(async () => {
+  // Fetch city options for filters first
+  await fetchFilterOptions()
+  // Then fetch cafe data for the current page (no filters initially)
   fetchCafes(currentPage.value)
 })
 </script>
