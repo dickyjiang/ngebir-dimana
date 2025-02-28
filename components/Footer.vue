@@ -4,8 +4,13 @@
         <div>
           <img src="/src/assets/img/logo_ndm_gray.svg" alt="logo" class="h-6" />
         </div>
+        <div>
+          <p class="text-gray-600 px-7 text-sm">
+            ©2025 ISUKJADI All rights reserved | email: <span><a href="mailto:dicky@dickyjiang.com">SI DIKKI</a></span> atau <span><a href="mailto:budi@avasoft.co">SI BUDI</a></span>
+          </p>
+        </div>
         <div class="flex items-center gap-2 text-sm">
-          <button class="text-gray-600 px-7">© 2025 Ngopidimana.com</button>
+          <p class="text-gray-600 px-7">© 2025 Ngopidimana.com</p>
         </div>
       </div>
     </div>
