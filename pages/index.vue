@@ -80,6 +80,11 @@
             class="cursor-pointer text-blue-500 hover:underline">
             Next
           </span>
+          <span v-if="currentPage < totalPages && !visiblePages.includes(totalPages)" 
+            @click="changePage(totalPages)" 
+            class="cursor-pointer text-blue-500 hover:underline">
+            Last ({{ totalPages }})
+          </span>
         </div>
       </div>
     </div>
