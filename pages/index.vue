@@ -111,23 +111,97 @@ function toggleFilter(type, value) {
   }
 }
 
-const filteredData = computed(() => {
-  return data.value.filter(cafe => {
-    const matchesSearch = cafe.name.toLowerCase().includes(searchQuery.value.toLowerCase())
-    const matchesRating = activeFilters.value.rating.length === 0 || activeFilters.value.rating.includes(Math.round(cafe.rating))
-    const matchesRange = activeFilters.value.range.length === 0 || activeFilters.value.range.includes(cafe.range)
-    const matchesCity = activeFilters.value.city.length === 0 || activeFilters.value.city.includes(cafe.city)
-    return matchesSearch && matchesRating && matchesRange && matchesCity
-  })
-})
+// Change the fetchCafes function to include filter parameters
+async function fetchCafes(page, filters = null) {
+  loading.value = true
+  const { $supabase } = useNuxtApp()
+  
+  // Calculate range based on current page
+  const from = (page - 1) * itemsPerPage
+  const to = from + itemsPerPage - 1
 
+  try {
+    // Start with a query builder
+    let query = $supabase
+      .from('cafes')
+      .select('*', { count: 'exact' })
+    
+    // Apply filters if they exist
+    if (filters) {
+      // City filter
+      if (filters.city && filters.city.length > 0) {
+        query = query.in('city', filters.city)
+        console.log(`Filtering by cities: ${filters.city.join(', ')}`)
+      }
+      
+      // Rating filter - needs to handle the Math.round() issue
+      if (filters.rating && filters.rating.length > 0) {
+        // For ratings, we need a more complex filter because we're rounding in the UI
+        // This is a simplified approach - ideally use a between range for each rating
+        const minRating = Math.min(...filters.rating) - 0.5
+        const maxRating = Math.max(...filters.rating) + 0.49
+        query = query.gte('rating', minRating).lte('rating', maxRating)
+        console.log(`Filtering by ratings between ${minRating} and ${maxRating}`)
+      }
+      
+      // Price range filter
+      if (filters.range && filters.range.length > 0) {
+        query = query.in('range', filters.range)
+        console.log(`Filtering by ranges: ${filters.range.join(', ')}`)
+      }
+    }
+    
+    // Apply search query if it exists
+    if (searchQuery.value) {
+      query = query.ilike('name', `%${searchQuery.value}%`)
+      console.log(`Searching for: ${searchQuery.value}`)
+    }
+    
+    // Finally apply pagination
+    query = query.range(from, to)
+    
+    // Execute the query
+    const { data: supabaseData, error, count } = await query
+    
+    if (error) {
+      console.error('Error fetching data:', error)
+    } else {
+      console.log(`Fetched page ${page} with ${supabaseData.length} cafes (total: ${count})`)
+      data.value = supabaseData
+      totalCafes.value = count || 0
+    }
+  } catch (err) {
+    console.error('Exception while fetching cafes:', err)
+  } finally {
+    loading.value = false
+  }
+}
+
+// Update the watch functionality to apply filters
+watch(
+  () => [
+    JSON.stringify(activeFilters.value.city),
+    JSON.stringify(activeFilters.value.rating),
+    JSON.stringify(activeFilters.value.range)
+  ],
+  () => {
+    console.log('Filters changed, fetching filtered cafes')
+    currentPage.value = 1
+    fetchCafes(currentPage.value, activeFilters.value)
+  }
+)
+
+// Also watch search query to trigger filtering
 watch(searchQuery, (newQuery) => {
   console.log('Search Query:', newQuery)
-  console.log('Filtered Data:', filteredData.value)
+  currentPage.value = 1 // Reset to first page when search changes
+  fetchCafes(currentPage.value, activeFilters.value)
 })
 
+// Remove the filteredData computed property since we're now filtering in the database
+// Instead, use data directly
 const paginatedData = computed(() => {
-  return filteredData.value
+  return data.value
 })
 
 const totalPages = computed(() => {
@@ -253,46 +327,17 @@ const popularCategories = computed(() => {
   return Array.from(categories)
 })
 
-async function fetchCafes(page) {
-  loading.value = true
-  const { $supabase } = useNuxtApp()
-  
-  // Calculate range based on current page
-  const from = (page - 1) * itemsPerPage
-  const to = from + itemsPerPage - 1
-
-  try {
-    // Use cafes table as requested
-    const { data: supabaseData, error, count } = await $supabase
-      .from('cafes')
-      .select('*', { count: 'exact' })
-      .range(from, to)
-
-    if (error) {
-      console.error('Error fetching data:', error)
-    } else {
-      console.log(`Fetched page ${page} with ${supabaseData.length} cafes`)
-      data.value = supabaseData
-      totalCafes.value = count
-    }
-  } catch (err) {
-    console.error('Exception while fetching cafes:', err)
-  } finally {
-    loading.value = false
-  }
-}
-
 function changePage(page) {
   if (page >= 1 && page <= totalPages.value) {
     currentPage.value = page
-    fetchCafes(page)
+    fetchCafes(page, activeFilters.value) // Pass the current filters when changing page
   }
 }
 
 onMounted(async () => {
   // Fetch city options for filters first
   await fetchFilterOptions()
-  // Then fetch cafe data for the current page
+  // Then fetch cafe data for the current page (no filters initially)
   fetchCafes(currentPage.value)
 })
 </script>
