@@ -271,7 +271,11 @@ async function fetchFilterOptions() {
       console.error('Error fetching ratings:', ratingError)
     } else {
       // Extract unique ratings and round them
-      uniqueRatings.value = [...new Set(ratingData.map(item => Math.round(item.rating)))].sort((a, b) => a - b)
+      // Filter out any NaN values to prevent "NaN Stars" from appearing
+      uniqueRatings.value = [...new Set(ratingData
+        .map(item => Math.round(item.rating))
+        .filter(rating => !isNaN(rating)) // Filter out NaN values
+      )].sort((a, b) => a - b)
       console.log(`Fetched ${uniqueRatings.value.length} unique ratings`)
     }
     
@@ -287,7 +291,11 @@ async function fetchFilterOptions() {
       console.error('Error fetching price ranges:', rangeError)
     } else {
       // Extract unique price ranges
-      uniquePriceRanges.value = [...new Set(rangeData.map(item => item.range))].sort()
+      // Filter out any empty, null, or undefined values
+      uniquePriceRanges.value = [...new Set(rangeData
+        .map(item => item.range)
+        .filter(range => range && range.trim() !== '') // Remove empty values
+      )].sort()
       console.log(`Fetched ${uniquePriceRanges.value.length} unique price ranges`)
     }
   } catch (err) {
