@@ -19,6 +19,7 @@
     "vue-router": "latest"
   },
   "devDependencies": {
-    "@nuxtjs/gtm": "^2.4.0"
+    "@nuxtjs/gtm": "^2.4.0",
+    "vue-gtag-next": "^1.14.0"
   }
 }
