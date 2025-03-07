@@ -9,9 +9,6 @@
             ©2025 ISUKJADI All rights reserved | email: <span><a href="mailto:dicky@dickyjiang.com">SI DIKKI</a></span> atau <span><a href="mailto:budi@avasoft.co">SI BUDI</a></span>
           </p>
         </div>
-        <div class="flex items-center gap-2 text-sm">
-          <p class="text-gray-600 px-7">© 2025 Ngopidimana.com</p>
-        </div>
       </div>
     </div>
   </template>
