@@ -97,6 +97,7 @@ import { useNuxtApp } from '#app'
 import Sidebar from '~/components/Sidebar.vue'
 import PopularCategories from '~/components/PopularCategories.vue'
 import '@fortawesome/fontawesome-free/css/all.css'
+import { debounce } from 'lodash'
 
 const data = ref([])
 const loading = ref(true)
@@ -116,8 +117,62 @@ function toggleFilter(type, value) {
   }
 }
 
+// Add caching for filter data
+const CACHE_DURATION = 30 * 60 * 1000 // 30 minutes in milliseconds
+
+// Function to check if cache is valid
+function isCacheValid(timestamp) {
+  return timestamp && (Date.now() - timestamp < CACHE_DURATION);
+}
+
+// Function to save data to localStorage with timestamp
+function saveToCache(key, data) {
+  try {
+    localStorage.setItem(key, JSON.stringify({
+      data,
+      timestamp: Date.now()
+    }));
+  } catch (e) {
+    console.error('Error saving to cache:', e);
+  }
+}
+
+// Function to get data from cache
+function getFromCache(key) {
+  try {
+    const cached = localStorage.getItem(key);
+    if (cached) {
+      const { data, timestamp } = JSON.parse(cached);
+      if (isCacheValid(timestamp)) {
+        return data;
+      }
+    }
+  } catch (e) {
+    console.error('Error reading from cache:', e);
+  }
+  return null;
+}
+
+// Debounced search function
+const debouncedFetchBySearch = debounce((query, filters) => {
+  currentPage.value = 1;
+  fetchCafes(1, filters);
+}, 500); // 500ms delay
+
 // Change the fetchCafes function to include filter parameters
 async function fetchCafes(page, filters = null) {
+  // Use a cache key that represents the current filters and page
+  const cacheKey = `cafes_${page}_${JSON.stringify(filters)}_${searchQuery.value}`;
+  const cachedData = getFromCache(cacheKey);
+  
+  if (cachedData) {
+    console.log(`Using cached data for page ${page}`);
+    data.value = cachedData.data;
+    totalCafes.value = cachedData.totalCafes;
+    loading.value = false;
+    return;
+  }
+  
   loading.value = true
   const { $supabase } = useNuxtApp()
   
@@ -180,6 +235,14 @@ async function fetchCafes(page, filters = null) {
   } finally {
     loading.value = false
   }
+
+  // Add caching at the end of the fetch
+  if (data.value && !error) {
+    saveToCache(cacheKey, {
+      data: data.value,
+      totalCafes: totalCafes.value
+    });
+  }
 }
 
 // Update the watch functionality to apply filters
@@ -190,17 +253,16 @@ watch(
     JSON.stringify(activeFilters.value.range)
   ],
   () => {
-    console.log('Filters changed, fetching filtered cafes')
-    currentPage.value = 1
-    fetchCafes(currentPage.value, activeFilters.value)
+    console.log('Filters changed');
+    currentPage.value = 1; 
+    fetchCafes(1, activeFilters.value);
   }
 )
 
 // Also watch search query to trigger filtering
 watch(searchQuery, (newQuery) => {
-  console.log('Search Query:', newQuery)
-  currentPage.value = 1 // Reset to first page when search changes
-  fetchCafes(currentPage.value, activeFilters.value)
+  console.log('Search query changed:', newQuery);
+  debouncedFetchBySearch(newQuery, activeFilters.value);
 })
 
 // Remove the filteredData computed property since we're now filtering in the database
@@ -233,81 +295,69 @@ const uniqueCities = ref([])
 const uniqueRatings = ref([])
 const uniquePriceRanges = ref([])
 
-// Fetch filter options with improved city handling
+// Modify fetchFilterOptions to use caching
 async function fetchFilterOptions() {
-  const { $supabase } = useNuxtApp()
+  // Try to get filter options from cache first
+  const cachedFilters = getFromCache('cafeFilterOptions');
+  if (cachedFilters) {
+    console.log('Using cached filter options');
+    uniqueCities.value = cachedFilters.cities || [];
+    uniqueRatings.value = cachedFilters.ratings || [];
+    uniquePriceRanges.value = cachedFilters.ranges || [];
+    return;
+  }
+
+  const { $supabase } = useNuxtApp();
   
   try {
-    // Use v_city view to get cities
-    console.log("Fetching cities from v_city view...")
-    const { data: cityData, error: cityError } = await $supabase
-      .from('v_city')
-      .select('*')
-    
-    if (cityError) {
-      console.error('Error fetching cities from v_city:', cityError)
-    } else {
-      console.log(`Retrieved ${cityData.length} cities from v_city view`)
+    // Make a single call to get all filter data at once
+    console.log('Fetching all filter options in a single query...');
+    const [cityResponse, ratingsAndRangesResponse] = await Promise.all([
+      // City data - separate call since it's from a different view
+      $supabase.from('v_city').select('*'),
       
-      // Process cities from v_city
-      if (cityData && cityData.length > 0) {
-        // Get city names from the view (assuming the field is called 'city' or 'name')
-        const cityField = 'city' in cityData[0] ? 'city' : 'name'
-        uniqueCities.value = cityData
-          .map(item => item[cityField]?.trim())
-          .filter(Boolean)
-          .sort()
-        
-        console.log(`Processed ${uniqueCities.value.length} cities from v_city`)
-      } else {
-        console.log("No cities found in v_city view")
-        uniqueCities.value = []
-      }
+      // Get both ratings and price ranges in one call
+      $supabase.from('cafes').select('rating, range')
+    ]);
+    
+    // Process cities
+    if (cityResponse.error) {
+      console.error('Error fetching cities:', cityResponse.error);
+    } else if (cityResponse.data && cityResponse.data.length > 0) {
+      const cityField = 'city' in cityResponse.data[0] ? 'city' : 'name';
+      uniqueCities.value = cityResponse.data
+        .map(item => item[cityField]?.trim())
+        .filter(Boolean)
+        .sort();
     }
     
-    // Use cafes table for ratings
-    console.log("Fetching ratings from cafes table...")
-    const { data: ratingData, error: ratingError } = await $supabase
-      .from('cafes')
-      .select('rating')
-      .not('rating', 'is', null)
-    
-    if (ratingError) {
-      console.error('Error fetching ratings:', ratingError)
+    // Process ratings and price ranges from the single response
+    if (ratingsAndRangesResponse.error) {
+      console.error('Error fetching ratings and ranges:', ratingsAndRangesResponse.error);
     } else {
-      // Extract unique ratings and round them
-      // Filter out any NaN values to prevent "NaN Stars" from appearing
-      uniqueRatings.value = [...new Set(ratingData
+      // Extract unique ratings
+      uniqueRatings.value = [...new Set(ratingsAndRangesResponse.data
         .map(item => Math.round(item.rating))
-        .filter(rating => !isNaN(rating)) // Filter out NaN values
-      )].sort((a, b) => a - b)
-      console.log(`Fetched ${uniqueRatings.value.length} unique ratings`)
-    }
-    
-    // Use cafes table for price ranges
-    console.log("Fetching price ranges from cafes table...")
-    const { data: rangeData, error: rangeError } = await $supabase
-      .from('cafes')
-      .select('range')
-      .not('range', 'is', null)
-      .order('range')
-    
-    if (rangeError) {
-      console.error('Error fetching price ranges:', rangeError)
-    } else {
+        .filter(rating => !isNaN(rating))
+      )].sort((a, b) => a - b);
+      
       // Extract unique price ranges
-      // Filter out any empty, null, or undefined values
-      uniquePriceRanges.value = [...new Set(rangeData
+      uniquePriceRanges.value = [...new Set(ratingsAndRangesResponse.data
         .map(item => item.range)
-        .filter(range => range && range.trim() !== '') // Remove empty values
-      )].sort()
-      console.log(`Fetched ${uniquePriceRanges.value.length} unique price ranges`)
+        .filter(range => range && range.trim() !== '')
+      )].sort();
     }
+    
+    // Cache the filter options
+    saveToCache('cafeFilterOptions', {
+      cities: uniqueCities.value,
+      ratings: uniqueRatings.value,
+      ranges: uniquePriceRanges.value
+    });
+    
   } catch (err) {
-    console.error('Exception fetching filter options:', err)
-    uniqueCities.value = []
-    uniqueRatings.value = []
-    uniquePriceRanges.value = []
+    console.error('Exception fetching filter options:', err);
+    // ... your existing error handling ...
   }
 }
 
