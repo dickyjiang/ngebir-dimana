@@ -46,7 +46,7 @@
             class="rounded-md flex flex-col h-full pb-4 border overflow-hidden">
             <NuxtLink :to="`/cafes/${cafe.id}`">
               <NuxtImg alt="Cafe Image" class="w-full h-48 object-cover mb-4" :src="cafe.photo"
-                @error="handleImageError" />
+                placeholder="/img/noimg.webp" />
               <div class="flex-1 flex-col px-4">
                 <h2 class="text-lg text-gray-800 leading-tight line-clamp-2 font-semibold">{{ cafe.name }}</h2>
                 <p class="text-sm text-gray-500 line-clamp-2 mt-2">{{ cafe.description }}</p>
@@ -361,10 +361,6 @@ async function fetchFilterOptions() {
   }
 }
 
-function handleImageError(event) {
-  event.target.src = '/src/assets/img/noImage_placeholder.webp' // Set a default image
-  console.error('Image failed to load:', event.target.src)
-}
 
 function performSearch() {
   console.log('Performing search with query:', searchQuery.value)
