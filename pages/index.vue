@@ -117,41 +117,7 @@ function toggleFilter(type, value) {
   }
 }
 
-// Add caching for filter data
-const CACHE_DURATION = 30 * 60 * 1000 // 30 minutes in milliseconds
 
-// Function to check if cache is valid
-function isCacheValid(timestamp) {
-  return timestamp && (Date.now() - timestamp < CACHE_DURATION);
-}
-
-// Function to save data to localStorage with timestamp
-function saveToCache(key, data) {
-  try {
-    localStorage.setItem(key, JSON.stringify({
-      data,
-      timestamp: Date.now()
-    }));
-  } catch (e) {
-    console.error('Error saving to cache:', e);
-  }
-}
-
-// Function to get data from cache
-function getFromCache(key) {
-  try {
-    const cached = localStorage.getItem(key);
-    if (cached) {
-      const { data, timestamp } = JSON.parse(cached);
-      if (isCacheValid(timestamp)) {
-        return data;
-      }
-    }
-  } catch (e) {
-    console.error('Error reading from cache:', e);
-  }
-  return null;
-}
 
 // Debounced search function
 const debouncedFetchBySearch = debounce((query, filters) => {
@@ -162,16 +128,6 @@ const debouncedFetchBySearch = debounce((query, filters) => {
 // Change the fetchCafes function to include filter parameters
 async function fetchCafes(page, filters = null) {
   // Use a cache key that represents the current filters and page
-  const cacheKey = `cafes_${page}_${JSON.stringify(filters)}_${searchQuery.value}`;
-  const cachedData = getFromCache(cacheKey);
-  
-  if (cachedData) {
-    console.log(`Using cached data for page ${page}`);
-    data.value = cachedData.data;
-    totalCafes.value = cachedData.totalCafes;
-    loading.value = false;
-    return;
-  }
   
   loading.value = true
   const { $supabase } = useNuxtApp()
@@ -237,12 +193,6 @@ async function fetchCafes(page, filters = null) {
   }
 
   // Add caching at the end of the fetch
-  if (data.value && !error) {
-    saveToCache(cacheKey, {
-      data: data.value,
-      totalCafes: totalCafes.value
-    });
-  }
 }
 
 // Update the watch functionality to apply filters
@@ -298,15 +248,6 @@ const uniquePriceRanges = ref([])
 // Modify fetchFilterOptions to use caching
 async function fetchFilterOptions() {
   // Try to get filter options from cache first
-  const cachedFilters = getFromCache('cafeFilterOptions');
-  if (cachedFilters) {
-    console.log('Using cached filter options');
-    uniqueCities.value = cachedFilters.cities || [];
-    uniqueRatings.value = cachedFilters.ratings || [];
-    uniquePriceRanges.value = cachedFilters.ranges || [];
-    return;
-  }
-
   const { $supabase } = useNuxtApp();
   
   try {
@@ -347,13 +288,6 @@ async function fetchFilterOptions() {
         .filter(range => range && range.trim() !== '')
       )].sort();
     }
-    
-    // Cache the filter options
-    saveToCache('cafeFilterOptions', {
-      cities: uniqueCities.value,
-      ratings: uniqueRatings.value,
-      ranges: uniquePriceRanges.value
-    });
     
   } catch (err) {
     console.error('Exception fetching filter options:', err);
@@ -410,7 +344,7 @@ export default {
 <style scoped>
 @font-face {
   font-family: 'Sharp Grotesk';
-  src: url('~assets/fonts/sharp-grotesk-medium-25-regular.woff') format('woff');
+  src: url('~/assets/fonts/sharp-grotesk-medium-25-regular.woff') format('woff');
   font-weight: normal;
   font-style: normal;
 }
