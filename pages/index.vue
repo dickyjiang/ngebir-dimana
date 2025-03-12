@@ -152,12 +152,12 @@ async function fetchCafes(page, filters = null) {
       
       // Rating filter - needs to handle the Math.round() issue
       if (filters.rating && filters.rating.length > 0) {
-        // For ratings, we need a more complex filter because we're rounding in the UI
-        // This is a simplified approach - ideally use a between range for each rating
-        const minRating = Math.min(...filters.rating) - 0.5
-        const maxRating = Math.max(...filters.rating) + 0.49
-        query = query.gte('rating', minRating).lte('rating', maxRating)
-        console.log(`Filtering by ratings between ${minRating} and ${maxRating}`)
+        if (filters.rating && filters.rating.length > 0) {
+          query = query.or(
+            filters.rating.map(rating => `rating.like.${rating}%`).join(',')
+          )
+          console.log(`Filtering by ratings: ${filters.rating.join(', ')}`)
+        }
       }
       
       // Price range filter
