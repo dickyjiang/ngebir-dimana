@@ -46,7 +46,7 @@
             class="rounded-md flex flex-col h-full pb-4 border overflow-hidden">
             <NuxtLink :to="`/cafes/${cafe.id}`">
               <NuxtImg alt="Cafe Image" class="w-full h-48 object-cover mb-4" :src="cafe.photo"
-                @error="handleImageError" />
+                placeholder="/img/noimg.webp" />
               <div class="flex-1 flex-col px-4">
                 <h2 class="text-lg text-gray-800 leading-tight line-clamp-2 font-semibold">{{ cafe.name }}</h2>
                 <p class="text-sm text-gray-500 line-clamp-2 mt-2">{{ cafe.description }}</p>
@@ -117,41 +117,7 @@ function toggleFilter(type, value) {
   }
 }
 
-// Add caching for filter data
-const CACHE_DURATION = 30 * 60 * 1000 // 30 minutes in milliseconds
 
-// Function to check if cache is valid
-function isCacheValid(timestamp) {
-  return timestamp && (Date.now() - timestamp < CACHE_DURATION);
-}
-
-// Function to save data to localStorage with timestamp
-function saveToCache(key, data) {
-  try {
-    localStorage.setItem(key, JSON.stringify({
-      data,
-      timestamp: Date.now()
-    }));
-  } catch (e) {
-    console.error('Error saving to cache:', e);
-  }
-}
-
-// Function to get data from cache
-function getFromCache(key) {
-  try {
-    const cached = localStorage.getItem(key);
-    if (cached) {
-      const { data, timestamp } = JSON.parse(cached);
-      if (isCacheValid(timestamp)) {
-        return data;
-      }
-    }
-  } catch (e) {
-    console.error('Error reading from cache:', e);
-  }
-  return null;
-}
 
 // Debounced search function
 const debouncedFetchBySearch = debounce((query, filters) => {
@@ -162,16 +128,6 @@ const debouncedFetchBySearch = debounce((query, filters) => {
 // Change the fetchCafes function to include filter parameters
 async function fetchCafes(page, filters = null) {
   // Use a cache key that represents the current filters and page
-  const cacheKey = `cafes_${page}_${JSON.stringify(filters)}_${searchQuery.value}`;
-  const cachedData = getFromCache(cacheKey);
-  
-  if (cachedData) {
-    console.log(`Using cached data for page ${page}`);
-    data.value = cachedData.data;
-    totalCafes.value = cachedData.totalCafes;
-    loading.value = false;
-    return;
-  }
   
   loading.value = true
   const { $supabase } = useNuxtApp()
@@ -196,12 +152,12 @@ async function fetchCafes(page, filters = null) {
       
       // Rating filter - needs to handle the Math.round() issue
       if (filters.rating && filters.rating.length > 0) {
-        // For ratings, we need a more complex filter because we're rounding in the UI
-        // This is a simplified approach - ideally use a between range for each rating
-        const minRating = Math.min(...filters.rating) - 0.5
-        const maxRating = Math.max(...filters.rating) + 0.49
-        query = query.gte('rating', minRating).lte('rating', maxRating)
-        console.log(`Filtering by ratings between ${minRating} and ${maxRating}`)
+        if (filters.rating && filters.rating.length > 0) {
+          query = query.or(
+            filters.rating.map(rating => `rating.like.${rating}%`).join(',')
+          )
+          console.log(`Filtering by ratings: ${filters.rating.join(', ')}`)
+        }
       }
       
       // Price range filter
@@ -237,12 +193,6 @@ async function fetchCafes(page, filters = null) {
   }
 
   // Add caching at the end of the fetch
-  if (data.value && !error) {
-    saveToCache(cacheKey, {
-      data: data.value,
-      totalCafes: totalCafes.value
-    });
-  }
 }
 
 // Update the watch functionality to apply filters
@@ -298,15 +248,6 @@ const uniquePriceRanges = ref([])
 // Modify fetchFilterOptions to use caching
 async function fetchFilterOptions() {
   // Try to get filter options from cache first
-  const cachedFilters = getFromCache('cafeFilterOptions');
-  if (cachedFilters) {
-    console.log('Using cached filter options');
-    uniqueCities.value = cachedFilters.cities || [];
-    uniqueRatings.value = cachedFilters.ratings || [];
-    uniquePriceRanges.value = cachedFilters.ranges || [];
-    return;
-  }
-
   const { $supabase } = useNuxtApp();
   
   try {
@@ -348,23 +289,12 @@ async function fetchFilterOptions() {
       )].sort();
     }
     
-    // Cache the filter options
-    saveToCache('cafeFilterOptions', {
-      cities: uniqueCities.value,
-      ratings: uniqueRatings.value,
-      ranges: uniquePriceRanges.value
-    });
-    
   } catch (err) {
     console.error('Exception fetching filter options:', err);
     // ... your existing error handling ...
   }
 }
 
-function handleImageError(event) {
-  event.target.src = '/src/assets/img/noImage_placeholder.webp' // Set a default image
-  console.error('Image failed to load:', event.target.src)
-}
 
 function performSearch() {
   console.log('Performing search with query:', searchQuery.value)
@@ -414,7 +344,7 @@ export default {
 <style scoped>
 @font-face {
   font-family: 'Sharp Grotesk';
-  src: url('~assets/fonts/sharp-grotesk-medium-25-regular.woff') format('woff');
+  src: url('~/assets/fonts/sharp-grotesk-medium-25-regular.woff') format('woff');
   font-weight: normal;
   font-style: normal;
 }
