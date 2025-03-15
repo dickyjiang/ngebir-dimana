@@ -3,6 +3,7 @@
       <div class="w-full pb-2 border-b border-gray-400 mb-4">
         <h2 class="text-lg font-medium">Filter</h2>
       </div>
+      
       <div class="mb-8">
         <h3 class="text-sm font-medium">Rating</h3>
         <div class="flex flex-wrap gap-2 text-xs text-nowrap my-4">
@@ -42,9 +43,13 @@
   
   const props = defineProps({
     activeFilters: Object,
-    cities: Array, // Ensure this is declared
-    ratings: Array, // Add ratings prop
-    ranges: Array // Renamed from priceRanges to match parent component
+    cities: Array,
+    ratings: Array,
+    ranges: Array,
+    // Keep these props for compatibility, but we won't use them in the sidebar
+    onNearbyToggle: Function,
+    isNearbyActive: Boolean,
+    locationLoading: Boolean
   })
   
   onMounted(() => {
@@ -74,6 +79,13 @@
       props.activeFilters[type].splice(index, 1)
     } else {
       props.activeFilters[type].push(value)
+    }
+  }
+  
+  // Keep this function for compatibility but it won't be used in the sidebar
+  function toggleNearbyFilter() {
+    if (props.onNearbyToggle) {
+      props.onNearbyToggle()
     }
   }
   

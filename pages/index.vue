@@ -17,6 +17,15 @@
             </div>
           </div>
         </div>
+        <div class="mt-8 w-full flex flex-row gap-4 items-center justify-center">
+          <button @click="toggleNearbyFilter" 
+            :class="{ 'text-black bg-white': isNearbyActive, 'text-white border border-white': !isNearbyActive }"
+            class="px-4 py-2 rounded-full flex items-center gap-2">
+            <span v-if="locationLoading" class="inline-block w-3 h-3 border-2 border-t-transparent rounded-full animate-spin"
+              :class="{ 'border-black': isNearbyActive, 'border-white': !isNearbyActive }"></span>
+            <span>Cafe terdekat</span>
+          </button>
+        </div>
       </div>
     </div>
   </section>
@@ -28,6 +37,9 @@
         :cities="uniqueCities"
         :ratings="uniqueRatings"
         :ranges="uniquePriceRanges"
+        :onNearbyToggle="toggleNearbyFilter"
+        :isNearbyActive="isNearbyActive"
+        :locationLoading="locationLoading"
       />
     </div>
     <div class="p-4 flex-1">
@@ -105,6 +117,13 @@ const currentPage = ref(1)
 const itemsPerPage = 12
 const searchQuery = ref('')
 
+// Add state for user location and nearby filter
+const userLocation = ref(null)
+const locationLoading = ref(false)
+const locationError = ref(null)
+const isNearbyActive = ref(false)
+const nearbyRadius = 10 // in kilometers
+
 // Initialize activeFilters with all expected properties
 const activeFilters = ref({ rating: [], range: [], city: [] })
 
@@ -116,8 +135,6 @@ function toggleFilter(type, value) {
     activeFilters.value[type].push(value)
   }
 }
-
-
 
 // Debounced search function
 const debouncedFetchBySearch = debounce((query, filters) => {
@@ -295,7 +312,6 @@ async function fetchFilterOptions() {
   }
 }
 
-
 function performSearch() {
   console.log('Performing search with query:', searchQuery.value)
 }
@@ -324,6 +340,161 @@ function changePage(page) {
   if (page >= 1 && page <= totalPages.value) {
     currentPage.value = page
     fetchCafes(page, activeFilters.value) // Pass the current filters when changing page
+  }
+}
+
+// Get user location
+async function getUserLocation() {
+  if (userLocation.value) {
+    // If we already have the location, just use it
+    return userLocation.value
+  }
+  
+  locationLoading.value = true
+  locationError.value = null
+  
+  try {
+    // Check if geolocation is available
+    if (!navigator.geolocation) {
+      console.warn("Geolocation is not supported by your browser")
+      locationError.value = "Geolocation is not supported by your browser"
+      throw new Error("Geolocation not supported")
+    }
+    
+    // Get current position with a shorter timeout
+    const position = await new Promise((resolve, reject) => {
+      navigator.geolocation.getCurrentPosition(
+        resolve, 
+        reject, 
+        {
+          enableHighAccuracy: false, // Changed to false for faster response
+          timeout: 5000, // 5 seconds timeout
+          maximumAge: 60000 // Allow cached positions up to 1 minute old
+        }
+      )
+    })
+    
+    userLocation.value = {
+      latitude: position.coords.latitude,
+      longitude: position.coords.longitude
+    }
+    
+    console.log("User location:", userLocation.value)
+    return userLocation.value
+  } catch (error) {
+    console.error("Error getting user location:", error)
+    locationError.value = error.message || "Unable to get your location"
+    throw error
+  } finally {
+    locationLoading.value = false
+  }
+}
+
+// Calculate distance between two points using Haversine formula
+function calculateDistance(lat1, lon1, lat2, lon2) {
+  const R = 6371 // Radius of the earth in km
+  const dLat = deg2rad(lat2 - lat1)
+  const dLon = deg2rad(lon2 - lon1)
+  const a = 
+    Math.sin(dLat/2) * Math.sin(dLat/2) +
+    Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * 
+    Math.sin(dLon/2) * Math.sin(dLon/2)
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))
+  const distance = R * c // Distance in km
+  return distance
+}
+
+function deg2rad(deg) {
+  return deg * (Math.PI/180)
+}
+
+// Toggle nearby filter
+async function toggleNearbyFilter() {
+  try {
+    if (isNearbyActive.value) {
+      // If already active, deactivate it
+      isNearbyActive.value = false
+      // Clear any city filters that might have been set
+      activeFilters.value.city = []
+      // Fetch all cafes
+      fetchCafes(1, activeFilters.value)
+      return
+    }
+    
+    // Get user location
+    await getUserLocation()
+    
+    if (!userLocation.value) {
+      console.error("No user location available")
+      return
+    }
+    
+    // Activate nearby filter
+    isNearbyActive.value = true
+    
+    // Fetch cafes with location data to calculate distances
+    await fetchCafesWithLocation()
+  } catch (error) {
+    console.error("Error toggling nearby filter:", error)
+    isNearbyActive.value = false
+  }
+}
+
+// Fetch cafes with location data to calculate distances
+async function fetchCafesWithLocation() {
+  loading.value = true
+  const { $supabase } = useNuxtApp()
+  
+  try {
+    // Fetch all cafes with latitude and longitude
+    const { data: cafesWithLocation, error } = await $supabase
+      .from('cafes')
+      .select('id, latitude, longitude, city')
+      .not('latitude', 'is', null)
+      .not('longitude', 'is', null)
+    
+    if (error) {
+      console.error('Error fetching cafes with location:', error)
+      return
+    }
+    
+    if (!cafesWithLocation || cafesWithLocation.length === 0) {
+      console.warn('No cafes with location data found')
+      return
+    }
+    
+    console.log(`Found ${cafesWithLocation.length} cafes with location data`)
+    
+    // Calculate distances
+    const nearbyCities = new Set()
+    
+    cafesWithLocation.forEach(cafe => {
+      if (cafe.latitude && cafe.longitude && cafe.city) {
+        const distance = calculateDistance(
+          userLocation.value.latitude, 
+          userLocation.value.longitude,
+          cafe.latitude,
+          cafe.longitude
+        )
+        
+        // If within radius, add the city to our set
+        if (distance <= nearbyRadius) {
+          nearbyCities.add(cafe.city)
+        }
+      }
+    })
+    
+    console.log(`Found ${nearbyCities.size} nearby cities:`, Array.from(nearbyCities))
+    
+    // Update city filters to include only nearby cities
+    activeFilters.value.city = Array.from(nearbyCities)
+    
+    // Fetch cafes with the updated city filters
+    fetchCafes(1, activeFilters.value)
+  } catch (err) {
+    console.error('Error in fetchCafesWithLocation:', err)
+  } finally {
+    loading.value = false
   }
 }
 
