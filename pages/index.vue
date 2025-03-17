@@ -1,6 +1,6 @@
 <template>
   <section id="hero" class="my-4 px-4 h-[35svh] sm:h-[40svh]">
-    <div class="container mx-auto rounded-2xl overflow-clip relative flex items-center justify-center h-full">
+    <div class="container mx-auto lg:max-w-[90%] rounded-2xl overflow-clip relative flex items-center justify-center h-full">
       <img class="object-cover object-center w-full h-full" src="/src/assets/img/hero.webp" alt="hero image" />
       <div class="absolute inset-0 bg-black opacity-55 z-[1]"></div>
       <div class="absolute z-[2] flex flex-col items-center justify-center w-[90%] sm:w-[80%] mx-auto h-full">
@@ -28,7 +28,7 @@
     </div>
   </section>
   <PopularCategories class="hidden" :categories="popularCategories" />
-  <section id="main-content" class="flex sm:px-4">
+  <section id="main-content" class="flex sm:px-4  sm:max-w-[90%] mx-auto">
     <!-- Mobile Toggle Button -->
     <button 
       @click="toggleSidebar"
