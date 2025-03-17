@@ -29,7 +29,32 @@
   </section>
   <PopularCategories class="hidden" :categories="popularCategories" />
   <section id="main-content" class="flex sm:px-4">
-    <div class="sticky top-4 w-full max-w-[20%] p-4 border border-gray-400 hidden md:block" style="height: 100vh; overflow-y: auto;">
+    <!-- Mobile Toggle Button -->
+    <button 
+      @click="toggleSidebar"
+      class="fixed bottom-4 right-4 z-50 md:hidden bg-gray-800 text-white px-6 py-3 rounded-full shadow-lg text-sm font-medium"
+    >
+      {{ isSidebarOpen ? 'Close' : 'Filter' }}
+    </button>
+
+    <!-- Sidebar Overlay for Mobile -->
+    <div 
+      v-if="isSidebarOpen" 
+      @click="toggleSidebar"
+      class="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
+    ></div>
+
+    <!-- Sidebar -->
+    <div 
+      :class="{
+        'fixed inset-y-0 left-0 w-[80%] bg-white z-40 transform transition-transform duration-300 ease-in-out': true,
+        'translate-x-0': isSidebarOpen,
+        '-translate-x-full': !isSidebarOpen,
+        'md:translate-x-0 md:static md:w-[20%] md:max-w-[20%]': true
+      }"
+      class="p-4 border border-gray-400"
+      style="height: 100vh; overflow-y: auto;"
+    >
       <Sidebar 
         :activeFilters="activeFilters" 
         :cities="uniqueCities"
@@ -114,6 +139,9 @@ const loading = ref(true)
 const currentPage = ref(1)
 const itemsPerPage = 12
 const searchQuery = ref('')
+
+// Add state for sidebar visibility
+const isSidebarOpen = ref(false)
 
 // Add state for user location and nearby filter
 const userLocation = ref(null)
@@ -494,6 +522,11 @@ async function fetchCafesWithLocation() {
   } finally {
     loading.value = false
   }
+}
+
+// Function to toggle sidebar
+function toggleSidebar() {
+  isSidebarOpen.value = !isSidebarOpen.value
 }
 
 onMounted(async () => {
