@@ -1,26 +1,24 @@
 <template>
-  <section id="hero" class="my-4 px-4 h-[25svh] sm:h-[40svh]">
+  <section id="hero" class="my-4 px-4 h-[35svh] sm:h-[40svh]">
     <div class="container mx-auto rounded-2xl overflow-clip relative flex items-center justify-center h-full">
       <img class="object-cover object-center w-full h-full" src="/src/assets/img/hero.webp" alt="hero image" />
       <div class="absolute inset-0 bg-black opacity-55 z-10"></div>
-      <div class="absolute z-20 flex flex-col items-center justify-center w-[80%] mx-auto h-full">
-        <h1 class="text-3xl sm:text-5xl text-white text-center font-medium tracking-wide mb-4">Ngopi di mana?</h1>
-        <h2 class="text-md sm:text-xl tracking-wide text-white mb-4 text-center">{{ totalCafes }} Cafe's Directory</h2>
-        <div class="mt-4 w-full flex flex-col gap-4 items-center justify-center">
-          <div class="flex items-center gap-2 w-full max-w-lg">
+      <div class="absolute z-20 flex flex-col items-center justify-center w-[90%] sm:w-[80%] mx-auto h-full">
+        <h1 class="text-2xl sm:text-5xl text-white text-center font-medium tracking-wide mb-2 sm:mb-4">Ngopi di mana?</h1>
+        <h2 class="text-sm sm:text-xl tracking-wide text-white mb-2 sm:mb-4 text-center">{{ totalCafes }} Cafe's Directory</h2>
+        <div class="mt-2 sm:mt-4 w-full flex flex-col gap-2 sm:gap-4 items-center justify-center px-4">
+          <div class="flex items-center gap-2 w-full">
             <input v-model="searchQuery" type="text" placeholder="Search cafes..."
-              class="text-sm sm:text-base border w-full max-w-md border-gray-600 rounded-lg p-2 sm:p-3 pr-10" />
-            <div class="relative">
-              <button @click="performSearch" class="absolute right-6 top-1/2 transform -translate-y-1/2 text-gray-500">
-                <i class="fas fa-search"></i>
-              </button>
-            </div>
+              class="text-sm sm:text-base border w-full border-gray-600 rounded-lg p-2 sm:p-3 pr-8" />
+            <button @click="performSearch" class="text-gray-500 -ml-8">
+              <i class="fas fa-search"></i>
+            </button>
           </div>
         </div>
-        <div class="mt-8 w-full flex flex-row gap-4 items-center justify-center">
+        <div class="mt-4 sm:mt-8 w-full flex flex-row gap-4 items-center justify-center">
           <button @click="toggleNearbyFilter" 
             :class="{ 'text-black bg-white': isNearbyActive, 'text-white border border-white': !isNearbyActive }"
-            class="px-4 py-2 rounded-full flex items-center gap-2">
+            class="px-3 sm:px-4 py-1 sm:py-2 rounded-full flex items-center gap-2 text-sm sm:text-base">
             <span v-if="locationLoading" class="inline-block w-3 h-3 border-2 border-t-transparent rounded-full animate-spin"
               :class="{ 'border-black': isNearbyActive, 'border-white': !isNearbyActive }"></span>
             <span>Cafe terdekat</span>
