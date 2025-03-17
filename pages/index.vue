@@ -6,7 +6,7 @@
       <div class="absolute z-20 flex flex-col items-center justify-center w-[90%] sm:w-[80%] mx-auto h-full">
         <h1 class="text-2xl sm:text-5xl text-white text-center font-medium tracking-wide mb-2 sm:mb-4">Ngopi di mana?</h1>
         <h2 class="text-sm sm:text-xl tracking-wide text-white mb-2 sm:mb-4 text-center">{{ totalCafes }} Cafe's Directory</h2>
-        <div class="mt-2 sm:mt-4 w-full flex flex-col gap-2 sm:gap-4 items-center justify-center px-4">
+        <div class="mt-2 sm:mt-4 w-full sm:w-1/2 flex flex-col gap-2 sm:gap-4 items-center justify-center px-4">
           <div class="flex items-center gap-2 w-full">
             <input v-model="searchQuery" type="text" placeholder="Search cafes..."
               class="text-sm sm:text-base border w-full border-gray-600 rounded-lg p-2 sm:p-3 pr-8" />
