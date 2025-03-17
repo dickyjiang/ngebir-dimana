@@ -2,9 +2,13 @@
   "name": "nuxt-app",
   "private": true,
   "type": "module",
+  "engines": {
+    "node": ">=18.20.5"
+  },
   "scripts": {
     "build": "nuxt build",
     "dev": "nuxt dev",
+    "dev:watch": "nuxt dev --watch",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare"
@@ -22,5 +26,9 @@
   "devDependencies": {
     "@nuxtjs/gtm": "^2.4.0",
     "vue-gtag-next": "^1.14.0"
+  },
+  "overrides": {
+    "execa": "^7.2.0",
+    "human-signals": "^5.0.0"
   }
 }
