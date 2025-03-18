@@ -10,22 +10,25 @@
           <div class="flex items-center gap-2 w-full">
             <input v-model="searchQuery" type="text" placeholder="Search cafes..."
               class="text-sm sm:text-base border w-full border-gray-600 rounded-lg p-2 sm:p-3 pr-8" />
-            <button @click="performSearch" class="text-gray-500 -ml-8">
+            <button @click="performSearch" class="text-gray-500 -ml-10">
               <i class="fas fa-search"></i>
             </button>
           </div>
         </div>
-        <div class="mt-4 sm:mt-8 w-full flex flex-row gap-4 items-center justify-center">
+        <
+      </div>
+    </div>
+  </section>
+  <section id="popular-categories" class="my-4">
+    <div class="my-4 sm:my-4 w-full py-2 sm:max-w-[90%] mx-auto flex flex-row gap-4 items-center justify-center rounded-lg">
           <button @click="toggleNearbyFilter" 
-            :class="{ 'text-black bg-white': isNearbyActive, 'text-white border border-white': !isNearbyActive }"
-            class="px-3 sm:px-4 py-1 sm:py-2 rounded-full flex items-center gap-2 text-sm sm:text-base cursor-pointer touch-manipulation">
+            :class="{ 'text-white bg-black': isNearbyActive, 'text-gray-500 border border-gray-400': !isNearbyActive }"
+            class="px-3 sm:px-4 py-1 sm:py-2 rounded-full flex items-center gap-2 text-xs sm:text-base cursor-pointer touch-manipulation">
             <span v-if="locationLoading" class="inline-block w-3 h-3 border-2 border-t-transparent rounded-full animate-spin"
-              :class="{ 'border-black': isNearbyActive, 'border-white': !isNearbyActive }"></span>
+              :class="{ 'border-black': isNearbyActive, 'border-black': !isNearbyActive }"></span>
             <span>Cafe terdekat</span>
           </button>
         </div>
-      </div>
-    </div>
   </section>
   <PopularCategories class="hidden" :categories="popularCategories" />
   <section id="main-content" class="flex sm:px-4  sm:max-w-[90%] mx-auto">
@@ -553,6 +556,21 @@ export default {
 
 h1 {
   font-family: 'Sharp Grotesk', sans-serif; /* Fallback to sans-serif */
+}
+
+/* Global focus styles */
+:focus {
+  outline: none !important;
+  box-shadow: 0 0 0 1px black !important;
+}
+
+:focus:not(:focus-visible) {
+  box-shadow: none !important;
+}
+
+:focus-visible {
+  outline: none !important;
+  box-shadow: 0 0 0 1px black !important;
 }
 
 /* ... existing styles ... */

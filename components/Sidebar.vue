@@ -95,5 +95,22 @@
   </script>
   
   <style scoped>
-  /* Add any component-specific styles here */
+  /* Remove default blue focus ring and replace with black for all focusable elements */
+  button:focus, input:focus, select:focus, textarea:focus, a:focus, [tabindex]:focus {
+    outline: none;
+    box-shadow: 0 0 0 1px black;
+  }
+  
+  /* Ensure focus styles work with keyboard navigation for accessibility */
+  button:focus:not(:focus-visible), input:focus:not(:focus-visible), 
+  select:focus:not(:focus-visible), textarea:focus:not(:focus-visible), 
+  a:focus:not(:focus-visible), [tabindex]:focus:not(:focus-visible) {
+    box-shadow: none;
+  }
+  
+  button:focus-visible, input:focus-visible, select:focus-visible, 
+  textarea:focus-visible, a:focus-visible, [tabindex]:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 1px black;
+  }
   </style>
