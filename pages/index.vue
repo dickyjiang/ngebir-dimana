@@ -45,16 +45,16 @@
     <div
       class="my-4 sm:my-4 w-full py-2 sm:max-w-[90%] mx-auto flex flex-row gap-4 items-center justify-center rounded-lg"
     >
-      <button
+      <div
+        @touchstart.prevent="toggleNearbyFilter"
         @click="toggleNearbyFilter"
         :class="{
           'text-white bg-black': isNearbyActive,
           'text-gray-500 border border-gray-400': !isNearbyActive,
         }"
-        class="px-3 sm:px-4 py-1 sm:py-2 rounded-full flex items-center gap-2 text-xs sm:text-base cursor-pointer touch-manipulation"
-        style="-webkit-tap-highlight-color: transparent; touch-action: manipulation;"
-        type="button"
+        class="px-3 sm:px-4 py-1 sm:py-2 rounded-full flex items-center gap-2 text-xs sm:text-base cursor-pointer"
         role="button"
+        tabindex="0"
       >
         <span
           v-if="locationLoading"
@@ -65,7 +65,7 @@
           }"
         ></span>
         <span>Cafe terdekat</span>
-      </button>
+      </div>
     </div>
   </section>
   <PopularCategories class="hidden" :categories="popularCategories" />
@@ -485,11 +485,32 @@ async function getUserLocation() {
 
     // Get current position with a shorter timeout
     const position = await new Promise((resolve, reject) => {
-      navigator.geolocation.getCurrentPosition(resolve, reject, {
-        enableHighAccuracy: false, // Changed to false for faster response
-        timeout: 5000, // 5 seconds timeout
-        maximumAge: 60000, // Allow cached positions up to 1 minute old
-      });
+      // Try to get position using both methods for iOS compatibility
+      const watchId = navigator.geolocation.watchPosition(
+        (pos) => {
+          navigator.geolocation.clearWatch(watchId);
+          resolve(pos);
+        },
+        (err) => {
+          console.warn("Error in watchPosition:", err);
+          // Fallback to getCurrentPosition
+          navigator.geolocation.getCurrentPosition(resolve, reject, {
+            enableHighAccuracy: false,
+            timeout: 10000,
+            maximumAge: 60000,
+          });
+        },
+        {
+          enableHighAccuracy: false,
+          timeout: 5000,
+          maximumAge: 60000,
+        }
+      );
+      
+      // Set a timeout to clear the watch if it takes too long
+      setTimeout(() => {
+        navigator.geolocation.clearWatch(watchId);
+      }, 15000);
     });
 
     userLocation.value = {
@@ -529,8 +550,17 @@ function deg2rad(deg) {
 }
 
 // Toggle nearby filter
+let isToggleInProgress = false;
+
 async function toggleNearbyFilter() {
+  // Prevent multiple rapid calls
+  if (isToggleInProgress) return;
+  
+  isToggleInProgress = true;
+  
   try {
+    console.log("Toggle nearby filter called");
+    
     if (isNearbyActive.value) {
       // If already active, deactivate it
       isNearbyActive.value = false;
@@ -557,6 +587,11 @@ async function toggleNearbyFilter() {
   } catch (error) {
     console.error("Error toggling nearby filter:", error);
     isNearbyActive.value = false;
+  } finally {
+    // Add a small delay before allowing the function to be called again
+    setTimeout(() => {
+      isToggleInProgress = false;
+    }, 300);
   }
 }
 
@@ -700,9 +735,30 @@ h1 {
 }
 
 /* Fix for iOS touch events */
-button {
+button, [role="button"] {
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  position: relative;
+  z-index: 1;
+}
+
+/* Add special iOS tap handling for button-like elements */
+[role="button"] {
+  position: relative;
+}
+
+[role="button"]::after {
+  content: "";
+  display: block;
+  position: absolute;
+  top: -10px;
+  left: -10px;
+  right: -10px;
+  bottom: -10px;
+  z-index: 0;
 }
 </style>
