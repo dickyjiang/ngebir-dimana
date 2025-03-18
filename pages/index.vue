@@ -45,16 +45,15 @@
     <div
       class="my-4 sm:my-4 w-full py-2 sm:max-w-[90%] mx-auto flex flex-row gap-4 items-center justify-center rounded-lg"
     >
-      <div
-        @touchstart.prevent="toggleNearbyFilter"
+      <button
         @click="toggleNearbyFilter"
+        onclick="try { window.iOSToggleNearbyFilter && window.iOSToggleNearbyFilter(); } catch(e) { console.error('iOS handler error:', e); }"
         :class="{
           'text-white bg-black': isNearbyActive,
           'text-gray-500 border border-gray-400': !isNearbyActive,
         }"
-        class="px-3 sm:px-4 py-1 sm:py-2 rounded-full flex items-center gap-2 text-xs sm:text-base cursor-pointer"
-        role="button"
-        tabindex="0"
+        class="px-3 sm:px-4 py-1 sm:py-2 rounded-full flex items-center gap-2 text-xs sm:text-base font-medium"
+        style="min-width: 120px; min-height: 40px;"
       >
         <span
           v-if="locationLoading"
@@ -65,7 +64,7 @@
           }"
         ></span>
         <span>Cafe terdekat</span>
-      </div>
+      </button>
     </div>
   </section>
   <PopularCategories class="hidden" :categories="popularCategories" />
@@ -553,15 +552,37 @@ function deg2rad(deg) {
 let isToggleInProgress = false;
 
 async function toggleNearbyFilter() {
+  // For debugging
+  console.log("toggleNearbyFilter triggered");
+  
+  // Check if running on iOS
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+                (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  
+  if (isIOS) {
+    console.log("Running on iOS device");
+    // Try to show alert for debugging on iOS
+    try {
+      alert("Button clicked on iOS!");
+    } catch (e) {
+      console.error("Could not show alert:", e);
+    }
+  }
+  
   // Prevent multiple rapid calls
-  if (isToggleInProgress) return;
+  if (isToggleInProgress) {
+    console.log("Toggle already in progress, ignoring");
+    return;
+  }
   
   isToggleInProgress = true;
+  console.log("Setting isToggleInProgress to true");
   
   try {
-    console.log("Toggle nearby filter called");
+    console.log("Toggle nearby filter processing");
     
     if (isNearbyActive.value) {
+      console.log("Deactivating nearby filter");
       // If already active, deactivate it
       isNearbyActive.value = false;
       // Clear any city filters that might have been set
@@ -571,6 +592,7 @@ async function toggleNearbyFilter() {
       return;
     }
 
+    console.log("Attempting to get user location");
     // Get user location
     await getUserLocation();
 
@@ -579,18 +601,22 @@ async function toggleNearbyFilter() {
       return;
     }
 
+    console.log("Setting nearby filter to active");
     // Activate nearby filter
     isNearbyActive.value = true;
 
+    console.log("Fetching cafes with location data");
     // Fetch cafes with location data to calculate distances
     await fetchCafesWithLocation();
   } catch (error) {
     console.error("Error toggling nearby filter:", error);
     isNearbyActive.value = false;
   } finally {
+    console.log("Toggle complete, setting timeout to reset isToggleInProgress");
     // Add a small delay before allowing the function to be called again
     setTimeout(() => {
       isToggleInProgress = false;
+      console.log("isToggleInProgress reset to false");
     }, 300);
   }
 }
@@ -661,7 +687,51 @@ function toggleSidebar() {
   isSidebarOpen.value = !isSidebarOpen.value;
 }
 
+// Special handler for iOS
+function iOSToggleNearbyFilter() {
+  console.log("iOS specific toggle handler called");
+  alert("iOS handler activated");
+  
+  // Simple synchronous toggle for iOS
+  if (isNearbyActive.value) {
+    isNearbyActive.value = false;
+    activeFilters.value.city = [];
+    fetchCafes(1, activeFilters.value);
+  } else {
+    // Request location
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        userLocation.value = {
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+        };
+        isNearbyActive.value = true;
+        fetchCafesWithLocation();
+      },
+      (error) => {
+        console.error("Error getting location:", error);
+        alert("Could not get your location. Please check your location settings.");
+      },
+      {
+        enableHighAccuracy: false,
+        timeout: 10000,
+        maximumAge: 60000
+      }
+    );
+  }
+}
+
 onMounted(async () => {
+  // Add the functions to window for iOS compatibility
+  window.toggleNearbyFilter = toggleNearbyFilter;
+  window.iOSToggleNearbyFilter = iOSToggleNearbyFilter;
+  
+  // Detect iOS specifically
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+                (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+                
+  console.log("Is iOS device:", isIOS);
+  
   // Fetch city options for filters first
   await fetchFilterOptions();
   // Then fetch cafe data for the current page (no filters initially)
@@ -735,7 +805,7 @@ h1 {
 }
 
 /* Fix for iOS touch events */
-button, [role="button"] {
+button, [role="button"], a {
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
@@ -747,11 +817,11 @@ button, [role="button"] {
 }
 
 /* Add special iOS tap handling for button-like elements */
-[role="button"] {
+[role="button"], a {
   position: relative;
 }
 
-[role="button"]::after {
+[role="button"]::after, a::after {
   content: "";
   display: block;
   position: absolute;
