@@ -36,6 +36,24 @@
               <i class="fas fa-search"></i>
             </button>
           </div>
+          <button
+            @click="toggleNearbyFilter"
+            :class="{
+              'text-yellow-500 bg-black border border-yellow-500': isNearbyActive,
+              'text-gray-100 border border-gray-400': !isNearbyActive,
+            }"
+            class="mt-2 px-3 sm:px-4 py-1 sm:py-2 rounded-full flex items-center gap-2 text-xs sm:text-base cursor-pointer touch-manipulation"
+          >
+            <span
+              v-if="locationLoading"
+              class="inline-block w-3 h-3 border-2 border-t-transparent rounded-full animate-spin"
+              :class="{
+                'border-yellow-500': isNearbyActive,
+                'border-black': !isNearbyActive,
+              }"
+            ></span>
+            <span>Cafe terdekat</span>
+          </button>
         </div>
         <
       </div>
@@ -45,24 +63,7 @@
     <div
       class="my-4 sm:my-4 w-full py-2 sm:max-w-[90%] mx-auto flex flex-row gap-4 items-center justify-center rounded-lg"
     >
-      <button
-        @click="toggleNearbyFilter"
-        :class="{
-          'text-white bg-black': isNearbyActive,
-          'text-gray-500 border border-gray-400': !isNearbyActive,
-        }"
-        class="px-3 sm:px-4 py-1 sm:py-2 rounded-full flex items-center gap-2 text-xs sm:text-base cursor-pointer touch-manipulation"
-      >
-        <span
-          v-if="locationLoading"
-          class="inline-block w-3 h-3 border-2 border-t-transparent rounded-full animate-spin"
-          :class="{
-            'border-black': isNearbyActive,
-            'border-black': !isNearbyActive,
-          }"
-        ></span>
-        <span>Cafe terdekat</span>
-      </button>
+      <!-- Button removed from here -->
     </div>
   </section>
   <PopularCategories class="hidden" :categories="popularCategories" />
