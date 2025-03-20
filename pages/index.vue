@@ -47,13 +47,11 @@
     >
       <button
         @click="toggleNearbyFilter"
-        onclick="try { window.iOSToggleNearbyFilter && window.iOSToggleNearbyFilter(); } catch(e) { console.error('iOS handler error:', e); }"
         :class="{
           'text-white bg-black': isNearbyActive,
           'text-gray-500 border border-gray-400': !isNearbyActive,
         }"
-        class="px-3 sm:px-4 py-1 sm:py-2 rounded-full flex items-center gap-2 text-xs sm:text-base font-medium"
-        style="min-width: 120px; min-height: 40px;"
+        class="px-3 sm:px-4 py-1 sm:py-2 rounded-full flex items-center gap-2 text-xs sm:text-base cursor-pointer touch-manipulation"
       >
         <span
           v-if="locationLoading"
@@ -484,32 +482,11 @@ async function getUserLocation() {
 
     // Get current position with a shorter timeout
     const position = await new Promise((resolve, reject) => {
-      // Try to get position using both methods for iOS compatibility
-      const watchId = navigator.geolocation.watchPosition(
-        (pos) => {
-          navigator.geolocation.clearWatch(watchId);
-          resolve(pos);
-        },
-        (err) => {
-          console.warn("Error in watchPosition:", err);
-          // Fallback to getCurrentPosition
-          navigator.geolocation.getCurrentPosition(resolve, reject, {
-            enableHighAccuracy: false,
-            timeout: 10000,
-            maximumAge: 60000,
-          });
-        },
-        {
-          enableHighAccuracy: false,
-          timeout: 5000,
-          maximumAge: 60000,
-        }
-      );
-      
-      // Set a timeout to clear the watch if it takes too long
-      setTimeout(() => {
-        navigator.geolocation.clearWatch(watchId);
-      }, 15000);
+      navigator.geolocation.getCurrentPosition(resolve, reject, {
+        enableHighAccuracy: false, // Changed to false for faster response
+        timeout: 5000, // 5 seconds timeout
+        maximumAge: 60000, // Allow cached positions up to 1 minute old
+      });
     });
 
     userLocation.value = {
@@ -549,40 +526,9 @@ function deg2rad(deg) {
 }
 
 // Toggle nearby filter
-let isToggleInProgress = false;
-
 async function toggleNearbyFilter() {
-  // For debugging
-  console.log("toggleNearbyFilter triggered");
-  
-  // Check if running on iOS
-  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
-                (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-  
-  if (isIOS) {
-    console.log("Running on iOS device");
-    // Try to show alert for debugging on iOS
-    try {
-      alert("Button clicked on iOS!");
-    } catch (e) {
-      console.error("Could not show alert:", e);
-    }
-  }
-  
-  // Prevent multiple rapid calls
-  if (isToggleInProgress) {
-    console.log("Toggle already in progress, ignoring");
-    return;
-  }
-  
-  isToggleInProgress = true;
-  console.log("Setting isToggleInProgress to true");
-  
   try {
-    console.log("Toggle nearby filter processing");
-    
     if (isNearbyActive.value) {
-      console.log("Deactivating nearby filter");
       // If already active, deactivate it
       isNearbyActive.value = false;
       // Clear any city filters that might have been set
@@ -592,7 +538,6 @@ async function toggleNearbyFilter() {
       return;
     }
 
-    console.log("Attempting to get user location");
     // Get user location
     await getUserLocation();
 
@@ -601,23 +546,14 @@ async function toggleNearbyFilter() {
       return;
     }
 
-    console.log("Setting nearby filter to active");
     // Activate nearby filter
     isNearbyActive.value = true;
 
-    console.log("Fetching cafes with location data");
     // Fetch cafes with location data to calculate distances
     await fetchCafesWithLocation();
   } catch (error) {
     console.error("Error toggling nearby filter:", error);
     isNearbyActive.value = false;
-  } finally {
-    console.log("Toggle complete, setting timeout to reset isToggleInProgress");
-    // Add a small delay before allowing the function to be called again
-    setTimeout(() => {
-      isToggleInProgress = false;
-      console.log("isToggleInProgress reset to false");
-    }, 300);
   }
 }
 
@@ -687,51 +623,7 @@ function toggleSidebar() {
   isSidebarOpen.value = !isSidebarOpen.value;
 }
 
-// Special handler for iOS
-function iOSToggleNearbyFilter() {
-  console.log("iOS specific toggle handler called");
-  alert("iOS handler activated");
-  
-  // Simple synchronous toggle for iOS
-  if (isNearbyActive.value) {
-    isNearbyActive.value = false;
-    activeFilters.value.city = [];
-    fetchCafes(1, activeFilters.value);
-  } else {
-    // Request location
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        userLocation.value = {
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
-        };
-        isNearbyActive.value = true;
-        fetchCafesWithLocation();
-      },
-      (error) => {
-        console.error("Error getting location:", error);
-        alert("Could not get your location. Please check your location settings.");
-      },
-      {
-        enableHighAccuracy: false,
-        timeout: 10000,
-        maximumAge: 60000
-      }
-    );
-  }
-}
-
 onMounted(async () => {
-  // Add the functions to window for iOS compatibility
-  window.toggleNearbyFilter = toggleNearbyFilter;
-  window.iOSToggleNearbyFilter = iOSToggleNearbyFilter;
-  
-  // Detect iOS specifically
-  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
-                (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-                
-  console.log("Is iOS device:", isIOS);
-  
   // Fetch city options for filters first
   await fetchFilterOptions();
   // Then fetch cafe data for the current page (no filters initially)
@@ -802,33 +694,5 @@ h1 {
   height: 150px; /* Adjust height to match your design */
   width: 100%;
   margin-bottom: 1em;
-}
-
-/* Fix for iOS touch events */
-button, [role="button"], a {
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-  touch-action: manipulation;
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  user-select: none;
-  position: relative;
-  z-index: 1;
-}
-
-/* Add special iOS tap handling for button-like elements */
-[role="button"], a {
-  position: relative;
-}
-
-[role="button"]::after, a::after {
-  content: "";
-  display: block;
-  position: absolute;
-  top: -10px;
-  left: -10px;
-  right: -10px;
-  bottom: -10px;
-  z-index: 0;
 }
 </style>
