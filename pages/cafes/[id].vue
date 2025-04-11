@@ -48,6 +48,14 @@
                 </div>
               </div>
             </div>
+            <button 
+              v-if="cafe.latitude && cafe.longitude"
+              @click="openInGoogleMaps"
+              class="mt-4 w-full bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg flex items-center justify-center gap-2"
+            >
+              <i class="fas fa-map-marker-alt"></i>
+              Open in Google Maps
+            </button>
             <p class="text-lg text-gray-700 my-2">{{ cafe.description }}</p>
             <div>
             <div class="flex items-center gap-2 py-4 border-b border-gray-500">
@@ -244,6 +252,42 @@ const about = ref({});
 // New JSON string to be added to the About section
 const additionalAboutData =
   '{"Service options": {"Outdoor seating": true, "Takeaway": true, "Dine-in": true}, "Accessibility": {"Wheelchair-accessible car park": false, "Wheelchair-accessible entrance": false, "Wheelchair-accessible seating": false}, "Offerings": {"Coffee": true}, "Dining options": {"Seating": true}, "Amenities": {"Toilets": true}, "Atmosphere": {"Casual": true, "Cosy": true}, "Crowd": {"Groups": true}, "Children": {"Good for kids": true}}';
+
+function openInGoogleMaps() {
+  // First priority: use location_link if available
+  if (cafe.value?.location_link) {
+    console.log('Using location_link');
+    window.open(cafe.value.location_link, '_blank');
+    return;
+  }
+  
+  // Second priority: use place_id
+  if (cafe.value?.place_id) {
+    console.log('Using place_id');
+    const url = `https://www.google.com/maps/place/?q=place_id:${cafe.value.place_id}`;
+    window.open(url, '_blank');
+    return;
+  }
+  
+  // Third priority: use google_id
+  if (cafe.value?.google_id) {
+    console.log('Using google_id');
+    const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(cafe.value.name)}&query_place_id=${cafe.value.google_id}`;
+    window.open(url, '_blank');
+    return;
+  }
+  
+  // Fallback: use coordinates if other options aren't available
+  if (cafe.value?.latitude && cafe.value?.longitude) {
+    console.log('Using coordinates as fallback');
+    const lat = cafe.value.latitude.toString().replace(',', '.').trim();
+    const lng = cafe.value.longitude.toString().replace(',', '.').trim();
+    const url = `https://www.google.com/maps/search/${encodeURIComponent(cafe.value.name)}/@${lat},${lng},17z`;
+    window.open(url, '_blank');
+  } else {
+    console.log('No location data available');
+  }
+}
 
 onMounted(async () => {
   console.log("Route ID:", route.params.id);
