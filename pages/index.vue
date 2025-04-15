@@ -1,4 +1,16 @@
 <template>
+  <!-- Toast Notification -->
+  <div 
+    v-if="showToast" 
+    class="fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg max-w-xs text-white transition-opacity duration-300"
+    :class="{ 'bg-red-500': toastType === 'error', 'bg-green-500': toastType === 'success' }"
+  >
+    <div class="flex items-center justify-between">
+      <span>{{ toastMessage }}</span>
+      <button @click="showToast = false" class="ml-4 text-white font-bold">×</button>
+    </div>
+  </div>
+  
   <section id="hero" class="my-4 px-4 h-[35svh] sm:h-[40svh]">
     <div
       class="container mx-auto lg:max-w-[90%] rounded-2xl overflow-clip relative flex items-center justify-center h-full"
@@ -233,10 +245,15 @@ const userLocation = ref(null);
 const locationLoading = ref(false);
 const locationError = ref(null);
 const isNearbyActive = ref(false);
-const nearbyRadius = 10; // in kilometers
+const nearbyRadius = 3; // in kilometers (reduced from 10km)
 
 // Initialize activeFilters with all expected properties
-const activeFilters = ref({ rating: [], range: [], city: [] });
+const activeFilters = ref({ rating: [], range: [], city: [], borough: [] });
+
+// Add a new ref for toast notifications
+const showToast = ref(false);
+const toastMessage = ref('');
+const toastType = ref('error'); // 'error' or 'success'
 
 function toggleFilter(type, value) {
   const index = activeFilters.value[type].indexOf(value);
@@ -274,6 +291,12 @@ async function fetchCafes(page, filters = null) {
       if (filters.city && filters.city.length > 0) {
         query = query.in("city", filters.city);
         console.log(`Filtering by cities: ${filters.city.join(", ")}`);
+      }
+
+      // Borough filter
+      if (filters.borough && filters.borough.length > 0) {
+        query = query.in("borough", filters.borough);
+        console.log(`Filtering by boroughs: ${filters.borough.join(", ")}`);
       }
 
       // Rating filter - needs to handle the Math.round() issue
@@ -327,6 +350,7 @@ async function fetchCafes(page, filters = null) {
 watch(
   () => [
     JSON.stringify(activeFilters.value.city),
+    JSON.stringify(activeFilters.value.borough),
     JSON.stringify(activeFilters.value.rating),
     JSON.stringify(activeFilters.value.range),
   ],
@@ -483,11 +507,25 @@ async function getUserLocation() {
 
     // Get current position with a shorter timeout
     const position = await new Promise((resolve, reject) => {
-      navigator.geolocation.getCurrentPosition(resolve, reject, {
-        enableHighAccuracy: false, // Changed to false for faster response
-        timeout: 5000, // 5 seconds timeout
-        maximumAge: 60000, // Allow cached positions up to 1 minute old
-      });
+      // iOS Safari needs secure context (HTTPS) to use geolocation
+      // Also, iOS requires explicit user interaction for geolocation permissions
+      const geoOptions = {
+        enableHighAccuracy: true, // Set to true for iOS
+        timeout: 15000, // Increased timeout for iOS (15 seconds)
+        maximumAge: 0 // Don't use cached position on iOS
+      };
+      
+      const handleSuccess = (position) => {
+        console.log("Geolocation success:", position);
+        resolve(position);
+      };
+      
+      const handleError = (error) => {
+        console.warn(`Geolocation error (${error.code}): ${error.message}`);
+        reject(error);
+      };
+      
+      navigator.geolocation.getCurrentPosition(handleSuccess, handleError, geoOptions);
     });
 
     userLocation.value = {
@@ -500,6 +538,16 @@ async function getUserLocation() {
   } catch (error) {
     console.error("Error getting user location:", error);
     locationError.value = error.message || "Unable to get your location";
+    
+    // More user-friendly error message for common geolocation errors
+    if (error.code === 1) {
+      locationError.value = "Location access was denied. Please enable location services for this website in your device settings.";
+    } else if (error.code === 2) {
+      locationError.value = "Unable to determine your location. Please check your device's location settings.";
+    } else if (error.code === 3) {
+      locationError.value = "Location request timed out. Please try again.";
+    }
+    
     throw error;
   } finally {
     locationLoading.value = false;
@@ -534,16 +582,39 @@ async function toggleNearbyFilter() {
       isNearbyActive.value = false;
       // Clear any city filters that might have been set
       activeFilters.value.city = [];
+      activeFilters.value.borough = [];
       // Fetch all cafes
       fetchCafes(1, activeFilters.value);
       return;
     }
 
     // Get user location
-    await getUserLocation();
+    try {
+      await getUserLocation();
+    } catch (error) {
+      // Show a toast notification for location errors
+      toastMessage.value = locationError.value || "Unable to get your location";
+      toastType.value = 'error';
+      showToast.value = true;
+      
+      // Hide toast after 5 seconds
+      setTimeout(() => {
+        showToast.value = false;
+      }, 5000);
+      
+      return; // Exit the function if location can't be obtained
+    }
 
     if (!userLocation.value) {
       console.error("No user location available");
+      toastMessage.value = "Unable to get your location. Please try again.";
+      toastType.value = 'error';
+      showToast.value = true;
+      
+      setTimeout(() => {
+        showToast.value = false;
+      }, 5000);
+      
       return;
     }
 
@@ -555,6 +626,14 @@ async function toggleNearbyFilter() {
   } catch (error) {
     console.error("Error toggling nearby filter:", error);
     isNearbyActive.value = false;
+    
+    toastMessage.value = "An error occurred. Please try again.";
+    toastType.value = 'error';
+    showToast.value = true;
+    
+    setTimeout(() => {
+      showToast.value = false;
+    }, 5000);
   }
 }
 
@@ -567,7 +646,7 @@ async function fetchCafesWithLocation() {
     // Fetch all cafes with latitude and longitude
     const { data: cafesWithLocation, error } = await $supabase
       .from("cafes")
-      .select("id, latitude, longitude, city")
+      .select("id, latitude, longitude, city, borough")
       .not("latitude", "is", null)
       .not("longitude", "is", null);
 
@@ -585,9 +664,10 @@ async function fetchCafesWithLocation() {
 
     // Calculate distances
     const nearbyCities = new Set();
+    const nearbyBoroughs = new Set();
 
     cafesWithLocation.forEach((cafe) => {
-      if (cafe.latitude && cafe.longitude && cafe.city) {
+      if (cafe.latitude && cafe.longitude) {
         const distance = calculateDistance(
           userLocation.value.latitude,
           userLocation.value.longitude,
@@ -595,9 +675,10 @@ async function fetchCafesWithLocation() {
           cafe.longitude
         );
 
-        // If within radius, add the city to our set
+        // If within radius, add both city and borough to our sets
         if (distance <= nearbyRadius) {
-          nearbyCities.add(cafe.city);
+          if (cafe.city) nearbyCities.add(cafe.city);
+          if (cafe.borough) nearbyBoroughs.add(cafe.borough);
         }
       }
     });
@@ -606,11 +687,16 @@ async function fetchCafesWithLocation() {
       `Found ${nearbyCities.size} nearby cities:`,
       Array.from(nearbyCities)
     );
+    console.log(
+      `Found ${nearbyBoroughs.size} nearby boroughs:`,
+      Array.from(nearbyBoroughs)
+    );
 
-    // Update city filters to include only nearby cities
+    // Update filters to include only nearby cities and boroughs
     activeFilters.value.city = Array.from(nearbyCities);
+    activeFilters.value.borough = Array.from(nearbyBoroughs);
 
-    // Fetch cafes with the updated city filters
+    // Fetch cafes with the updated filters
     fetchCafes(1, activeFilters.value);
   } catch (err) {
     console.error("Error in fetchCafesWithLocation:", err);
