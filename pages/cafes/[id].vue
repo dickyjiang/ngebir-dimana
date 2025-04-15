@@ -50,26 +50,24 @@
                 </div>
               </div>
             </div>
+            <div class="flex gap-2 items-center justify-center">
             <button
               v-if="cafe.latitude && cafe.longitude"
               @click="openInGoogleMaps"
-              class="mt-4 w-full bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg flex items-center justify-center gap-2"
-            >
+              class="mt-4 w-full bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg flex items-center justify-center gap-2">
               <i class="fas fa-map-marker-alt"></i>
               Open in Google Maps
             </button>
+            <button
+              v-if="cafe.site || cafe.instagram_url"
+              @click="openWebsite"
+              class="mt-4 w-full bg-gray-800 hover:bg-gray-700 text-white py-2 px-4 rounded-lg flex items-center justify-center gap-2">
+              <i class="fas fa-globe"></i>
+              Visit
+            </button>
+            </div>
             <p class="text-lg text-gray-700 my-2">{{ cafe.description }}</p>
             <div>
-              <div
-                class="flex items-center gap-2 py-4 border-b border-gray-500"
-              >
-                <button
-                  class="text-gray-500 border border-gray-500 px-2 py-1 text-sm rounded-full"
-                >
-                  <p>{{ cafe.borough }}</p>
-                </button>
-                <!-- Repeat buttons for other boroughs if necessary -->
-              </div>
               <div class="py-4">
                 <div v-if="about && Object.keys(about).length">
                   <div class="flex flex-wrap gap-2">
@@ -80,12 +78,6 @@
                       class="px-3 py-2 flex text-white text-xs items-center gap-2 border rounded-full border-gray-300 bg-blue-500"
                     >
                       Wheelchair-accessible
-                    </p>
-                    <p
-                      v-else
-                      class="px-3 py-2 flex text-xs text-center text-red-500 items-center gap-2 rounded-full border border-red-500"
-                    >
-                      No Wheelchair-accessible
                     </p>
                     <div
                       v-if="about.Atmosphere?.Casual"
@@ -312,6 +304,14 @@
       window.open(url, '_blank');
     } else {
       console.log('No location data available');
+    }
+  }
+
+  function openWebsite() {
+    if (cafe.value?.site) {
+      window.open(cafe.value.site, '_blank');
+    } else if (cafe.value?.instagram_url) {
+      window.open(cafe.value.instagram_url, '_blank');
     }
   }
 
