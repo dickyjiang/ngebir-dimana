@@ -11,6 +11,62 @@
     </div>
   </div>
   
+  <!-- Manual Location Modal -->
+  <div v-if="showLocationModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-lg shadow-xl p-6 max-w-md w-full">
+      <h3 class="text-lg font-semibold mb-4">Set Your Location Manually</h3>
+      <p class="text-sm text-gray-600 mb-4">
+        We couldn't access your device location. Please enter your coordinates manually:
+      </p>
+      
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-700 mb-1">Latitude</label>
+        <input 
+          v-model="manualLatitude" 
+          type="number" 
+          step="0.000001"
+          placeholder="e.g. -6.9175"
+          class="w-full px-3 py-2 border border-gray-300 rounded-md"
+        />
+      </div>
+      
+      <div class="mb-6">
+        <label class="block text-sm font-medium text-gray-700 mb-1">Longitude</label>
+        <input 
+          v-model="manualLongitude" 
+          type="number"
+          step="0.000001"
+          placeholder="e.g. 107.6191"
+          class="w-full px-3 py-2 border border-gray-300 rounded-md"
+        />
+      </div>
+      
+      <div class="text-xs text-gray-500 mb-4">
+        <p>Tip: You can get your coordinates from Google Maps by right-clicking on your location and selecting "What's here?"</p>
+      </div>
+      
+      <div class="flex justify-end gap-2">
+        <button 
+          @click="showLocationModal = false" 
+          class="px-4 py-2 border border-gray-300 rounded-md text-gray-700"
+        >
+          Cancel
+        </button>
+        <button 
+          @click="setManualLocation"
+          :disabled="!isValidCoordinates"
+          :class="{
+            'bg-blue-500 text-white': isValidCoordinates,
+            'bg-gray-300 text-gray-500': !isValidCoordinates
+          }"
+          class="px-4 py-2 rounded-md"
+        >
+          Use Location
+        </button>
+      </div>
+    </div>
+  </div>
+  
   <section id="hero" class="my-4 px-4 h-[35svh] sm:h-[40svh]">
     <div
       class="container mx-auto lg:max-w-[90%] rounded-2xl overflow-clip relative flex items-center justify-center h-full"
@@ -245,7 +301,8 @@ const userLocation = ref(null);
 const locationLoading = ref(false);
 const locationError = ref(null);
 const isNearbyActive = ref(false);
-const nearbyRadius = 3; // in kilometers (reduced from 10km)
+const nearbyRadius = 10; // in kilometers (increased back to 10km)
+const nearbyCafeIds = ref([]); // Store IDs of nearby cafes
 
 // Initialize activeFilters with all expected properties
 const activeFilters = ref({ rating: [], range: [], city: [], borough: [] });
@@ -254,6 +311,11 @@ const activeFilters = ref({ rating: [], range: [], city: [], borough: [] });
 const showToast = ref(false);
 const toastMessage = ref('');
 const toastType = ref('error'); // 'error' or 'success'
+
+// Add these refs for the manual location modal
+const showLocationModal = ref(false);
+const manualLatitude = ref(null);
+const manualLongitude = ref(null);
 
 function toggleFilter(type, value) {
   const index = activeFilters.value[type].indexOf(value);
@@ -483,11 +545,54 @@ const popularCategories = computed(() => {
 function changePage(page) {
   if (page >= 1 && page <= totalPages.value) {
     currentPage.value = page;
-    fetchCafes(page, activeFilters.value); // Pass the current filters when changing page
+    
+    // Use different fetch function based on whether nearby filter is active
+    if (isNearbyActive.value && nearbyCafeIds.value && nearbyCafeIds.value.length > 0) {
+      // Fetch nearby cafes with the specific cafe IDs
+      fetchNearbyFilteredCafes(page, { cafeIds: nearbyCafeIds.value });
+    } else {
+      // Use normal filter-based fetching
+      fetchCafes(page, activeFilters.value);
+    }
   }
 }
 
-// Get user location
+// Computed property to validate coordinates
+const isValidCoordinates = computed(() => {
+  const lat = parseFloat(manualLatitude.value);
+  const lng = parseFloat(manualLongitude.value);
+  
+  return !isNaN(lat) && !isNaN(lng) && 
+    lat >= -90 && lat <= 90 && 
+    lng >= -180 && lng <= 180;
+});
+
+// Function to set location manually
+function setManualLocation() {
+  if (!isValidCoordinates.value) return;
+  
+  userLocation.value = {
+    latitude: parseFloat(manualLatitude.value),
+    longitude: parseFloat(manualLongitude.value)
+  };
+  
+  console.log("Manual location set:", userLocation.value);
+  showLocationModal.value = false;
+  
+  // Continue with nearby filter
+  isNearbyActive.value = true;
+  fetchCafesWithLocation();
+  
+  // Show success message
+  toastMessage.value = "Location set manually. Finding nearby cafes...";
+  toastType.value = 'success';
+  showToast.value = true;
+  setTimeout(() => {
+    showToast.value = false;
+  }, 3000);
+}
+
+// Modify the getUserLocation to show an option for manual input
 async function getUserLocation() {
   if (userLocation.value) {
     // If we already have the location, just use it
@@ -537,15 +642,20 @@ async function getUserLocation() {
     return userLocation.value;
   } catch (error) {
     console.error("Error getting user location:", error);
-    locationError.value = error.message || "Unable to get your location";
     
     // More user-friendly error message for common geolocation errors
     if (error.code === 1) {
-      locationError.value = "Location access was denied. Please enable location services for this website in your device settings.";
+      locationError.value = "Location access was denied. Please enable location services for this website in your browser settings.";
     } else if (error.code === 2) {
-      locationError.value = "Unable to determine your location. Please check your device's location settings.";
+      // POSITION_UNAVAILABLE - More detailed guidance
+      locationError.value = "Unable to determine your location. Please check that:\n\n1. Your device's location is turned on\n2. You're using a secure connection (HTTPS)\n3. You're not in private/incognito mode\n4. You've granted location permissions";
+      
+      // Show the manual location input modal
+      showLocationModal.value = true;
     } else if (error.code === 3) {
-      locationError.value = "Location request timed out. Please try again.";
+      locationError.value = "Location request timed out. Please try again with a better connection.";
+    } else {
+      locationError.value = error.message || "Unable to get your location";
     }
     
     throw error;
@@ -574,7 +684,7 @@ function deg2rad(deg) {
   return deg * (Math.PI / 180);
 }
 
-// Toggle nearby filter
+// Modify toggleNearbyFilter to handle manual location input option
 async function toggleNearbyFilter() {
   try {
     if (isNearbyActive.value) {
@@ -588,41 +698,62 @@ async function toggleNearbyFilter() {
       return;
     }
 
+    // Before requesting location, show instructions toast for better UX
+    toastMessage.value = "Please allow location access when prompted. Make sure you're using HTTPS and location is enabled.";
+    toastType.value = 'success';
+    showToast.value = true;
+    
+    // Hide after 5 seconds
+    setTimeout(() => {
+      showToast.value = false;
+    }, 5000);
+
     // Get user location
     try {
       await getUserLocation();
     } catch (error) {
-      // Show a toast notification for location errors
-      toastMessage.value = locationError.value || "Unable to get your location";
-      toastType.value = 'error';
-      showToast.value = true;
+      // Don't show error toast if we're showing the manual location modal instead
+      if (!showLocationModal.value) {
+        // Show a toast notification for location errors
+        toastMessage.value = locationError.value || "Unable to get your location";
+        toastType.value = 'error';
+        showToast.value = true;
+        
+        // Hide toast after 8 seconds (longer for detailed error messages)
+        setTimeout(() => {
+          showToast.value = false;
+        }, 8000);
+      }
       
-      // Hide toast after 5 seconds
-      setTimeout(() => {
-        showToast.value = false;
-      }, 5000);
-      
-      return; // Exit the function if location can't be obtained
+      // Only exit if we're not showing the manual location modal
+      if (!showLocationModal.value) {
+        return; // Exit the function if location can't be obtained and not showing manual modal
+      }
     }
 
-    if (!userLocation.value) {
+    if (!userLocation.value && !showLocationModal.value) {
       console.error("No user location available");
-      toastMessage.value = "Unable to get your location. Please try again.";
+      toastMessage.value = "Unable to get your location. Do you want to enter it manually?";
       toastType.value = 'error';
       showToast.value = true;
       
       setTimeout(() => {
         showToast.value = false;
-      }, 5000);
+        // Show manual location modal as a fallback
+        showLocationModal.value = true;
+      }, 3000);
       
       return;
     }
 
-    // Activate nearby filter
-    isNearbyActive.value = true;
+    // If we have a location (auto or manual) and we're not showing the modal
+    if (userLocation.value && !showLocationModal.value) {
+      // Activate nearby filter
+      isNearbyActive.value = true;
 
-    // Fetch cafes with location data to calculate distances
-    await fetchCafesWithLocation();
+      // Fetch cafes with location data to calculate distances
+      await fetchCafesWithLocation();
+    }
   } catch (error) {
     console.error("Error toggling nearby filter:", error);
     isNearbyActive.value = false;
@@ -657,14 +788,22 @@ async function fetchCafesWithLocation() {
 
     if (!cafesWithLocation || cafesWithLocation.length === 0) {
       console.warn("No cafes with location data found");
+      toastMessage.value = "No cafes with location data found nearby";
+      toastType.value = 'error';
+      showToast.value = true;
+      
+      setTimeout(() => {
+        showToast.value = false;
+      }, 5000);
       return;
     }
 
     console.log(`Found ${cafesWithLocation.length} cafes with location data`);
 
-    // Calculate distances
+    // Calculate distances and find cafes within radius
     const nearbyCities = new Set();
     const nearbyBoroughs = new Set();
+    const foundNearbyCafeIds = [];
 
     cafesWithLocation.forEach((cafe) => {
       if (cafe.latitude && cafe.longitude) {
@@ -679,9 +818,13 @@ async function fetchCafesWithLocation() {
         if (distance <= nearbyRadius) {
           if (cafe.city) nearbyCities.add(cafe.city);
           if (cafe.borough) nearbyBoroughs.add(cafe.borough);
+          foundNearbyCafeIds.push(cafe.id);
         }
       }
     });
+
+    // Update our reactive reference
+    nearbyCafeIds.value = foundNearbyCafeIds;
 
     console.log(
       `Found ${nearbyCities.size} nearby cities:`,
@@ -691,15 +834,70 @@ async function fetchCafesWithLocation() {
       `Found ${nearbyBoroughs.size} nearby boroughs:`,
       Array.from(nearbyBoroughs)
     );
+    console.log(
+      `Found ${nearbyCafeIds.value.length} nearby cafes directly:`,
+      nearbyCafeIds.value
+    );
 
-    // Update filters to include only nearby cities and boroughs
+    if (nearbyCafeIds.value.length === 0) {
+      toastMessage.value = `No cafes found within ${nearbyRadius} km of your location`;
+      toastType.value = 'error';
+      showToast.value = true;
+      
+      setTimeout(() => {
+        showToast.value = false;
+      }, 5000);
+    } else {
+      toastMessage.value = `Found ${nearbyCafeIds.value.length} cafes within ${nearbyRadius} km of your location`;
+      toastType.value = 'success';
+      showToast.value = true;
+      
+      setTimeout(() => {
+        showToast.value = false;
+      }, 5000);
+    }
+
+    // Update filters to include only nearby cities, boroughs, and specific cafe IDs
     activeFilters.value.city = Array.from(nearbyCities);
     activeFilters.value.borough = Array.from(nearbyBoroughs);
-
-    // Fetch cafes with the updated filters
-    fetchCafes(1, activeFilters.value);
+    
+    // Fetch cafes with the updated filters, including direct cafe ID filtering
+    fetchNearbyFilteredCafes(1, { cafeIds: nearbyCafeIds.value });
   } catch (err) {
     console.error("Error in fetchCafesWithLocation:", err);
+  } finally {
+    loading.value = false;
+  }
+}
+
+// Specialized function to fetch cafes by direct ID filtering
+async function fetchNearbyFilteredCafes(page, filterParam) {
+  loading.value = true;
+  const { $supabase } = useNuxtApp();
+
+  // Calculate range based on current page
+  const from = (page - 1) * itemsPerPage;
+  const to = from + itemsPerPage - 1;
+
+  try {
+    // Only fetch cafes with specific IDs
+    const { data: cafeData, error, count } = await $supabase
+      .from("cafes")
+      .select("*", { count: "exact" })
+      .in("id", filterParam.cafeIds)
+      .range(from, to);
+
+    if (error) {
+      console.error("Error fetching nearby cafes:", error);
+    } else {
+      console.log(
+        `Fetched page ${page} with ${cafeData.length} nearby cafes (total: ${count})`
+      );
+      data.value = cafeData;
+      totalCafes.value = count || 0;
+    }
+  } catch (err) {
+    console.error("Exception while fetching nearby cafes:", err);
   } finally {
     loading.value = false;
   }
