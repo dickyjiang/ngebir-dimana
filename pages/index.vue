@@ -301,7 +301,7 @@ const userLocation = ref(null);
 const locationLoading = ref(false);
 const locationError = ref(null);
 const isNearbyActive = ref(false);
-const nearbyRadius = 10; // in kilometers (increased back to 10km)
+const nearbyRadius = 5; // in kilometers (reduced from 10km to 5km)
 const nearbyCafeIds = ref([]); // Store IDs of nearby cafes
 
 // Initialize activeFilters with all expected properties
