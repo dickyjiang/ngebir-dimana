@@ -1,5 +1,5 @@
 <template>
-    <div class="flex items-center justify-center sm:justify-between w-full p-2 max-w-[90%] lg:max-w-[90%] mx-auto bg-white border-t-2 border-b-2 border-gray-800 my-2">
+    <div class="flex items-center justify-center sm:justify-between w-full p-2 max-w-[90%] lg:max-w-[98%] mx-auto bg-white border-t-2 border-b-2 border-gray-800 my-2">
       <a href="/">
         <img src="/src/assets/img/logo_ndm.svg" alt="logo" class="h-6">
       </a>

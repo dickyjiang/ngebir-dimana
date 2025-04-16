@@ -50,7 +50,7 @@
                 </div>
               </div>
             </div>
-            <div class="flex gap-2 items-center justify-center">
+            <div class="flex flex-col sm:flex-row gap-2 items-center justify-center">
             <button
               v-if="cafe.latitude && cafe.longitude"
               @click="openInGoogleMaps"

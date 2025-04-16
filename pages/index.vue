@@ -69,7 +69,7 @@
   
   <section id="hero" class="my-4 px-4 h-[35svh] sm:h-[40svh]">
     <div
-      class="container mx-auto lg:max-w-[90%] rounded-2xl overflow-clip relative flex items-center justify-center h-full"
+      class="container mx-auto lg:max-w-[98%] rounded-2xl overflow-clip relative flex items-center justify-center h-full"
     >
       <img
         class="object-cover object-center w-full h-full"
@@ -135,7 +135,7 @@
     </div>
   </section>
   <PopularCategories class="hidden" :categories="popularCategories" />
-  <section id="main-content" class="flex sm:px-4 sm:max-w-[90%] mx-auto">
+  <section id="main-content" class="flex sm:px-4 sm:max-w-[98%] mx-auto">
     <!-- Mobile Toggle Button -->
     <button
       @click="toggleSidebar"
