@@ -67,33 +67,25 @@
     </div>
   </div>
   
-  <section id="hero" class="my-4 px-4 h-[35svh] sm:h-[40svh]">
+  <section id="hero" class="my-4 px-4">
     <div
-      class="container mx-auto lg:max-w-[98%] rounded-2xl overflow-clip relative flex items-center justify-center h-full"
-    >
+      class="container mx-auto lg:max-w-[98%] py-8 rounded-2xl overflow-clip relative flex items-center justify-center">
       <img
-        class="object-cover object-center w-full h-full"
+        class="absolute object-cover object-center w-full h-full"
         src="/src/assets/img/hero.webp"
         alt="hero image"
       />
-      <div class="absolute inset-0 bg-black opacity-55 z-[1]"></div>
-      <div
-        class="absolute z-[2] flex flex-col items-center justify-center w-[90%] sm:w-[80%] mx-auto h-full"
-      >
+      <div class="absolute inset-0 bg-black opacity-60 z-[1]"></div>
+      <div class=" z-[2] flex flex-col items-center justify-center w-[90%] sm:w-[90%] mx-auto h-full">
         <h1
-          class="text-2xl sm:text-5xl text-white text-center font-medium tracking-wide mb-2 sm:mb-4"
-        >
+          class="text-2xl sm:text-4xl md:text-5xl text-white text-center font-medium tracking-wide mb-2 sm:mb-4">
           Ngopi di mana?
         </h1>
-        <h2
-          class="text-sm sm:text-xl tracking-wide text-white mb-2 sm:mb-4 text-center"
-        >
+        <h2 class="text-sm md:text-xl tracking-wide text-white mb-2 sm:mb-4 text-center">
           {{ totalCafes }} Cafe's Directory
         </h2>
-        <div
-          class="mt-2 sm:mt-4 w-full sm:w-1/2 flex flex-col gap-2 sm:gap-4 items-center justify-center px-4"
-        >
-          <div class="flex items-center gap-2 w-full">
+        <div class="mt-2 sm:mt-4 w-full md:w-3/4 flex flex-col gap-2 sm:gap-4 items-center justify-center px-4">
+          <div class="flex items-center gap-2 w-full md:w-1/2">
             <input
               v-model="searchQuery"
               type="text"
@@ -104,24 +96,43 @@
               <i class="fas fa-search"></i>
             </button>
           </div>
-          <button
-            @click="toggleNearbyFilter"
-            :class="{
-              'text-yellow-500 bg-black border border-yellow-500': isNearbyActive,
-              'text-gray-100 border border-gray-400': !isNearbyActive,
-            }"
-            class="mt-2 px-3 sm:px-4 py-1 sm:py-2 rounded-full flex items-center gap-2 text-xs sm:text-base cursor-pointer touch-manipulation"
-          >
-            <span
-              v-if="locationLoading"
-              class="inline-block w-3 h-3 border-2 border-t-transparent rounded-full animate-spin"
+          <div class="flex flex-wrap items-center gap-2 w-full">
+
+            <button
+              @click="toggleNearbyFilter"
               :class="{
-                'border-yellow-500': isNearbyActive,
-                'border-black': !isNearbyActive,
+                'text-yellow-500 bg-black border border-yellow-500': isNearbyActive,
+                'text-gray-100 border border-gray-400': !isNearbyActive,
               }"
-            ></span>
-            <span>Cafe terdekat</span>
-          </button>
+              class="mt-2 px-3 sm:px-4 py-1 sm:py-2 rounded-full flex items-center gap-2 text-xs sm:text-base cursor-pointer touch-manipulation"
+            >
+              <span
+                v-if="locationLoading"
+                class="inline-block w-3 h-3 border-2 border-t-transparent rounded-full animate-spin"
+                :class="{
+                  'border-yellow-500': isNearbyActive,
+                  'border-black': !isNearbyActive,
+                }"
+              ></span>
+              <span>Cafe terdekat</span>
+            </button>
+            <!-- @budi new filter -->
+            <button class="text-white border border-white mt-2 px-3 sm:px-4 py-1 sm:py-2 rounded-full flex items-center gap-2 text-xs sm:text-base cursor-pointer touch-manipulation">
+              Cafe Terbaru
+            </button>
+            <button class="text-white border border-white mt-2 px-3 sm:px-4 py-1 sm:py-2 rounded-full flex items-center gap-2 text-xs sm:text-base cursor-pointer touch-manipulation">
+              WFC Friendly
+            </button>
+            <button class="text-white border border-white mt-2 px-3 sm:px-4 py-1 sm:py-2 rounded-full flex items-center gap-2 text-xs sm:text-base cursor-pointer touch-manipulation">
+              Pet Friendly
+            </button>
+            <button class="text-white border border-white mt-2 px-3 sm:px-4 py-1 sm:py-2 rounded-full flex items-center gap-2 text-xs sm:text-base cursor-pointer touch-manipulation">
+              Family Friendly
+            </button>
+            <button class="text-white border border-white mt-2 px-3 sm:px-4 py-1 sm:py-2 rounded-full flex items-center gap-2 text-xs sm:text-base cursor-pointer touch-manipulation">
+              Wheelchair Friendly
+            </button>
+          </div>
         </div>
         <
       </div>
@@ -134,7 +145,29 @@
       <!-- Button removed from here -->
     </div>
   </section>
+  <!-- @budi ini teh udah pernah diload - bising kapake skrg di hidden dulu -->
   <PopularCategories class="hidden" :categories="popularCategories" />
+  <!-- @budi slot untuk cafe terbaru - kalau banyak akan animated slide -->
+  <section id="new-cafes" class="my-4">
+    <div class="my-4  w-full py-2 mx-auto flex flex-row gap-4 items-center justify-center bg-gray-200">
+      <div
+        class=" text-gray-800 text-center font-medium tracking-wide mb-2 sm:mb-4 border border-gray-600 h-40 w-80">
+        Cafe Terbaru 1
+      </div>
+      <div
+        class=" text-gray-800 text-center font-medium tracking-wide mb-2 sm:mb-4 border border-gray-600 h-40 w-80">
+        Cafe Terbaru 2
+      </div>
+      <div
+        class=" text-gray-800 text-center font-medium tracking-wide mb-2 sm:mb-4 border border-gray-600 h-40 w-80">
+        Cafe Terbaru 3
+      </div>
+      <div
+        class=" text-gray-800 text-center font-medium tracking-wide mb-2 sm:mb-4 border border-gray-600 h-40 w-80">
+        Cafe Terbaru 4
+      </div>
+    </div>
+  </section>
   <section id="main-content" class="flex sm:px-4 sm:max-w-[98%] mx-auto">
     <!-- Mobile Toggle Button -->
     <button
@@ -172,6 +205,7 @@
         :locationLoading="locationLoading"
       />
     </div>
+    
     <div class="p-4 flex-1">
       <div
         v-if="loading"
@@ -912,7 +946,9 @@ onMounted(async () => {
   // Fetch city options for filters first
   await fetchFilterOptions();
   // Then fetch cafe data for the current page (no filters initially)
-  fetchCafes(currentPage.value);
+  await fetchCafes(currentPage.value);
+  // Automatically trigger nearby cafes functionality on load
+  toggleNearbyFilter();
 });
 </script>
 
