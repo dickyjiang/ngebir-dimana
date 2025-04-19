@@ -252,6 +252,27 @@
     </div>
     <div v-else class="text-center text-gray-500">Cafe not found.</div>
   </div>
+   <!-- @budi section ini showing cafe yg realted dengan last search result - atau kalau bukan hasil search show close location dari cafe terpilih) -->
+  <section id="related-cafes" class="my-4">
+    <div class="my-4  w-full py-2 mx-auto flex flex-row gap-4 items-center justify-center bg-gray-200">
+      <div
+        class=" text-gray-800 text-center font-medium tracking-wide mb-2 sm:mb-4 border border-gray-600 h-40 w-80">
+        Cafe Terbaru 1
+      </div>
+      <div
+        class=" text-gray-800 text-center font-medium tracking-wide mb-2 sm:mb-4 border border-gray-600 h-40 w-80">
+        Cafe Terbaru 2
+      </div>
+      <div
+        class=" text-gray-800 text-center font-medium tracking-wide mb-2 sm:mb-4 border border-gray-600 h-40 w-80">
+        Cafe Terbaru 3
+      </div>
+      <div
+        class=" text-gray-800 text-center font-medium tracking-wide mb-2 sm:mb-4 border border-gray-600 h-40 w-80">
+        Cafe Terbaru 4
+      </div>
+    </div>
+  </section>
 </template>
 
 <script setup>
