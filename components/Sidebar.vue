@@ -4,31 +4,44 @@
       <h2 class="text-lg font-medium">Filter</h2>
     </div>
 
-    <!-- <div class="mb-8">
-        <h3 class="text-sm font-medium">Rating</h3>
-        <div class="flex flex-wrap gap-2 text-xs text-nowrap my-4">
-          <button v-for="rating in uniqueRatings" :key="rating" @click="toggleFilter('rating', rating)"
-            :class="{ 'bg-gray-800 text-white': activeFilters.rating.includes(rating), 'bg-none border border-gray-400': !activeFilters.rating.includes(rating) }"
-            class="px-3 py-2 rounded-full">
-            {{ rating }} Stars
-          </button>
-        </div>
-      </div> -->
+    <div class="mb-8">
+      <h3 class="text-sm font-medium">Rating</h3>
+      <div class="flex flex-wrap gap-2 text-xs text-nowrap my-4">
+        <button
+          v-for="rating in ratings"
+          :key="rating.rating"
+          @click="toggleFilter('rating', rating.rating)"
+          :class="{
+            'bg-gray-800 text-white': activeFilters.rating.includes(
+              rating.rating
+            ),
+            'bg-none border border-gray-400': !activeFilters.rating.includes(
+              rating.rating
+            ),
+          }"
+          class="px-3 py-2 rounded-full"
+        >
+          {{ rating.rating }} Stars
+        </button>
+      </div>
+    </div>
     <div class="mb-8">
       <h3 class="text-sm font-medium">Price Range</h3>
       <div class="flex flex-wrap gap-2 text-xs text-nowrap my-4">
         <button
           v-for="range in uniqueRanges"
-          :key="range"
-          @click="toggleFilter('range', range)"
+          :key="range.range"
+          @click="toggleFilter('range', range.range)"
           :class="{
-            'bg-gray-800 text-white w-14': activeFilters.range.includes(range),
+            'bg-gray-800 text-white w-14': activeFilters.range.includes(
+              range.range
+            ),
             'bg-none border border-gray-400 w-14':
-              !activeFilters.range.includes(range),
+              !activeFilters.range.includes(range.range),
           }"
           class="px-3 py-2 rounded-full"
         >
-          {{ range }}
+          {{ range.range }}
         </button>
       </div>
     </div>
@@ -37,17 +50,18 @@
       <h2 class="text-lg font-medium">Lokasi</h2>
     </div>
     <div class="flex flex-wrap gap-3 text-sm text-gray-500 text-nowrap my-4">
+      <!-- {{ uniqueCities }} -->
       <button
         v-for="city in uniqueCities"
-        :key="city"
-        @click="toggleFilter('city', city)"
+        :key="city.city_slug"
+        @click="toggleFilter('city', city.city_slug)"
         :class="{
-          'bg-gray-800 text-white': activeFilters.city.includes(city),
-          'bg-gray-100': !activeFilters.city.includes(city),
+          'bg-gray-800 text-white': activeFilters.city.includes(city.city_slug),
+          'bg-gray-100': !activeFilters.city.includes(city.city_slug),
         }"
         class="px-3 py-1 rounded-full"
       >
-        {{ city }}
+        {{ city.city }}
       </button>
     </div>
   </aside>
@@ -81,13 +95,24 @@
       : ['$', '$$', '$$$', '$$$$']; // Fallback to defaults
   });
 
-  function toggleFilter(type, value) {
+  async function toggleFilter(type, value) {
     const index = props.activeFilters[type].indexOf(value);
     if (index > -1) {
       props.activeFilters[type].splice(index, 1);
     } else {
       props.activeFilters[type].push(value);
     }
+    console.log('filter di sidebar');
+    console.log(props.activeFilters);
+    console.log(props.activeFilters.city.join('+')); //Proxy(Array) {0: 'badung', 1: 'bali'}
+    await navigateTo({
+      path: '/',
+      query: {
+        city: props.activeFilters.city.join('-'),
+        ratings: props.activeFilters.rating.join('-'),
+        ranges: props.activeFilters.range.join('-'),
+      },
+    });
   }
 
   // Keep this function for compatibility but it won't be used in the sidebar

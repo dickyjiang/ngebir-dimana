@@ -50,21 +50,25 @@
                 </div>
               </div>
             </div>
-            <div class="flex flex-col sm:flex-row gap-2 items-center justify-center">
-            <button
-              v-if="cafe.latitude && cafe.longitude"
-              @click="openInGoogleMaps"
-              class="mt-4 w-full bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg flex items-center justify-center gap-2">
-              <i class="fas fa-map-marker-alt"></i>
-              Open in Google Maps
-            </button>
-            <button
-              v-if="cafe.site || cafe.instagram_url"
-              @click="openWebsite"
-              class="mt-4 w-full bg-gray-800 hover:bg-gray-700 text-white py-2 px-4 rounded-lg flex items-center justify-center gap-2">
-              <i class="fas fa-globe"></i>
-              Visit
-            </button>
+            <div
+              class="flex flex-col sm:flex-row gap-2 items-center justify-center"
+            >
+              <button
+                v-if="cafe.latitude && cafe.longitude"
+                @click="openInGoogleMaps"
+                class="mt-4 w-full bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg flex items-center justify-center gap-2"
+              >
+                <i class="fas fa-map-marker-alt"></i>
+                Open in Google Maps
+              </button>
+              <button
+                v-if="cafe.site || cafe.instagram_url"
+                @click="openWebsite"
+                class="mt-4 w-full bg-gray-800 hover:bg-gray-700 text-white py-2 px-4 rounded-lg flex items-center justify-center gap-2"
+              >
+                <i class="fas fa-globe"></i>
+                Visit
+              </button>
             </div>
             <p class="text-lg text-gray-700 my-2">{{ cafe.description }}</p>
             <div>
@@ -252,23 +256,29 @@
     </div>
     <div v-else class="text-center text-gray-500">Cafe not found.</div>
   </div>
-   <!-- @budi section ini showing cafe yg realted dengan last search result - atau kalau bukan hasil search show close location dari cafe terpilih) -->
+  <!-- @budi section ini showing cafe yg realted dengan last search result - atau kalau bukan hasil search show close location dari cafe terpilih) -->
   <section id="related-cafes" class="my-4">
-    <div class="my-4  w-full py-2 mx-auto flex flex-row gap-4 items-center justify-center bg-gray-200">
+    <div
+      class="my-4 w-full py-2 mx-auto flex flex-row gap-4 items-center justify-center bg-gray-200"
+    >
       <div
-        class=" text-gray-800 text-center font-medium tracking-wide mb-2 sm:mb-4 border border-gray-600 h-40 w-80">
+        class="text-gray-800 text-center font-medium tracking-wide mb-2 sm:mb-4 border border-gray-600 h-40 w-80"
+      >
         Cafe Terbaru 1
       </div>
       <div
-        class=" text-gray-800 text-center font-medium tracking-wide mb-2 sm:mb-4 border border-gray-600 h-40 w-80">
+        class="text-gray-800 text-center font-medium tracking-wide mb-2 sm:mb-4 border border-gray-600 h-40 w-80"
+      >
         Cafe Terbaru 2
       </div>
       <div
-        class=" text-gray-800 text-center font-medium tracking-wide mb-2 sm:mb-4 border border-gray-600 h-40 w-80">
+        class="text-gray-800 text-center font-medium tracking-wide mb-2 sm:mb-4 border border-gray-600 h-40 w-80"
+      >
         Cafe Terbaru 3
       </div>
       <div
-        class=" text-gray-800 text-center font-medium tracking-wide mb-2 sm:mb-4 border border-gray-600 h-40 w-80">
+        class="text-gray-800 text-center font-medium tracking-wide mb-2 sm:mb-4 border border-gray-600 h-40 w-80"
+      >
         Cafe Terbaru 4
       </div>
     </div>
@@ -338,32 +348,32 @@
 
   onMounted(async () => {
     console.log('Route ID:', route.params.id);
-    const { $supabase } = useNuxtApp();
-    const { data: cafeData, error } = await $supabase
-      .from('cafes')
-      .select('*')
-      .eq('id', route.params.id)
-      .single();
+    // const { $supabase } = useNuxtApp();
+    // const { data: cafeData, error } = await $supabase
+    //   .from('cafes')
+    //   .select('*')
+    //   .eq('id', route.params.id)
+    //   .single();
 
-    if (error) {
-      console.error('Error fetching cafe details:', error);
-    } else {
-      console.log('Fetched Cafe Data:', cafeData);
-      cafe.value = cafeData;
+    // if (error) {
+    //   console.error('Error fetching cafe details:', error);
+    // } else {
+    //   console.log('Fetched Cafe Data:', cafeData);
+    //   cafe.value = cafeData;
 
-      // Check if cafeData.about is a string and parse it if necessary
-      if (typeof cafeData.about === 'string') {
-        about.value = JSON.parse(cafeData.about);
-      } else {
-        about.value = cafeData.about; // Assume it's already an object
-      }
+    //   // Check if cafeData.about is a string and parse it if necessary
+    //   if (typeof cafeData.about === 'string') {
+    //     about.value = JSON.parse(cafeData.about);
+    //   } else {
+    //     about.value = cafeData.about; // Assume it's already an object
+    //   }
 
-      // Merge additional data into the about object
-      const additionalData = JSON.parse(additionalAboutData);
-      Object.assign(about.value, additionalData);
+    //   // Merge additional data into the about object
+    //   const additionalData = JSON.parse(additionalAboutData);
+    //   Object.assign(about.value, additionalData);
 
-      console.log('About Data:', about.value); // Check the structure of the about data
-    }
+    //   console.log('About Data:', about.value); // Check the structure of the about data
+    // }
     loading.value = false;
   });
 </script>

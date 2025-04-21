@@ -1,0 +1,23 @@
+POST http://localhost:3000/api/search HTTP/1.1
+Accept: application/json
+Content-Type: application/json
+User-Agent: curl/7.64.1
+Accept-Encoding: gzip
+Connection: keep-alive
+Host: localhost:3000
+Content-Length: 123
+
+{
+    "city": ["batu", "bsd","kulon_progo","singaraja"],
+    "ratings": [3,2,4],
+     "ranges": ["$$"],
+    "from": 0,
+    "to": 10
+}
+
+
+# http://localhost:3000/?city=badung-bali-bandung&ratings=1&ranges=$
+
+    # "ratings": [1],
+    # "ratings": ["3,4", "3,5"],
+    # "ranges": ["$$"],
