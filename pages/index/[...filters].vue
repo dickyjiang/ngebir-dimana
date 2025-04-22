@@ -54,22 +54,24 @@
     const from = (page - 1) * itemsPerPage;
     const to = from + itemsPerPage - 1;
     try {
+      let payload = {};
       if (filters) {
-        const payload = {
+        payload = {
           city: filters.city || [],
           ratings: filters.rating || [],
           ranges: filters.range || [],
           from: from,
           to: to,
         };
-        const hasil = await $fetch('/api/search', {
-          method: 'POST',
-          body: payload,
-          headers: useRequestHeaders(['cookie']),
-        });
-        console.log('hasil:', hasil);
-        // todo : belum di apa2 in
       }
+
+      const hasil = await $fetch('/api/search', {
+        method: 'POST',
+        body: payload,
+        headers: useRequestHeaders(['cookie']),
+      });
+      totalCafes.value = hasil.count || 0;
+      data.value = hasil.data || [];
     } catch (err) {
       console.error('Exception while fetching cafes:', err);
     } finally {

@@ -82,11 +82,11 @@
   });
 
   onMounted(() => {
-    console.log('Filter options received:', {
-      cities: props.cities?.length || 0,
-      ratings: props.ratings?.length || 0,
-      ranges: props.ranges?.length || 0,
-    });
+    // console.log('Filter options received:', {
+    //   cities: props.cities?.length || 0,
+    //   ratings: props.ratings?.length || 0,
+    //   ranges: props.ranges?.length || 0,
+    // });
   });
 
   const uniqueRanges = computed(() => {
@@ -102,9 +102,6 @@
     } else {
       props.activeFilters[type].push(value);
     }
-    console.log('filter di sidebar');
-    console.log(props.activeFilters);
-    console.log(props.activeFilters.city.join('+')); //Proxy(Array) {0: 'badung', 1: 'bali'}
     await navigateTo({
       path: '/',
       query: {
