@@ -24,6 +24,8 @@ export default defineEventHandler(async (event) => {
         query.in('range', body.ranges)
     }
 
+    query = query.ilike("name", `%${body.searchQuery}%`);
+
     query.range(body.from, body.to)
     // console.log('query', query)
 

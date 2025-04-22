@@ -62,6 +62,7 @@
           ranges: filters.range || [],
           from: from,
           to: to,
+          searchQuery: searchQuery.value || '',
         };
       }
 

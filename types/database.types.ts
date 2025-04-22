@@ -63,6 +63,7 @@ export type Database = {
           category: string | null
           cid: string | null
           city: string | null
+          city_slug: string | null
           description: string | null
           full_address: string | null
           google_id: string | null
@@ -92,6 +93,7 @@ export type Database = {
           query: string | null
           range: string | null
           rating: string | null
+          rating_num: number | null
           reservation_links: string | null
           reviews: number | null
           reviews_id: string | null
@@ -104,6 +106,7 @@ export type Database = {
           reviews_per_score_5: number | null
           reviews_tags: string | null
           site: string | null
+          slug_name: string | null
           state: string | null
           street: string | null
           street_view: string | null
@@ -124,6 +127,7 @@ export type Database = {
           category?: string | null
           cid?: string | null
           city?: string | null
+          city_slug?: string | null
           description?: string | null
           full_address?: string | null
           google_id?: string | null
@@ -153,6 +157,7 @@ export type Database = {
           query?: string | null
           range?: string | null
           rating?: string | null
+          rating_num?: number | null
           reservation_links?: string | null
           reviews?: number | null
           reviews_id?: string | null
@@ -165,6 +170,7 @@ export type Database = {
           reviews_per_score_5?: number | null
           reviews_tags?: string | null
           site?: string | null
+          slug_name?: string | null
           state?: string | null
           street?: string | null
           street_view?: string | null
@@ -185,6 +191,7 @@ export type Database = {
           category?: string | null
           cid?: string | null
           city?: string | null
+          city_slug?: string | null
           description?: string | null
           full_address?: string | null
           google_id?: string | null
@@ -214,6 +221,7 @@ export type Database = {
           query?: string | null
           range?: string | null
           rating?: string | null
+          rating_num?: number | null
           reservation_links?: string | null
           reviews?: number | null
           reviews_id?: string | null
@@ -226,6 +234,7 @@ export type Database = {
           reviews_per_score_5?: number | null
           reviews_tags?: string | null
           site?: string | null
+          slug_name?: string | null
           state?: string | null
           street?: string | null
           street_view?: string | null
@@ -568,6 +577,7 @@ export type Database = {
       v_city: {
         Row: {
           city: string | null
+          city_slug: string | null
         }
         Relationships: []
       }
