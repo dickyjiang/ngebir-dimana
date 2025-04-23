@@ -110,6 +110,13 @@ cells:
               --'long' => 'lt.107.52600934120879',
               --'long' => 'gt.107.41750257290643' },
     metadata: {}
+  - kind: 2
+    languageId: sql
+    value: |-
+      select *
+      from features
+      where name ilike '%pet%'
+    metadata: {}
 metadata:
   conn:
     id: ezdfhUMl9UO9LcXxz95zw

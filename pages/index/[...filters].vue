@@ -20,7 +20,11 @@
   const isNearbyActive = ref(false);
 
   // Initialize activeFilters with all expected properties
-  const activeFilters = ref({ rating: [], range: [], city: [], borough: [] });
+  const activeFilters = ref({
+    city: [],
+    borough: [],
+    features: [],
+  });
 
   // Add state for sidebar visibility
   const isSidebarOpen = ref(false);
@@ -56,8 +60,6 @@
       if (filters) {
         payload = {
           city: filters.city || [],
-          ratings: filters.rating || [],
-          ranges: filters.range || [],
           from: from,
           to: to,
           searchQuery: searchQuery.value || '',
@@ -88,8 +90,6 @@
     () => [
       JSON.stringify(activeFilters.value.city),
       JSON.stringify(activeFilters.value.borough),
-      JSON.stringify(activeFilters.value.rating),
-      JSON.stringify(activeFilters.value.range),
     ],
     () => {
       currentPage.value = 1;
@@ -133,8 +133,6 @@
 
   // Initialize filter options with empty arrays
   const uniqueCities = ref([]);
-  const uniqueRatings = ref([]);
-  const uniquePriceRanges = ref([]);
 
   // Modify fetchFilterOptions to use caching
   async function fetchFilterOptions() {
@@ -148,22 +146,6 @@
     if (cities.length > 0) {
       // uniqueCities.value = cities.map((item) => item.city).sort();
       uniqueCities.value = cities;
-    }
-
-    const ratings = await $fetch('/api/ratings', {
-      headers: useRequestHeaders(['cookie']),
-      method: 'get',
-    });
-    if (ratings.length > 0) {
-      uniqueRatings.value = ratings;
-    }
-
-    const prices = await $fetch('/api/prices', {
-      headers: useRequestHeaders(['cookie']),
-      method: 'get',
-    });
-    if (prices.length > 0) {
-      uniquePriceRanges.value = prices;
     }
   }
 
@@ -402,6 +384,25 @@
     }
   }
 
+  async function toggleFeature(feature_id) {
+    console.log('Toggling feature:', feature_id);
+
+    const index = activeFilters.value['features'].indexOf(feature_id);
+    if (index > -1) {
+      activeFilters.value['features'].splice(index, 1);
+    } else {
+      activeFilters.value['features'].push(feature_id);
+    }
+
+    await navigateTo({
+      path: '/',
+      query: {
+        city: activeFilters.value.city.join('-'),
+        features: activeFilters.value['features'].join('-'),
+      },
+    });
+  }
+
   // Function to toggle sidebar
   function toggleSidebar() {
     isSidebarOpen.value = !isSidebarOpen.value;
@@ -417,18 +418,6 @@
       if (route.query.city) {
         const cities = route.query.city.split('-');
         activeFilters.value.city = cities;
-      }
-
-      // Parse ratings filter
-      if (route.query.ratings) {
-        const ratings = route.query.ratings.split('-');
-        activeFilters.value.rating = ratings;
-      }
-
-      // Parse ranges filter
-      if (route.query.ranges) {
-        const ranges = route.query.ranges.split('-');
-        activeFilters.value.range = ranges;
       }
     }
 
@@ -588,24 +577,50 @@
               Cafe Terbaru
             </button>
             <button
-              class="text-white border border-white mt-2 px-3 sm:px-4 py-1 sm:py-2 rounded-full flex items-center gap-2 text-xs sm:text-base cursor-pointer touch-manipulation"
-            >
-              WFC Friendly
-            </button>
-            <button
+              @click="toggleFeature(8)"
+              :class="{
+                'border-yellow-500': activeFilters.features.includes(8),
+                'border-black': !activeFilters.features.includes(8),
+              }"
               class="text-white border border-white mt-2 px-3 sm:px-4 py-1 sm:py-2 rounded-full flex items-center gap-2 text-xs sm:text-base cursor-pointer touch-manipulation"
             >
               Pet Friendly
             </button>
             <button
+              @click="toggleFeature(40)"
               class="text-white border border-white mt-2 px-3 sm:px-4 py-1 sm:py-2 rounded-full flex items-center gap-2 text-xs sm:text-base cursor-pointer touch-manipulation"
+              :class="{
+                'border-yellow-500': activeFilters.features.includes(40),
+                'border-black': !activeFilters.features.includes(40),
+              }"
             >
               Family Friendly
             </button>
             <button
+              @click="toggleFeature(28)"
               class="text-white border border-white mt-2 px-3 sm:px-4 py-1 sm:py-2 rounded-full flex items-center gap-2 text-xs sm:text-base cursor-pointer touch-manipulation"
+              :class="{
+                'border-yellow-500': activeFilters.features.includes(28),
+                'border-black': !activeFilters.features.includes(28),
+              }"
             >
               Wheelchair Friendly
+            </button>
+            <button
+              @click="toggleFeature(53)"
+              class="text-white border border-white mt-2 px-3 sm:px-4 py-1 sm:py-2 rounded-full flex items-center gap-2 text-xs sm:text-base cursor-pointer touch-manipulation"
+              :class="{
+                'border-yellow-500': activeFilters.features.includes(53),
+                'border-black': !activeFilters.features.includes(53),
+              }"
+            >
+              Outdoor
+            </button>
+            >>>>>
+            <button
+              class="text-white border border-white mt-2 px-3 sm:px-4 py-1 sm:py-2 rounded-full flex items-center gap-2 text-xs sm:text-base cursor-pointer touch-manipulation"
+            >
+              WFC Friendly
             </button>
             <button
               class="text-white border border-white mt-2 px-3 sm:px-4 py-1 sm:py-2 rounded-full flex items-center gap-2 text-xs sm:text-base cursor-pointer touch-manipulation"
@@ -621,11 +636,6 @@
               class="text-white border border-white mt-2 px-3 sm:px-4 py-1 sm:py-2 rounded-full flex items-center gap-2 text-xs sm:text-base cursor-pointer touch-manipulation"
             >
               pemandangan
-            </button>
-            <button
-              class="text-white border border-white mt-2 px-3 sm:px-4 py-1 sm:py-2 rounded-full flex items-center gap-2 text-xs sm:text-base cursor-pointer touch-manipulation"
-            >
-              Outdoor
             </button>
             <button
               class="text-white border border-white mt-2 px-3 sm:px-4 py-1 sm:py-2 rounded-full flex items-center gap-2 text-xs sm:text-base cursor-pointer touch-manipulation"
@@ -702,8 +712,6 @@
       <Sidebar
         :activeFilters="activeFilters"
         :cities="uniqueCities"
-        :ratings="uniqueRatings"
-        :ranges="uniquePriceRanges"
         :onNearbyToggle="toggleNearbyFilter"
         :isNearbyActive="isNearbyActive"
         :locationLoading="locationLoading"

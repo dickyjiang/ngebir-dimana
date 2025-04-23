@@ -4,48 +4,6 @@
       <h2 class="text-lg font-medium">Filter</h2>
     </div>
 
-    <div class="mb-8">
-      <h3 class="text-sm font-medium">Rating</h3>
-      <div class="flex flex-wrap gap-2 text-xs text-nowrap my-4">
-        <button
-          v-for="rating in ratings"
-          :key="rating.rating"
-          @click="toggleFilter('rating', rating.rating)"
-          :class="{
-            'bg-gray-800 text-white': activeFilters.rating.includes(
-              rating.rating
-            ),
-            'bg-none border border-gray-400': !activeFilters.rating.includes(
-              rating.rating
-            ),
-          }"
-          class="px-3 py-2 rounded-full"
-        >
-          {{ rating.rating }} Stars
-        </button>
-      </div>
-    </div>
-    <div class="mb-8">
-      <h3 class="text-sm font-medium">Price Range</h3>
-      <div class="flex flex-wrap gap-2 text-xs text-nowrap my-4">
-        <button
-          v-for="range in uniqueRanges"
-          :key="range.range"
-          @click="toggleFilter('range', range.range)"
-          :class="{
-            'bg-gray-800 text-white w-14': activeFilters.range.includes(
-              range.range
-            ),
-            'bg-none border border-gray-400 w-14':
-              !activeFilters.range.includes(range.range),
-          }"
-          class="px-3 py-2 rounded-full"
-        >
-          {{ range.range }}
-        </button>
-      </div>
-    </div>
-
     <div class="w-full pb-2 border-b border-gray-400">
       <h2 class="text-lg font-medium">Lokasi</h2>
     </div>
@@ -73,9 +31,6 @@
   const props = defineProps({
     activeFilters: Object,
     cities: Array,
-    ratings: Array,
-    ranges: Array,
-    // Keep these props for compatibility, but we won't use them in the sidebar
     onNearbyToggle: Function,
     isNearbyActive: Boolean,
     locationLoading: Boolean,
@@ -106,8 +61,7 @@
       path: '/',
       query: {
         city: props.activeFilters.city.join('-'),
-        ratings: props.activeFilters.rating.join('-'),
-        ranges: props.activeFilters.range.join('-'),
+        features: props.activeFilters.features.join('-'),
       },
     });
   }

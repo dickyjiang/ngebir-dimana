@@ -6,7 +6,7 @@ export default defineEventHandler(async (event) => {
     // const user = await serverSupabaseUser(event);
     const client = await serverSupabaseClient<Database>(event);
     const body = await readBody(event);
-    let query = client.from("cafes").select("name,city, city_slug,rating, range, rating_num", { count: "exact" });
+    let query = client.from("cafes").select("name,city, city_slug,rating, range, rating_num, cafe_features(cafe_id, feature_id)", { count: "exact" });
 
     if (body.city && body.city.length > 0) {
         query.in('city_slug', body.city)
@@ -74,6 +74,7 @@ export default defineEventHandler(async (event) => {
         // query = query.rangeGte('lat', '[latitudeB, latitudeS]')
         // query = query.range('long', longitudeS, longitudeB)
     }
+    // query = query.eq('cafe_features.feature_id', 8)
     console.log('query', query)
 
     const { data, error, count } = await query
