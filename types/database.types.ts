@@ -70,11 +70,14 @@ export type Database = {
           h3: string | null
           id: number
           kgmid: string | null
+          lat: number | null
           latitude: string | null
           located_in: string | null
+          location: unknown | null
           location_link: string | null
           location_reviews_link: string | null
           logo: string | null
+          long: number | null
           longitude: string | null
           name: string | null
           order_links: string | null
@@ -134,11 +137,14 @@ export type Database = {
           h3?: string | null
           id?: number
           kgmid?: string | null
+          lat?: number | null
           latitude?: string | null
           located_in?: string | null
+          location?: unknown | null
           location_link?: string | null
           location_reviews_link?: string | null
           logo?: string | null
+          long?: number | null
           longitude?: string | null
           name?: string | null
           order_links?: string | null
@@ -198,11 +204,14 @@ export type Database = {
           h3?: string | null
           id?: number
           kgmid?: string | null
+          lat?: number | null
           latitude?: string | null
           located_in?: string | null
+          location?: unknown | null
           location_link?: string | null
           location_reviews_link?: string | null
           logo?: string | null
+          long?: number | null
           longitude?: string | null
           name?: string | null
           order_links?: string | null
@@ -503,6 +512,45 @@ export type Database = {
           updated_at?: string | null
           username?: string | null
           website?: string | null
+        }
+        Relationships: []
+      }
+      restaurants: {
+        Row: {
+          id: number
+          location: unknown
+          name: string
+        }
+        Insert: {
+          id?: number
+          location: unknown
+          name: string
+        }
+        Update: {
+          id?: number
+          location?: unknown
+          name?: string
+        }
+        Relationships: []
+      }
+      stores: {
+        Row: {
+          description: string | null
+          id: number
+          location: unknown
+          name: string
+        }
+        Insert: {
+          description?: string | null
+          id?: number
+          location: unknown
+          name: string
+        }
+        Update: {
+          description?: string | null
+          id?: number
+          location?: unknown
+          name?: string
         }
         Relationships: []
       }

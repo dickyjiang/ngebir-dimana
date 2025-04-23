@@ -25,6 +25,91 @@ cells:
       select rating
       from cafes;
     metadata: {}
+  - kind: 1
+    languageId: markdown
+    value: >
+      [vite] connecting...
+
+      [vite] connected.
+
+      <Suspense> is an experimental feature and its API will likely change.
+
+      ✨ Nuxt DevTools  Press Shift + Option + D to open DevTools
+
+      [vite] connecting...
+
+      [vite] connected.
+
+      <Suspense> is an experimental feature and its API will likely change.
+
+      ✨ Nuxt DevTools  Press Shift + Option + D to open DevTools
+
+      userLocation
+
+      RefImpl {dep: Dep, __v_isRef: true, __v_isShallow: false, _rawValue: {…},
+      _value: Proxy(Object)}
+
+      userLocation.value
+
+      Proxy(Object) {latitude: -6.8794523, longitude: 107.5965618}
+    metadata: {}
+  - kind: 2
+    languageId: sql
+    value: "SELECT ST_DistanceSphere(
+
+      \    ST_MakePoint(-6.8794523, 107.5965618),
+
+      \    ST_MakePoint(longitude, latitude)
+
+      ) / 1000 AS distance_in_km
+
+      FROM cafes
+
+
+      select id, name, description, st_y(location::geometry) as lat,
+      st_x(location::geometry) as long, st_distance(location, st_point(long,
+      lat)::geography) as dist_meters
+
+      \  from public.stores
+
+      \  order by location <-> st_point(long, lat)::geography;
+
+
+      \  "
+    metadata: {}
+  - kind: 2
+    languageId: sql
+    value: |-
+      select name, longitude, latitude, id, st_point(longitude, latitude)
+      from cafes
+      limit 5;
+    metadata: {}
+  - kind: 2
+    languageId: sql
+    value: >-
+      select id, name, description, st_y(location::geometry) as lat,
+      st_x(location::geometry) as long
+
+      , st_distance(location, st_point(107.59655891385863,
+      -6.879245721118651)::geography) as dist_meters
+        from public.cafes
+        where st_distance(location, st_point(107.59655891385863, -6.879245721118651)::geography) < 5000
+        order by location <-> st_point(107.59655891385863, -6.879245721118651)::geography;
+    metadata: {}
+  - kind: 2
+    languageId: sql
+    value: |-
+      select id, name,city
+      from cafes 
+      where lat <= -6.829341750735787
+      and lat >= -6.919431840825877
+      and long <= 107.52600934120879
+      and long >= 107.41750257290643
+          --'lat' => 'lt.-6.829341750735787',
+            --  'lat' => 'gt.-6.919431840825877',
+              --'long' => 'lt.107.52600934120879',
+              --'long' => 'gt.107.41750257290643' },
+    metadata: {}
 metadata:
   conn:
     id: ezdfhUMl9UO9LcXxz95zw

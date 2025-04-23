@@ -18,8 +18,6 @@
   const locationLoading = ref(false);
   const locationError = ref(null);
   const isNearbyActive = ref(false);
-  const nearbyRadius = 5; // in kilometers (reduced from 10km to 5km)
-  const nearbyCafeIds = ref([]); // Store IDs of nearby cafes
 
   // Initialize activeFilters with all expected properties
   const activeFilters = ref({ rating: [], range: [], city: [], borough: [] });
@@ -64,6 +62,11 @@
           to: to,
           searchQuery: searchQuery.value || '',
         };
+        if (isNearbyActive.value) {
+          payload.cariLocation = true;
+          payload.latitude = userLocation.value.latitude || null;
+          payload.longitude = userLocation.value.longitude || null;
+        }
       }
 
       const hasil = await $fetch('/api/search', {
@@ -171,17 +174,7 @@
       currentPage.value = page;
 
       // Use different fetch function based on whether nearby filter is active
-      if (
-        isNearbyActive.value &&
-        nearbyCafeIds.value &&
-        nearbyCafeIds.value.length > 0
-      ) {
-        // Fetch nearby cafes with the specific cafe IDs
-        fetchNearbyFilteredCafes(page, { cafeIds: nearbyCafeIds.value });
-      } else {
-        // Use normal filter-based fetching
-        fetchCafes(page, activeFilters.value);
-      }
+      fetchCafes(page, activeFilters.value);
     }
   }
 
@@ -201,7 +194,7 @@
   });
 
   // Function to set location manually
-  function setManualLocation() {
+  async function setManualLocation() {
     if (!isValidCoordinates.value) return;
 
     userLocation.value = {
@@ -214,8 +207,8 @@
 
     // Continue with nearby filter
     isNearbyActive.value = true;
-    fetchCafesWithLocation();
 
+    await fetchCafes(1, activeFilters.value);
     // Show success message
     toastMessage.value = 'Location set manually. Finding nearby cafes...';
     toastType.value = 'success';
@@ -391,11 +384,9 @@
 
       // If we have a location (auto or manual) and we're not showing the modal
       if (userLocation.value && !showLocationModal.value) {
-        // Activate nearby filter
         isNearbyActive.value = true;
 
-        // Fetch cafes with location data to calculate distances
-        await fetchCafesWithLocation();
+        await fetchCafes(1, activeFilters.value);
       }
     } catch (error) {
       // console.error('Error toggling nearby filter:', error);
@@ -409,145 +400,6 @@
         showToast.value = false;
       }, 5000);
     }
-  }
-
-  // Fetch cafes with location data to calculate distances
-  async function fetchCafesWithLocation() {
-    loading.value = true;
-    // const { $supabase } = useNuxtApp();
-
-    // try {
-    //   // Fetch all cafes with latitude and longitude
-    //   const { data: cafesWithLocation, error } = await $supabase
-    //     .from('cafes')
-    //     .select('id, latitude, longitude, city, borough')
-    //     .not('latitude', 'is', null)
-    //     .not('longitude', 'is', null);
-
-    //   if (error) {
-    //     console.error('Error fetching cafes with location:', error);
-    //     return;
-    //   }
-
-    //   if (!cafesWithLocation || cafesWithLocation.length === 0) {
-    //     console.warn('No cafes with location data found');
-    //     toastMessage.value = 'No cafes with location data found nearby';
-    //     toastType.value = 'error';
-    //     showToast.value = true;
-
-    //     setTimeout(() => {
-    //       showToast.value = false;
-    //     }, 5000);
-    //     return;
-    //   }
-
-    //   console.log(`Found ${cafesWithLocation.length} cafes with location data`);
-
-    //   // Calculate distances and find cafes within radius
-    //   const nearbyCities = new Set();
-    //   const nearbyBoroughs = new Set();
-    //   const foundNearbyCafeIds = [];
-
-    //   cafesWithLocation.forEach((cafe) => {
-    //     if (cafe.latitude && cafe.longitude) {
-    //       const distance = calculateDistance(
-    //         userLocation.value.latitude,
-    //         userLocation.value.longitude,
-    //         cafe.latitude,
-    //         cafe.longitude
-    //       );
-
-    //       // If within radius, add both city and borough to our sets
-    //       if (distance <= nearbyRadius) {
-    //         if (cafe.city) nearbyCities.add(cafe.city);
-    //         if (cafe.borough) nearbyBoroughs.add(cafe.borough);
-    //         foundNearbyCafeIds.push(cafe.id);
-    //       }
-    //     }
-    //   });
-
-    //   // Update our reactive reference
-    //   nearbyCafeIds.value = foundNearbyCafeIds;
-
-    //   console.log(
-    //     `Found ${nearbyCities.size} nearby cities:`,
-    //     Array.from(nearbyCities)
-    //   );
-    //   console.log(
-    //     `Found ${nearbyBoroughs.size} nearby boroughs:`,
-    //     Array.from(nearbyBoroughs)
-    //   );
-    //   console.log(
-    //     `Found ${nearbyCafeIds.value.length} nearby cafes directly:`,
-    //     nearbyCafeIds.value
-    //   );
-
-    //   if (nearbyCafeIds.value.length === 0) {
-    //     toastMessage.value = `No cafes found within ${nearbyRadius} km of your location`;
-    //     toastType.value = 'error';
-    //     showToast.value = true;
-
-    //     setTimeout(() => {
-    //       showToast.value = false;
-    //     }, 5000);
-    //   } else {
-    //     toastMessage.value = `Found ${nearbyCafeIds.value.length} cafes within ${nearbyRadius} km of your location`;
-    //     toastType.value = 'success';
-    //     showToast.value = true;
-
-    //     setTimeout(() => {
-    //       showToast.value = false;
-    //     }, 5000);
-    //   }
-
-    //   // Update filters to include only nearby cities, boroughs, and specific cafe IDs
-    //   activeFilters.value.city = Array.from(nearbyCities);
-    //   activeFilters.value.borough = Array.from(nearbyBoroughs);
-
-    //   // Fetch cafes with the updated filters, including direct cafe ID filtering
-    //   fetchNearbyFilteredCafes(1, { cafeIds: nearbyCafeIds.value });
-    // } catch (err) {
-    //   console.error('Error in fetchCafesWithLocation:', err);
-    // } finally {
-    //   loading.value = false;
-    // }
-  }
-
-  // Specialized function to fetch cafes by direct ID filtering
-  async function fetchNearbyFilteredCafes(page, filterParam) {
-    loading.value = true;
-    // const { $supabase } = useNuxtApp();
-
-    // // Calculate range based on current page
-    // const from = (page - 1) * itemsPerPage;
-    // const to = from + itemsPerPage - 1;
-
-    // try {
-    //   // Only fetch cafes with specific IDs
-    //   const {
-    //     data: cafeData,
-    //     error,
-    //     count,
-    //   } = await $supabase
-    //     .from('cafes')
-    //     .select('*', { count: 'exact' })
-    //     .in('id', filterParam.cafeIds)
-    //     .range(from, to);
-
-    //   if (error) {
-    //     console.error('Error fetching nearby cafes:', error);
-    //   } else {
-    //     console.log(
-    //       `Fetched page ${page} with ${cafeData.length} nearby cafes (total: ${count})`
-    //     );
-    //     data.value = cafeData;
-    //     totalCafes.value = count || 0;
-    //   }
-    // } catch (err) {
-    //   console.error('Exception while fetching nearby cafes:', err);
-    // } finally {
-    //   loading.value = false;
-    // }
   }
 
   // Function to toggle sidebar
@@ -584,7 +436,7 @@
     await fetchCafes(currentPage.value, activeFilters.value);
     // await fetchCafes(currentPage.value);
     // Automatically trigger nearby cafes functionality on load
-    toggleNearbyFilter();
+    // toggleNearbyFilter();
   });
 </script>
 <template>
