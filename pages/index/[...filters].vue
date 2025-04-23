@@ -385,8 +385,6 @@
   }
 
   async function toggleFeature(feature_id) {
-    console.log('Toggling feature:', feature_id);
-
     const index = activeFilters.value['features'].indexOf(feature_id);
     if (index > -1) {
       activeFilters.value['features'].splice(index, 1);
@@ -742,7 +740,7 @@
             :key="index"
             class="rounded-md flex flex-col h-full pb-4 border overflow-hidden"
           >
-            <NuxtLink :to="`/cafes/${cafe.id}`">
+            <NuxtLink :to="`/cafe/${cafe.slug_name}`">
               <NuxtImg
                 alt="Cafe Image"
                 class="w-full h-48 object-cover mb-4"
@@ -777,7 +775,7 @@
                     alt="star"
                     class="h-3"
                   />
-                  <p class="text-gray-500 text-xs">{{ cafe.rating }}</p>
+                  <p class="text-gray-500 text-xs">{{ cafe.rating_num }}</p>
                 </div>
               </div>
             </NuxtLink>
