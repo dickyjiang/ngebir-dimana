@@ -290,12 +290,9 @@
       <!-- Button removed from here -->
     </div>
   </section>
-  <!-- @budi slot untuk cafe terbaru - kalau banyak akan animated slide -->
-  aaaa
   <section id="new-cafes" class="my-4">
     <NewCafesList :cafes="newCafes" :loading="loadingNewCafes" />
   </section>
-  aaa
 
   <section id="main-content" class="flex sm:px-4 sm:max-w-[98%] mx-auto">
     <!-- Mobile Toggle Button -->
