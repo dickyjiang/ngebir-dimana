@@ -2,9 +2,9 @@ cells:
   - kind: 2
     languageId: sql
     value: |-
-      select *
+      select count(1)
       from cafes
-      where id = 13976
+      where slug_name is null
     metadata: {}
   - kind: 2
     languageId: sql

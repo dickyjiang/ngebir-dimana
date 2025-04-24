@@ -12,7 +12,7 @@
       <button
         v-for="city in uniqueCities"
         :key="city.city_slug"
-        @click="toggleFilter('city', city.city_slug)"
+        @click="handleFilterToggle('city', city.city_slug)"
         :class="{
           'bg-gray-800 text-white': activeFilters.city.includes(city.city_slug),
           'bg-gray-100': !activeFilters.city.includes(city.city_slug),
@@ -27,6 +27,9 @@
 
 <script setup>
   import { ref, computed, onMounted } from 'vue';
+  import { useFilterToggle } from '~/composables/useFilterToggle';
+
+  const { toggleFilter } = useFilterToggle();
 
   const props = defineProps({
     activeFilters: Object,
@@ -50,20 +53,8 @@
       : ['$', '$$', '$$$', '$$$$']; // Fallback to defaults
   });
 
-  async function toggleFilter(type, value) {
-    const index = props.activeFilters[type].indexOf(value);
-    if (index > -1) {
-      props.activeFilters[type].splice(index, 1);
-    } else {
-      props.activeFilters[type].push(value);
-    }
-    await navigateTo({
-      path: '/',
-      query: {
-        city: props.activeFilters.city.join('-'),
-        features: props.activeFilters.features.join('-'),
-      },
-    });
+  async function handleFilterToggle(type, value) {
+    await toggleFilter(props.activeFilters, type, value);
   }
 
   // Keep this function for compatibility but it won't be used in the sidebar

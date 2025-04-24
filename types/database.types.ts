@@ -11,45 +11,31 @@ export type Database = {
     Tables: {
       cafe_features: {
         Row: {
-          feature: number
-          id: number
+          cafe_id: number
+          feature_id: number
         }
         Insert: {
-          feature: number
-          id: number
+          cafe_id: number
+          feature_id: number
         }
         Update: {
-          feature?: number
-          id?: number
+          cafe_id?: number
+          feature_id?: number
         }
         Relationships: [
           {
-            foreignKeyName: "cafe_features_cafes_id_fk"
-            columns: ["id"]
+            foreignKeyName: "cafe_features_cafe_id_fkey"
+            columns: ["cafe_id"]
             isOneToOne: false
             referencedRelation: "cafes"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "cafe_features_cafes_id_fk"
-            columns: ["id"]
-            isOneToOne: false
-            referencedRelation: "v_cafe_features"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "cafe_features_features_id_fk"
-            columns: ["feature"]
+            foreignKeyName: "cafe_features_feature_id_fkey"
+            columns: ["feature_id"]
             isOneToOne: false
             referencedRelation: "features"
             referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "cafe_features_features_id_fk"
-            columns: ["feature"]
-            isOneToOne: false
-            referencedRelation: "v_cafe_features"
-            referencedColumns: ["feature_id"]
           },
         ]
       }
@@ -445,14 +431,17 @@ export type Database = {
       }
       features: {
         Row: {
+          feature_slug: string | null
           id: number
           name: string | null
         }
         Insert: {
+          feature_slug?: string | null
           id?: number
           name?: string | null
         }
         Update: {
+          feature_slug?: string | null
           id?: number
           name?: string | null
         }
@@ -556,72 +545,6 @@ export type Database = {
       }
     }
     Views: {
-      v_cafe_features: {
-        Row: {
-          about: Json | null
-          area_service: boolean | null
-          booking_appointment_link: string | null
-          borough: string | null
-          business_status: string | null
-          category: string | null
-          cid: string | null
-          city: string | null
-          description: string | null
-          feature_id: number | null
-          feature_name: string | null
-          full_address: string | null
-          google_id: string | null
-          h3: string | null
-          id: number | null
-          kgmid: string | null
-          latitude: string | null
-          located_in: string | null
-          location_link: string | null
-          location_reviews_link: string | null
-          logo: string | null
-          longitude: string | null
-          name: string | null
-          order_links: string | null
-          other_hours: string | null
-          owner_id: string | null
-          owner_link: string | null
-          owner_title: string | null
-          phone: string | null
-          photo: string | null
-          photos_count: number | null
-          place_id: string | null
-          plus_code: string | null
-          popular_times: string | null
-          postal_code: string | null
-          posts: string | null
-          query: string | null
-          range: string | null
-          rating: string | null
-          reservation_links: string | null
-          reviews: number | null
-          reviews_id: string | null
-          reviews_link: string | null
-          reviews_per_score: string | null
-          reviews_per_score_1: string | null
-          reviews_per_score_2: string | null
-          reviews_per_score_3: string | null
-          reviews_per_score_4: string | null
-          reviews_per_score_5: number | null
-          reviews_tags: string | null
-          site: string | null
-          state: string | null
-          street: string | null
-          street_view: string | null
-          subtypes: string | null
-          time_zone: string | null
-          type: string | null
-          typical_time_spent: string | null
-          verified: boolean | null
-          working_hours: string | null
-          working_hours_old_format: string | null
-        }
-        Relationships: []
-      }
       v_city: {
         Row: {
           city: string | null

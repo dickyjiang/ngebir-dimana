@@ -8,6 +8,29 @@ export default defineEventHandler(async (event) => {
     const body = await readBody(event);
     let query = client.from("cafes").select("name,city, photo, city, slug_name, description, city_slug,rating, range, rating_num, cafe_features(cafe_id, feature_id)", { count: "exact" });
 
+    if (body.features && body.features.length > 0) {
+        const { data: feature_id, error: error1 } = await client.from("features")
+            .select('id')
+            .in('feature_slug', body.features)
+
+        // Create an array of feature IDs
+        const featureIds = feature_id?.map(feature => feature.id) || [];
+        console.log('Feature IDs:', featureIds);
+
+
+        const { data: cafes_ids, error: error2 } = await client.from("cafe_features")
+            .select('cafe_id')
+            .in('feature_id', featureIds)
+
+        const cafesIds = cafes_ids?.map(feature => feature.cafe_id) || [];
+        console.log('Feature IDs:', cafesIds);
+
+        if (featureIds.length > 0) {
+            // Filter cafes that have any of these features
+            query = query.in('id', cafesIds);
+        }
+    }
+
     if (body.city && body.city.length > 0) {
         query.in('city_slug', body.city)
     }
@@ -35,17 +58,15 @@ export default defineEventHandler(async (event) => {
     //     `ST_Distance(location::geography, ST_MakePoint(107.59655891385863, -6.879245721118651)::geography) > 5000`
     // );
     // query = query.gt('id', 5000)
+    // query = query.order('id', { ascending: false })
 
-    if (body.from && body.to) {
-        query = query.range(body.from, body.to)
-    }
+    query = query.range(body.from, body.to)
+
     if (body.cariLocation) {
         // Calculating the Shift:
         // Latitude: To shift 5 km north, you would add approximately 0.0449 degrees to the current latitude. To shift south, you would subtract 0.0449 degrees. 
         // Longitude: To shift 5 km east, you would add approximately 0.0449/cos(latitude) degrees to the current longitude. To shift west, you would subtract 0.0449/cos(latitude) degrees. 
-        console.log('body.latitude', body.latitude)
         // body.latitude -6.874430493406096
-        console.log('body.longitude', body.longitude)
         // body.longtitude 107.4717864955787
         let latitude = body.latitude
         let latitudeS = body.latitude
@@ -60,10 +81,6 @@ export default defineEventHandler(async (event) => {
         longitudeS = longitude - (5 / (111 * Math.cos(latitude)))
         longitudeB = longitude + (5 / (111 * Math.cos(latitude)))
 
-        console.log('latitudeS', latitudeS)
-        console.log('latitudeB', latitudeB)
-        console.log('longitudeS', longitudeS)
-        console.log('longitudeB', longitudeB)
 
         query = query.not('latitude', 'is', null)
         query = query.not('longitude', 'is', null)
@@ -74,8 +91,7 @@ export default defineEventHandler(async (event) => {
         // query = query.rangeGte('lat', '[latitudeB, latitudeS]')
         // query = query.range('long', longitudeS, longitudeB)
     }
-    // query = query.eq('cafe_features.feature_id', 8)
-    console.log('query', query)
+    console.log(query)
 
     const { data, error, count } = await query
     if (error) throw createError({ statusMessage: error.message });

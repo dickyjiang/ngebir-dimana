@@ -11,7 +11,7 @@
       <div class="flex flex-col md:flex-row items-start justify-between gap-4">
         <div class="w-full md:w-1/2">
           <NuxtImg
-            :src="cafe.photo"
+            :src="cafe.data.photo"
             alt="Cafe Image"
             class="w-full h-64 object-cover mb-4 rounded-lg"
             placeholder="/img/noimg.webp"
@@ -22,7 +22,7 @@
             >
               <div class="w-12 h-12 rounded-full overflow-hidden">
                 <NuxtImg
-                  :src="cafe.logo"
+                  :src="cafe.data.logo"
                   alt="Cafe Logo"
                   class="w-full h-full object-cover mb-4"
                   placeholder="/img/logo-default.png"
@@ -35,7 +35,7 @@
                     alt="location"
                     class="h-4"
                   />
-                  <p class="text-gray-500">{{ cafe.city }}</p>
+                  <p class="text-gray-500">{{ cafe.data.city }}</p>
                 </div>
                 <div class="flex items-center gap-2">
                   <div class="flex items-center gap-2">
@@ -44,9 +44,11 @@
                       alt="rating"
                       class="h-4"
                     />
-                    <p class="text-gray-500">{{ cafe.rating }}</p>
+                    <p class="text-gray-500">{{ cafe.data.rating }}</p>
                   </div>
-                  <p class="text-gray-500 font-semibold">{{ cafe.range }}</p>
+                  <p class="text-gray-500 font-semibold">
+                    {{ cafe.data.range }}
+                  </p>
                 </div>
               </div>
             </div>
@@ -54,7 +56,7 @@
               class="flex flex-col sm:flex-row gap-2 items-center justify-center"
             >
               <button
-                v-if="cafe.latitude && cafe.longitude"
+                v-if="cafe.data.lat && cafe.data.long"
                 @click="openInGoogleMaps"
                 class="mt-4 w-full bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg flex items-center justify-center gap-2"
               >
@@ -62,7 +64,7 @@
                 Open in Google Maps
               </button>
               <button
-                v-if="cafe.site || cafe.instagram_url"
+                v-if="cafe.data.site || cafe.data.instagram_url"
                 @click="openWebsite"
                 class="mt-4 w-full bg-gray-800 hover:bg-gray-700 text-white py-2 px-4 rounded-lg flex items-center justify-center gap-2"
               >
@@ -70,7 +72,9 @@
                 Visit
               </button>
             </div>
-            <p class="text-lg text-gray-700 my-2">{{ cafe.description }}</p>
+            <p class="text-lg text-gray-700 my-2">
+              {{ cafe.data.description }}
+            </p>
             <div>
               <div class="py-4">
                 <div v-if="about && Object.keys(about).length">
@@ -294,11 +298,8 @@
   const loading = ref(true);
   const about = ref({});
 
-  // New JSON string to be added to the About section
-  const additionalAboutData =
-    '{"Service options": {"Outdoor seating": true, "Takeaway": true, "Dine-in": true}, "Accessibility": {"Wheelchair-accessible car park": false, "Wheelchair-accessible entrance": false, "Wheelchair-accessible seating": false}, "Offerings": {"Coffee": true}, "Dining options": {"Seating": true}, "Amenities": {"Toilets": true}, "Atmosphere": {"Casual": true, "Cosy": true}, "Crowd": {"Groups": true}, "Children": {"Good for kids": true}}';
-
   function openInGoogleMaps() {
+    // encan
     // First priority: use location_link if available
     if (cafe.value?.location_link) {
       console.log('Using location_link');
@@ -348,6 +349,12 @@
 
   onMounted(async () => {
     console.log('Route ID:', route.params.id);
+
+    const cafeData = await $fetch(`/api/cafe/${route.params.id}`, {
+      headers: useRequestHeaders(['cookie']),
+    });
+    console.log('Fetched Cafe Data:', cafeData);
+    cafe.value = cafeData;
     // const { $supabase } = useNuxtApp();
     // const { data: cafeData, error } = await $supabase
     //   .from('cafes')
