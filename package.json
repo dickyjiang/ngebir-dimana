@@ -16,6 +16,7 @@
   "dependencies": {
     "@fortawesome/fontawesome-free": "^6.7.2",
     "@nuxt/image": "^1.9.0",
+    "@nuxtjs/leaflet": "^1.2.6",
     "@nuxtjs/tailwindcss": "^6.13.1",
     "@supabase/supabase-js": "^2.48.1",
     "lodash": "^4.17.21",
@@ -24,8 +25,8 @@
     "vue-router": "latest"
   },
   "devDependencies": {
-    "@nuxtjs/supabase": "^1.5.0",
     "@nuxtjs/gtm": "^2.4.0",
+    "@nuxtjs/supabase": "^1.5.0",
     "vue-gtag-next": "^1.14.0"
   },
   "overrides": {

@@ -3,6 +3,7 @@
   import { ref, computed, onMounted, watch } from 'vue';
   import Sidebar from '~/components/Sidebar.vue';
   import CafeList from '~/components/cafe/CafeList.vue';
+  import NewCafesList from '~/components/cafe/NewCafesList.vue';
   import HeroSearch from '~/components/HeroSearch.vue';
   import '@fortawesome/fontawesome-free/css/all.css';
   import { debounce } from 'lodash';
@@ -37,12 +38,17 @@
     toggleNearbyFilter: toggleNearbyFilterComposable,
   } = useNearbyFilter();
 
+  // Add these variables for new cafes section
+  const newCafes = ref([]);
+  const loadingNewCafes = ref(false);
+
   const currentPage = ref(1);
   const itemsPerPage = 12;
   const searchQuery = ref('');
 
   // Initialize filter options with empty arrays
   const uniqueCities = ref([]);
+  const zoom = ref(6);
 
   // Initialize activeFilters with all expected properties
   const activeFilters = ref({
@@ -63,6 +69,29 @@
     fetchCafes(1, filters);
   }, 500); // 500ms delay
 
+  async function fetchNewCafes() {
+    loadingNewCafes.value = true;
+    try {
+      await fetchCafesFromComposable(
+        1,
+        10,
+        {
+          city: [],
+          borough: [],
+          features: [],
+        },
+        '',
+        false,
+        null
+      );
+      newCafes.value = data.value || [];
+    } catch (error) {
+      console.error('Error fetching new cafes:', error);
+      newCafes.value = [];
+    } finally {
+      loadingNewCafes.value = false;
+    }
+  }
   // Use the composable function instead of the original function
   async function fetchCafes(page, filters = null) {
     await fetchCafesFromComposable(
@@ -79,7 +108,7 @@
   watch(
     () => [
       JSON.stringify(activeFilters.value.city),
-      JSON.stringify(activeFilters.value.borough),
+      JSON.stringify(activeFilters.value.features),
     ],
     () => {
       currentPage.value = 1;
@@ -145,6 +174,7 @@
       }
 
       // Then fetch cafes with the initial filters
+      await fetchNewCafes();
       await fetchCafes(currentPage.value, activeFilters.value);
     } catch (error) {
       console.error('Error in onMounted:', error);
@@ -259,30 +289,7 @@
   </section>
   <!-- @budi slot untuk cafe terbaru - kalau banyak akan animated slide -->
   <section id="new-cafes" class="my-4">
-    <div
-      class="my-4 w-full py-2 mx-auto flex flex-row gap-4 items-center justify-center bg-gray-200"
-    >
-      <div
-        class="text-gray-800 text-center font-medium tracking-wide mb-2 sm:mb-4 border border-gray-600 h-40 w-80"
-      >
-        Cafe Terbaru 1
-      </div>
-      <div
-        class="text-gray-800 text-center font-medium tracking-wide mb-2 sm:mb-4 border border-gray-600 h-40 w-80"
-      >
-        Cafe Terbaru 2
-      </div>
-      <div
-        class="text-gray-800 text-center font-medium tracking-wide mb-2 sm:mb-4 border border-gray-600 h-40 w-80"
-      >
-        Cafe Terbaru 3
-      </div>
-      <div
-        class="text-gray-800 text-center font-medium tracking-wide mb-2 sm:mb-4 border border-gray-600 h-40 w-80"
-      >
-        Cafe Terbaru 4
-      </div>
-    </div>
+    <NewCafesList :cafes="newCafes" :loading="loadingNewCafes" />
   </section>
   <section id="main-content" class="flex sm:px-4 sm:max-w-[98%] mx-auto">
     <!-- Mobile Toggle Button -->

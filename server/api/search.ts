@@ -15,15 +15,12 @@ export default defineEventHandler(async (event) => {
 
         // Create an array of feature IDs
         const featureIds = feature_id?.map(feature => feature.id) || [];
-        console.log('Feature IDs:', featureIds);
-
 
         const { data: cafes_ids, error: error2 } = await client.from("cafe_features")
             .select('cafe_id')
             .in('feature_id', featureIds)
 
         const cafesIds = cafes_ids?.map(feature => feature.cafe_id) || [];
-        console.log('Feature IDs:', cafesIds);
 
         if (featureIds.length > 0) {
             // Filter cafes that have any of these features
@@ -58,7 +55,7 @@ export default defineEventHandler(async (event) => {
     //     `ST_Distance(location::geography, ST_MakePoint(107.59655891385863, -6.879245721118651)::geography) > 5000`
     // );
     // query = query.gt('id', 5000)
-    // query = query.order('id', { ascending: false })
+    query = query.order('id', { ascending: false })
 
     query = query.range(body.from, body.to)
 

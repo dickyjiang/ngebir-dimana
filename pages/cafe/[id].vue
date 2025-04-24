@@ -55,6 +55,43 @@
             <div
               class="flex flex-col sm:flex-row gap-2 items-center justify-center"
             >
+              <ClientOnly>
+                <LMap
+                  style="height: 350px"
+                  :zoom="1"
+                  :center="
+                    cafe.data.lat && cafe.data.long
+                      ? [Number(cafe.data.lat), Number(cafe.data.long)]
+                      : [0, 0]
+                  "
+                  :use-global-leaflet="false"
+                >
+                  <LTileLayer
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    attribution='&amp;copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
+                    layer-type="base"
+                    name="OpenStreetMap"
+                  />
+                  <LMarker
+                    v-if="cafe.data.lat && cafe.data.long"
+                    :lat-lng="[
+                      Number(cafe.data.lat + 0.1),
+                      Number(cafe.data.long),
+                    ]"
+                  >
+                    <LPopup> teuing tah </LPopup>
+                  </LMarker>
+                  <LMarker
+                    v-if="cafe.data.lat && cafe.data.long"
+                    :lat-lng="[Number(cafe.data.lat), Number(cafe.data.long)]"
+                  >
+                    <LPopup>
+                      {{ cafe.data.name }}
+                    </LPopup>
+                  </LMarker>
+                </LMap>
+              </ClientOnly>
+              bbb
               <button
                 v-if="cafe.data.lat && cafe.data.long"
                 @click="openInGoogleMaps"

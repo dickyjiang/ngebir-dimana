@@ -103,11 +103,6 @@
             </button>
             <!-- Cafe Terbaru filter -->
             <button
-              class="text-white border border-white mt-2 px-3 sm:px-4 py-1 sm:py-2 rounded-full flex items-center gap-2 text-xs sm:text-base cursor-pointer touch-manipulation"
-            >
-              Cafe Terbaru
-            </button>
-            <button
               @click="handleFeatureToggle('pets_dogs_allowed')"
               :class="{
                 'border-yellow-500':
