@@ -81,7 +81,7 @@
               <i class="fas fa-search"></i>
             </button>
           </div>
-          <div class="flex flex-wrap items-center gap-2 w-full">
+          <div class="flex flex-wrap items-center justify-center gap-2 w-full">
             <button
               @click="toggleNearbyFilter"
               :class="{
@@ -105,9 +105,9 @@
             <button
               @click="handleFeatureToggle('pets_dogs_allowed')"
               :class="{
-                'border-yellow-500':
+                'text-yellow-500 bg-black border border-yellow-500':
                   activeFilters.features.includes('pets_dogs_allowed'),
-                'border-black':
+                'text-gray-100 border-gray-400':
                   !activeFilters.features.includes('pets_dogs_allowed'),
               }"
               class="text-white border border-white mt-2 px-3 sm:px-4 py-1 sm:py-2 rounded-full flex items-center gap-2 text-xs sm:text-base cursor-pointer touch-manipulation"
@@ -118,7 +118,7 @@
               @click="handleFeatureToggle('crowd_family_friendly')"
               class="text-white border border-white mt-2 px-3 sm:px-4 py-1 sm:py-2 rounded-full flex items-center gap-2 text-xs sm:text-base cursor-pointer touch-manipulation"
               :class="{
-                'border-yellow-500': activeFilters.features.includes(
+                'text-yellow-500 bg-black border border-yellow-500': activeFilters.features.includes(
                   'crowd_family_friendly'
                 ),
                 'border-black': !activeFilters.features.includes(
@@ -134,7 +134,7 @@
               "
               class="text-white border border-white mt-2 px-3 sm:px-4 py-1 sm:py-2 rounded-full flex items-center gap-2 text-xs sm:text-base cursor-pointer touch-manipulation"
               :class="{
-                'border-yellow-500': activeFilters.features.includes(
+                'text-yellow-500 bg-black border border-yellow-500': activeFilters.features.includes(
                   'accessibility_wheelchair_accessible'
                 ),
                 'border-black': !activeFilters.features.includes(
@@ -148,7 +148,7 @@
               @click="handleFeatureToggle('service_options_outdoor_seating')"
               class="text-white border border-white mt-2 px-3 sm:px-4 py-1 sm:py-2 rounded-full flex items-center gap-2 text-xs sm:text-base cursor-pointer touch-manipulation"
               :class="{
-                'border-yellow-500': activeFilters.features.includes(
+                'text-yellow-500 bg-black border border-yellow-500': activeFilters.features.includes(
                   'service_options_outdoor_seating'
                 ),
                 'border-black': !activeFilters.features.includes(
@@ -158,7 +158,7 @@
             >
               Outdoor
             </button>
-            <button
+            <!-- <button
               class="text-white border border-white mt-2 px-3 sm:px-4 py-1 sm:py-2 rounded-full flex items-center gap-2 text-xs sm:text-base cursor-pointer touch-manipulation"
             >
               WFC Friendly
@@ -182,7 +182,7 @@
               class="text-white border border-white mt-2 px-3 sm:px-4 py-1 sm:py-2 rounded-full flex items-center gap-2 text-xs sm:text-base cursor-pointer touch-manipulation"
             >
               instagramable
-            </button>
+            </button> -->
           </div>
         </div>
       </div>
