@@ -1,5 +1,5 @@
 <template>
-  <section id="new-cafes" class="my-4 bg-gray-700">
+  <section id="new-cafes" class="my-4 bg-gray-700 hidden">
     <div
       class="my-4 w-full py-2 mx-auto flex flex-row gap-4 items-center justify-center bg-gray-200 overflow-x-auto"
     >
