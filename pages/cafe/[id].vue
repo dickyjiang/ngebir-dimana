@@ -329,11 +329,20 @@
 <script setup>
   import { ref, onMounted } from 'vue';
   import { useRoute, useNuxtApp } from '#app';
+  import { useSeo } from '~/composables/useSeo';
 
   const route = useRoute();
   const cafe = ref(null);
   const loading = ref(true);
   const about = ref({});
+
+  useSeo({
+    title: 'Website Paling Lengkap buat Cari Tempat Ngopi!',
+    description: 'Satu Klik, Ribuan Cafe! Temukan yang Pas untuk Kamu.',
+    image: '/img/OG-img.png',
+    url: `https://ngopi.di-mana.com/cafes/${route.params.id}`,
+    type: 'article',
+  });
 
   function openInGoogleMaps() {
     // encan
@@ -385,12 +394,12 @@
   }
 
   onMounted(async () => {
-    console.log('Route ID:', route.params.id);
+    // console.log('Route ID:', route.params.id);
 
     const cafeData = await $fetch(`/api/cafe/${route.params.id}`, {
       headers: useRequestHeaders(['cookie']),
     });
-    console.log('Fetched Cafe Data:', cafeData);
+    // console.log('Fetched Cafe Data:', cafeData);
     cafe.value = cafeData;
     // const { $supabase } = useNuxtApp();
     // const { data: cafeData, error } = await $supabase

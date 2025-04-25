@@ -88,7 +88,7 @@ export default defineEventHandler(async (event) => {
         // query = query.rangeGte('lat', '[latitudeB, latitudeS]')
         // query = query.range('long', longitudeS, longitudeB)
     }
-    console.log(query)
+    // console.log(query)
 
     const { data, error, count } = await query
     if (error) throw createError({ statusMessage: error.message });
