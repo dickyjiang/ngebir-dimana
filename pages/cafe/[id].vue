@@ -7,7 +7,7 @@
       <div class="skeleton skeleton-text"></div>
     </div>
     <div v-else-if="cafe">
-      <h1 class="text-4xl font-bold mb-4">{{ cafe.name }}</h1>
+      <h1 class="text-4xl font-bold mb-4">{{ cafe.data.name }}</h1>
       <div class="flex flex-col md:flex-row items-start justify-between gap-4">
         <div class="w-full md:w-1/2">
           <NuxtImg
@@ -17,17 +17,16 @@
             placeholder="/img/noimg.webp"
           />
           <div class="px-4">
-            <div
-              class="flex items-end gap-2 justify-between border-b border-gray-500 pb-3"
-            >
-              <div class="w-12 h-12 rounded-full overflow-hidden">
-                <NuxtImg
-                  :src="cafe.data.logo"
-                  alt="Cafe Logo"
-                  class="w-full h-full object-cover mb-4"
-                  placeholder="/img/logo-default.png"
-                />
-              </div>
+            <div class="flex items-end gap-2 justify-between border-b border-gray-500 pb-2">
+                <div class="w-10 h-10 rounded-full overflow-hidden">
+                  <NuxtImg
+                    :src="cafe.data.logo"
+                    alt="Cafe Logo"
+                    class="w-full h-full object-cover mb-4"
+                    placeholder="/img/logo-default.png"
+                  />
+                </div>
+
               <div class="flex items-center justify-between gap-2 py-1">
                 <div class="flex items-center gap-1">
                   <img
@@ -53,49 +52,12 @@
               </div>
             </div>
             <div
-              class="flex flex-col sm:flex-row gap-2 items-center justify-center"
-            >
-              <ClientOnly>
-                <LMap
-                  style="height: 350px"
-                  :zoom="12"
-                  :center="
-                    cafe.data.lat && cafe.data.long
-                      ? [Number(cafe.data.lat), Number(cafe.data.long)]
-                      : [0, 0]
-                  "
-                  :use-global-leaflet="false"
-                >
-                  <LTileLayer
-                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                    attribution='&amp;copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
-                    layer-type="base"
-                    name="OpenStreetMap"
-                  />
-                  <LMarker
-                    v-if="cafe.data.lat && cafe.data.long"
-                    :lat-lng="[
-                      Number(cafe.data.lat + 0.1),
-                      Number(cafe.data.long),
-                    ]"
-                  >
-                    <LPopup> teuing tah </LPopup>
-                  </LMarker>
-                  <LMarker
-                    v-if="cafe.data.lat && cafe.data.long"
-                    :lat-lng="[Number(cafe.data.lat), Number(cafe.data.long)]"
-                  >
-                    <LPopup>
-                      {{ cafe.data.name }}
-                    </LPopup>
-                  </LMarker>
-                </LMap>
-              </ClientOnly>
-              bbb
+              class="flex flex-col sm:flex-row gap-2 items-center justify-center">
+              
               <button
                 v-if="cafe.data.lat && cafe.data.long"
                 @click="openInGoogleMaps"
-                class="mt-4 w-full bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg flex items-center justify-center gap-2"
+                class="mt-4 w-full bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg flex items-center justify-center gap-2 max-w-1/2"
               >
                 <i class="fas fa-map-marker-alt"></i>
                 Open in Google Maps
@@ -128,9 +90,47 @@
             </div>
           </div>
         </div>
-        <div class="w-full md:w-1/2">
+        <div class="w-full md:w-1/2 flex flex-col gap-8">
+          <div class="border border-gray-300 rounded-lg ">
+            <ClientOnly>
+                  <LMap
+                    style="height: 350px"
+                    :zoom="12"
+                    :center="
+                      cafe.data.lat && cafe.data.long
+                        ? [Number(cafe.data.lat), Number(cafe.data.long)]
+                        : [0, 0]
+                    "
+                    :use-global-leaflet="false"
+                  >
+                    <LTileLayer
+                      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                      attribution='&amp;copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
+                      layer-type="base"
+                      name="OpenStreetMap"
+                    />
+                    <LMarker
+                      v-if="cafe.data.lat && cafe.data.long"
+                      :lat-lng="[
+                        Number(cafe.data.lat + 0.1),
+                        Number(cafe.data.long),
+                      ]"
+                    >
+                      <LPopup> teuing tah </LPopup>
+                    </LMarker>
+                    <LMarker
+                      v-if="cafe.data.lat && cafe.data.long"
+                      :lat-lng="[Number(cafe.data.lat), Number(cafe.data.long)]"
+                    >
+                      <LPopup>
+                        {{ cafe.data.name }}
+                      </LPopup>
+                    </LMarker>
+                  </LMap>
+                </ClientOnly>
+          </div>
           <div class="flex flex-col" v-if="cafe.data.working_hours">
-            <p>Working Hours</p>
+            <h2 class="text-lg font-semibold">Working Hours</h2>
             <table
               class="min-w-full border-collapse border border-gray-300 text-sm mt-2"
             >
@@ -153,13 +153,14 @@
               </tbody>
             </table>
           </div>
+          
         </div>
       </div>
     </div>
     <div v-else class="text-center text-gray-500">Cafe not found.</div>
   </div>
   <!-- @budi section ini showing cafe yg realted dengan last search result - atau kalau bukan hasil search show close location dari cafe terpilih) -->
-  <section id="related-cafes" class="my-4">
+  <!-- <section id="related-cafes" class="my-4">
     <div
       class="my-4 w-full py-2 mx-auto flex flex-row gap-4 items-center justify-center bg-gray-200"
     >
@@ -184,7 +185,7 @@
         Cafe Terbaru 4
       </div>
     </div>
-  </section>
+  </section> -->
 </template>
 
 <script setup>
