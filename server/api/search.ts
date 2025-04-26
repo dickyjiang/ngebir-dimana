@@ -33,14 +33,14 @@ export default defineEventHandler(async (event) => {
     }
 
     if (body.ratings && body.ratings.length > 0) {
-        const ratingFilters = body.ratings.map(rating =>
+        const ratingFilters = body.ratings.map((rating: number) =>
             `and(rating_num.gte.${rating},rating_num.lt.${rating + 1})`
         ).join(',');
         query = query.or(ratingFilters);
     }
 
     if (body.ranges && body.ranges.length > 0) {
-        const rangeArray = body.ranges.map(range => `"${range}"`);
+        const rangeArray = body.ranges.map((range: number) => `"${range}"`);
         query.in('range', body.ranges)
     }
 

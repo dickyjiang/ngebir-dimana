@@ -117,6 +117,31 @@ cells:
       from features
       where name ilike '%pet%'
     metadata: {}
+  - kind: 2
+    languageId: sql
+    value: |-
+      SELECT c.id, c.name, array_agg(f.feature_slug) as features
+      FROM cafes c
+      JOIN cafe_features cf ON c.id = cf.cafe_id
+      JOIN features f ON cf.feature_id = f.id
+      GROUP BY c.id, c.name
+      HAVING COUNT(DISTINCT f.id) > 1
+      ORDER BY c.name;
+    metadata: {}
+  - kind: 2
+    languageId: sql
+    value: |-
+      SELECT c.id, c.name
+      FROM cafes c
+      JOIN cafe_features cf ON c.id = cf.cafe_id
+      JOIN features f ON cf.feature_id = f.id
+      WHERE f.feature_slug IN ('offerings_vegan_options', 'amenities_wi_fi')
+      GROUP BY c.id, c.name
+    metadata: {}
+  - kind: 2
+    languageId: sql
+    value: select cafe_id from cafe_features GROUP BY feature_id, cafe_id ;
+    metadata: {}
 metadata:
   conn:
     id: ezdfhUMl9UO9LcXxz95zw
