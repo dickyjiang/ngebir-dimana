@@ -17,15 +17,17 @@
             placeholder="/img/noimg.webp"
           />
           <div class="px-4">
-            <div class="flex items-end gap-2 justify-between border-b border-gray-500 pb-2">
-                <div class="w-10 h-10 rounded-full overflow-hidden">
-                  <NuxtImg
-                    :src="cafe.data.logo"
-                    alt="Cafe Logo"
-                    class="w-full h-full object-cover mb-4"
-                    placeholder="/img/logo-default.png"
-                  />
-                </div>
+            <div
+              class="flex items-end gap-2 justify-between border-b border-gray-500 pb-2"
+            >
+              <div class="w-10 h-10 rounded-full overflow-hidden">
+                <NuxtImg
+                  :src="cafe.data.logo"
+                  alt="Cafe Logo"
+                  class="w-full h-full object-cover mb-4"
+                  placeholder="/img/logo-default.png"
+                />
+              </div>
 
               <div class="flex items-center justify-between gap-2 py-1">
                 <div class="flex items-center gap-1">
@@ -52,7 +54,8 @@
               </div>
             </div>
             <div
-              class="flex flex-col sm:flex-row gap-2 items-center justify-center">
+              class="flex flex-col sm:flex-row gap-2 items-center justify-center"
+            >
               <button
                 v-if="cafe.data.lat && cafe.data.long"
                 @click="openInGoogleMaps"
@@ -90,43 +93,43 @@
           </div>
         </div>
         <div class="w-full md:w-1/2 flex flex-col gap-8">
-          <div class="border border-gray-300 rounded-lg ">
+          <div class="border border-gray-300 rounded-lg">
             <ClientOnly>
-                  <LMap
-                    style="height: 350px"
-                    :zoom="12"
-                    :center="
-                      cafe.data.lat && cafe.data.long
-                        ? [Number(cafe.data.lat), Number(cafe.data.long)]
-                        : [0, 0]
-                    "
-                    :use-global-leaflet="false"
-                  >
-                    <LTileLayer
-                      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                      attribution='&amp;copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
-                      layer-type="base"
-                      name="OpenStreetMap"
-                    />
-                    <LMarker
-                      v-if="cafe.data.lat && cafe.data.long"
-                      :lat-lng="[
-                        Number(cafe.data.lat + 0.1),
-                        Number(cafe.data.long),
-                      ]"
-                    >
-                      <LPopup> teuing tah </LPopup>
-                    </LMarker>
-                    <LMarker
-                      v-if="cafe.data.lat && cafe.data.long"
-                      :lat-lng="[Number(cafe.data.lat), Number(cafe.data.long)]"
-                    >
-                      <LPopup>
-                        {{ cafe.data.name }}
-                      </LPopup>
-                    </LMarker>
-                  </LMap>
-                </ClientOnly>
+              <LMap
+                style="height: 350px"
+                :zoom="12"
+                :center="
+                  cafe.data.lat && cafe.data.long
+                    ? [Number(cafe.data.lat), Number(cafe.data.long)]
+                    : [0, 0]
+                "
+                :use-global-leaflet="false"
+              >
+                <LTileLayer
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                  attribution='&amp;copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
+                  layer-type="base"
+                  name="OpenStreetMap"
+                />
+                <LMarker
+                  v-if="cafe.data.lat && cafe.data.long"
+                  :lat-lng="[
+                    Number(cafe.data.lat + 0.1),
+                    Number(cafe.data.long),
+                  ]"
+                >
+                  <LPopup> teuing tah </LPopup>
+                </LMarker>
+                <LMarker
+                  v-if="cafe.data.lat && cafe.data.long"
+                  :lat-lng="[Number(cafe.data.lat), Number(cafe.data.long)]"
+                >
+                  <LPopup>
+                    {{ cafe.data.name }}
+                  </LPopup>
+                </LMarker>
+              </LMap>
+            </ClientOnly>
           </div>
           <div class="flex flex-col" v-if="cafe.data.working_hours">
             <h2 class="text-lg font-semibold">Working Hours</h2>
@@ -152,7 +155,6 @@
               </tbody>
             </table>
           </div>
-          
         </div>
       </div>
     </div>
@@ -217,9 +219,9 @@
   function openInGoogleMaps() {
     // encan
     // First priority: use location_link if available
-    if (cafe.value?.location_link) {
+    if (cafe.value?.data.location_link) {
       console.log('Using location_link');
-      window.open(cafe.value.location_link, '_blank');
+      window.open(cafe.value.data.location_link, '_blank');
       return;
     }
 

@@ -142,6 +142,13 @@ cells:
     languageId: sql
     value: select cafe_id from cafe_features GROUP BY feature_id, cafe_id ;
     metadata: {}
+  - kind: 2
+    languageId: sql
+    value: |-
+      select id, name, slug_name
+      from cafes
+      ORDER BY id desc
+    metadata: {}
 metadata:
   conn:
     id: ezdfhUMl9UO9LcXxz95zw
