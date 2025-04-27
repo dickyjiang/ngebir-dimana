@@ -16,15 +16,34 @@ export default defineEventHandler(async (event) => {
         // Create an array of feature IDs
         const featureIds = feature_id?.map(feature => feature.id) || [];
 
-        const { data: cafes_ids, error: error2 } = await client.from("cafe_features")
-            .select('cafe_id')
-            .in('feature_id', featureIds)
-
-        const cafesIds = cafes_ids?.map(feature => feature.cafe_id) || [];
-
+        // Modified approach to find cafes with ALL specified features
         if (featureIds.length > 0) {
-            // Filter cafes that have any of these features
-            query = query.in('id', cafesIds);
+            // Get all cafe_features combinations
+            const { data: cafe_features, error: cfError } = await client
+                .from("cafe_features")
+                .select('cafe_id, feature_id')
+                .in('feature_id', featureIds);
+
+            if (cafe_features) {
+                // Group by cafe_id to count features per cafe
+                const cafesWithFeatureCounts = cafe_features.reduce<Record<number, number>>((acc, record) => {
+                    acc[record.cafe_id] = (acc[record.cafe_id] || 0) + 1;
+                    return acc;
+                }, {});
+
+                // Filter cafes that have ALL the specified features
+                const cafeIdsWithAllFeatures = Object.entries(cafesWithFeatureCounts)
+                    .filter(([cafeId, count]) => count >= featureIds.length)
+                    .map(([cafeId]) => Number(cafeId));
+
+                // Only include cafes with all specified features
+                if (cafeIdsWithAllFeatures.length > 0) {
+                    query = query.in('id', cafeIdsWithAllFeatures);
+                } else {
+                    // If no cafes have all features, return empty result
+                    query = query.eq('id', -1); // This will return no results
+                }
+            }
         }
     }
 
