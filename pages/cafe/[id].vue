@@ -57,7 +57,9 @@
               class="flex flex-col sm:flex-row gap-2 items-center justify-center"
             >
               <button
-                v-if="cafe.data.lat && cafe.data.long"
+                v-if="
+                  (cafe.data.lat && cafe.data.long) || cafe.data.location_link
+                "
                 @click="openInGoogleMaps"
                 class="mt-4 w-full bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg flex items-center justify-center gap-2 max-w-1/2"
               >
