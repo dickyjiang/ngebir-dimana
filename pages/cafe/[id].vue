@@ -97,7 +97,7 @@
             <ClientOnly>
               <LMap
                 style="height: 350px"
-                :zoom="12"
+                :zoom="15"
                 :center="
                   cafe.data.lat && cafe.data.long
                     ? [Number(cafe.data.lat), Number(cafe.data.long)]
@@ -111,7 +111,7 @@
                   layer-type="base"
                   name="OpenStreetMap"
                 />
-                <LMarker
+                <!-- <LMarker
                   v-if="cafe.data.lat && cafe.data.long"
                   :lat-lng="[
                     Number(cafe.data.lat + 0.1),
@@ -119,7 +119,7 @@
                   ]"
                 >
                   <LPopup> teuing tah </LPopup>
-                </LMarker>
+                </LMarker> -->
                 <LMarker
                   v-if="cafe.data.lat && cafe.data.long"
                   :lat-lng="[Number(cafe.data.lat), Number(cafe.data.long)]"

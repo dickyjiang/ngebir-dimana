@@ -6,7 +6,7 @@ export default defineEventHandler(async (event) => {
     // const user = await serverSupabaseUser(event);
     const client = await serverSupabaseClient<Database>(event);
     const body = await readBody(event);
-    let query = client.from("cafes").select("name,city, photo, city, slug_name, description, city_slug,rating, range, rating_num, cafe_features(cafe_id, feature_id)", { count: "exact" });
+    let query = client.from("cafes").select("name,city, photo, city, slug_name, description, city_slug,rating, range, rating_num, site, cafe_features(cafe_id, feature_id)", { count: "exact" });
 
     if (body.features && body.features.length > 0) {
         const { data: feature_id, error: error1 } = await client.from("features")
