@@ -1,2 +1,5 @@
+User-agent: *
+Allow: /
+
 Sitemap: https://ngopi.di-mana.com/sitemap.xml
 
