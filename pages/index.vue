@@ -171,6 +171,10 @@
           const cities = route.query.city.split('-');
           activeFilters.value.city = cities;
         }
+        if (route.query.features) {
+          const cities = route.query.features.split('-');
+          activeFilters.value.city = cities;
+        }
       }
 
       // Then fetch cafes with the initial filters
