@@ -260,10 +260,8 @@
   }
 
   function openWebsite() {
-    if (cafe.value?.site) {
-      window.open(cafe.value.site, '_blank');
-    } else if (cafe.value?.instagram_url) {
-      window.open(cafe.value.instagram_url, '_blank');
+    if (cafe.value?.data.site) {
+      window.open(cafe.value.data.site, '_blank');
     }
   }
 
