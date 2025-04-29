@@ -74,7 +74,7 @@ export default defineEventHandler(async (event) => {
     //     `ST_Distance(location::geography, ST_MakePoint(107.59655891385863, -6.879245721118651)::geography) > 5000`
     // );
     // query = query.gt('id', 5000)
-    query = query.order('id', { ascending: false })
+    query = query.order('datetime', { ascending: false })
 
     query = query.range(body.from, body.to)
 
