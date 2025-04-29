@@ -77,38 +77,39 @@
           :key="index"
           class="rounded-md flex flex-col h-full pb-4 border overflow-hidden"
         >
-          <NuxtLink :to="`/cafe/${cafe.slug_name}`">
+          <NuxtLink :to="`/cafe/${cafe.slug_name}`" class="flex flex-col h-full">
             <NuxtImg
               alt="Cafe Image"
               class="w-full h-48 object-cover mb-4"
               :src="cafe.photo"
               placeholder="/img/noimg.webp"
             />
-            <div class="flex-1 flex-col px-4">
-              <h2
-                class="text-lg text-gray-800 leading-tight line-clamp-2 font-semibold"
-              >
-                {{ cafe.name }}
-              </h2>
-              <p class="text-sm text-gray-500 line-clamp-2 mt-2">
-                {{ cafe.description }}
-              </p>
-            </div>
-            <div class="flex justify-between px-4 mt-8">
-              <div class="flex items-center gap-1">
-                <img
-                  src="/src/assets/img/city.svg"
-                  alt="location"
-                  class="h-3"
-                />
-                <p class="text-gray-500 text-xs">{{ cafe.city }}</p>
+            <div class="flex-1 flex flex-col px-4">
+              <div class="flex-1">
+                <h2 class="text-lg text-gray-800 leading-tight line-clamp-2 font-semibold">
+                  {{ cafe.name }}
+                </h2>
+                <p class="text-sm text-gray-500 line-clamp-2 mt-2">
+                  {{ cafe.description }}
+                </p>
               </div>
-              <div class="flex items-center gap-1 font-semibold">
-                <p class="text-gray-500 text-xs">{{ cafe.range }}</p>
-              </div>
-              <div class="flex items-center gap-1">
-                <img src="/src/assets/img/rating.svg" alt="star" class="h-3" />
-                <p class="text-gray-500 text-xs">{{ cafe.rating_num }}</p>
+              
+              <div class="flex justify-between mt-8">
+                <div class="flex items-center gap-1">
+                  <img
+                    src="/src/assets/img/city.svg"
+                    alt="location"
+                    class="h-3"
+                  />
+                  <p class="text-gray-500 text-xs">{{ cafe.city }}</p>
+                </div>
+                <div class="flex items-center gap-1 font-semibold">
+                  <p class="text-gray-500 text-xs">{{ cafe.range }}</p>
+                </div>
+                <div class="flex items-center gap-1">
+                  <img src="/src/assets/img/rating.svg" alt="star" class="h-3" />
+                  <p class="text-gray-500 text-xs">{{ cafe.rating_num }}</p>
+                </div>
               </div>
             </div>
           </NuxtLink>
