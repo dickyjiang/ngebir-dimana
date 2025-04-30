@@ -318,7 +318,7 @@
         '-translate-x-full': !isSidebarOpen,
         'md:translate-x-0 md:static md:w-[20%] md:max-w-[20%]': true,
       }"
-      class="p-4 border border-gray-400"
+      class="p-4 border border-gray-400 rounded-md"
       style="height: 100vh; overflow-y: auto"
     >
       <Sidebar
@@ -330,7 +330,7 @@
       />
     </div>
 
-    <div class="p-4 flex-1">
+    <div class="px-4 flex-1">
       <CafeList
         :loading="loading"
         :cafes="paginatedData"
