@@ -44,16 +44,19 @@
     return pages;
   });
 
-  // Method to change page and emit event to parent
+  const listContainer = ref(null);
+
   function changePage(page) {
     if (page >= 1 && page <= props.totalPages) {
       emit('page-change', page);
+      // Scroll to top of the list container
+      listContainer.value?.scrollIntoView({ behavior: 'smooth' });
     }
   }
 </script>
 
 <template>
-  <div>
+  <div ref="listContainer">
     <div
       v-if="loading"
       class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3"
