@@ -52,7 +52,7 @@
 </template>
 
 <script setup lang="ts">
-import { useSeo } from '~/composables/useSeo'
+import { useSeo } from '../composables/useSeo'
 
 // Set SEO metadata
 useSeo({
@@ -62,5 +62,6 @@ useSeo({
 })
 </script>
 
-<style scoped>
+<style lang="postcss" scoped>
+/* Add any component-specific styles here */
 </style>
