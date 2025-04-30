@@ -180,10 +180,10 @@
             </button>
             <button
               v-if="activeFilters.features.length > 0"
-              class="text-white border border-white mt-2 px-3 sm:px-4 py-1 sm:py-2 rounded-full flex items-center gap-2 text-xs sm:text-base cursor-pointer touch-manipulation"
+              class="text-yellow-500 text-xs sm:text-base cursor-pointer touch-manipulation"
               @click="resetFeatureFilter"
             >
-              @dicky Reset Filter
+              Reset Filter
             </button>
             <!-- <button
               class="text-white border border-white mt-2 px-3 sm:px-4 py-1 sm:py-2 rounded-full flex items-center gap-2 text-xs sm:text-base cursor-pointer touch-manipulation"
