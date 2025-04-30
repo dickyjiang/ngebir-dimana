@@ -132,10 +132,13 @@
   });
 
   // Handler for page changes from CafeList component
+  const mainContent = ref(null);
   function changePage(page) {
     if (page >= 1 && page <= totalPages.value) {
       currentPage.value = page;
       fetchCafes(page, activeFilters.value);
+      // Add scroll behavior
+      mainContent.value?.scrollIntoView({ behavior: 'smooth' });
     }
   }
 
@@ -188,6 +191,7 @@
     // toggleNearbyFilter();
   });
 </script>
+
 <template>
   <!-- Toast Notification -->
   <div
@@ -295,7 +299,8 @@
   <section id="new-cafes" class="my-4">
     <NewCafesList :cafes="newCafes" :loading="loadingNewCafes" />
   </section>
-  <section id="main-content" class="flex sm:px-4 sm:max-w-[98%] mx-auto">
+  <!-- Add ref to the main-content section -->
+  <section id="main-content" ref="mainContent" class="flex sm:px-4 sm:max-w-[98%] mx-auto">
     <!-- Mobile Toggle Button -->
     <button
       @click="toggleSidebar"
@@ -317,10 +322,10 @@
         'fixed inset-y-0 left-0 w-[80%] bg-white z-40 transform transition-transform duration-300 ease-in-out': true,
         'translate-x-0': isSidebarOpen,
         '-translate-x-full': !isSidebarOpen,
-        'md:translate-x-0 md:static md:w-[20%] md:max-w-[20%]': true,
+        'md:translate-x-0 md:static md:w-[20%] md:max-w-[20%] md:sticky md:top-0': true,
       }"
-      class="p-4 border border-gray-400"
-      style="height: 100vh; overflow-y: auto"
+      class="p-4 border border-gray-400 rounded-md"
+      style="max-height: 100vh; overflow-y: auto"
     >
       <Sidebar
         :activeFilters="activeFilters"
