@@ -4,8 +4,15 @@
       <h2 class="text-lg font-medium">Filter</h2>
     </div> -->
 
-    <div class="w-full pb-2 border-b border-gray-400">
+    <div class="w-full pb-2 border-b border-gray-400 flex justify-between items-center">
       <h2 class="text-lg font-medium">Lokasi</h2>
+      <button
+        v-if="activeFilters.city && activeFilters.city.length > 0"
+        @click="resetCityFilters"
+        class="text-sm text-gray-500 hover:text-gray-700 px-2 py-1 rounded-md hover:bg-gray-100"
+      >
+        Reset Lokasi
+      </button>
     </div>
     <div class="flex flex-wrap gap-3 text-sm text-gray-500 text-nowrap my-4">
       <!-- {{ uniqueCities }} -->
@@ -67,6 +74,11 @@
   const uniqueCities = computed(() => {
     return props.cities; // Use the actual city names passed as a prop
   });
+
+  async function resetCityFilters() {
+    // Reset all city filters by setting city array to empty
+    await toggleFilter(props.activeFilters, 'city', null, true);
+  }
 </script>
 
 <style scoped>
