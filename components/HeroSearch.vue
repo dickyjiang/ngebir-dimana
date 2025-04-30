@@ -33,6 +33,19 @@
     emit('search', searchQuery.value);
   }
 
+  function clearSearch() {
+    searchQuery.value = '';
+    emit('search', '');
+  }
+
+  function handleSearchButton() {
+    if (searchQuery.value) {
+      clearSearch();
+    } else {
+      handleSearch();
+    }
+  }
+
   function toggleNearbyFilter() {
     emit('toggle-nearby');
   }
@@ -77,8 +90,8 @@
               class="text-sm sm:text-base border w-full border-gray-600 rounded-lg p-2 sm:p-3 pr-8"
               @input="handleSearch"
             />
-            <button class="text-gray-500 -ml-10">
-              <i class="fas fa-search"></i>
+            <button class="text-gray-500 -ml-10" @click="handleSearchButton">
+              <i :class="searchQuery ? 'fa fa-times' : 'fas fa-search'"></i>
             </button>
           </div>
           <div class="flex flex-wrap items-center justify-center gap-2 w-full">
