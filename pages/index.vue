@@ -171,12 +171,12 @@
       if (route.query) {
         // Parse city filter
         if (route.query.city) {
-          const cities = route.query.city.split('-');
+          const cities = route.query.city.split(',');
           activeFilters.value.city = cities;
         }
         if (route.query.features) {
-          const cities = route.query.features.split('-');
-          activeFilters.value.city = cities;
+          const features = route.query.features.split(',');
+          activeFilters.value.features = cities;
         }
       }
 
@@ -300,7 +300,11 @@
     <NewCafesList :cafes="newCafes" :loading="loadingNewCafes" />
   </section>
   <!-- Add ref to the main-content section -->
-  <section id="main-content" ref="mainContent" class="flex sm:px-4 sm:max-w-[98%] mx-auto">
+  <section
+    id="main-content"
+    ref="mainContent"
+    class="flex sm:px-4 sm:max-w-[98%] mx-auto"
+  >
     <!-- Mobile Toggle Button -->
     <button
       @click="toggleSidebar"

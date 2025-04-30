@@ -4,7 +4,9 @@
       <h2 class="text-lg font-medium">Filter</h2>
     </div> -->
 
-    <div class="w-full pb-2 border-b border-gray-400 flex justify-between items-center">
+    <div
+      class="w-full pb-2 border-b border-gray-400 flex justify-between items-center"
+    >
       <h2 class="text-lg font-medium">Lokasi</h2>
       <button
         v-if="activeFilters.city && activeFilters.city.length > 0"
@@ -36,7 +38,7 @@
   import { ref, computed, onMounted } from 'vue';
   import { useFilterToggle } from '~/composables/useFilterToggle';
 
-  const { toggleFilter } = useFilterToggle();
+  const { toggleFilter, resetFiltersCity } = useFilterToggle();
 
   const props = defineProps({
     activeFilters: Object,
@@ -76,8 +78,7 @@
   });
 
   async function resetCityFilters() {
-    // Reset all city filters by setting city array to empty
-    await toggleFilter(props.activeFilters, 'city', null, true);
+    await resetFiltersCity(props.activeFilters);
   }
 </script>
 

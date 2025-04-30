@@ -2,6 +2,8 @@
   import { ref, defineProps, defineEmits } from 'vue';
   import '@fortawesome/fontawesome-free/css/all.css';
 
+  const { resetFiltersFeature } = useFilterToggle();
+
   const props = defineProps({
     totalCafes: {
       type: Number,
@@ -52,6 +54,10 @@
 
   function handleFeatureToggle(feature_id) {
     emit('toggle-feature', feature_id);
+  }
+
+  async function resetFeatureFilter() {
+    await resetFiltersFeature(props.activeFilters);
   }
 </script>
 
@@ -116,26 +122,25 @@
             </button>
             <!-- Cafe Terbaru filter -->
             <button
-              @click="handleFeatureToggle('pets_dogs_allowed')"
+              @click="handleFeatureToggle('pets-dogs-allowed')"
               :class="{
                 'text-yellow-500 bg-black border border-yellow-500':
-                  activeFilters.features.includes('pets_dogs_allowed'),
+                  activeFilters.features.includes('pets-dogs-allowed'),
                 'text-gray-100 border-gray-400':
-                  !activeFilters.features.includes('pets_dogs_allowed'),
+                  !activeFilters.features.includes('pets-dogs-allowed'),
               }"
               class="text-white border border-white mt-2 px-3 sm:px-4 py-1 sm:py-2 rounded-full flex items-center gap-2 text-xs sm:text-base cursor-pointer touch-manipulation"
             >
               Pet Friendly
             </button>
             <button
-              @click="handleFeatureToggle('crowd_family_friendly')"
+              @click="handleFeatureToggle('crowd-family-friendly')"
               class="text-white border border-white mt-2 px-3 sm:px-4 py-1 sm:py-2 rounded-full flex items-center gap-2 text-xs sm:text-base cursor-pointer touch-manipulation"
               :class="{
-                'text-yellow-500 bg-black border border-yellow-500': activeFilters.features.includes(
-                  'crowd_family_friendly'
-                ),
+                'text-yellow-500 bg-black border border-yellow-500':
+                  activeFilters.features.includes('crowd-family-friendly'),
                 'border-black': !activeFilters.features.includes(
-                  'crowd_family_friendly'
+                  'crowd-family-friendly'
                 ),
               }"
             >
@@ -143,33 +148,42 @@
             </button>
             <button
               @click="
-                handleFeatureToggle('accessibility_wheelchair_accessible')
+                handleFeatureToggle('accessibility-wheelchair-accessible')
               "
               class="text-white border border-white mt-2 px-3 sm:px-4 py-1 sm:py-2 rounded-full flex items-center gap-2 text-xs sm:text-base cursor-pointer touch-manipulation"
               :class="{
-                'text-yellow-500 bg-black border border-yellow-500': activeFilters.features.includes(
-                  'accessibility_wheelchair_accessible'
-                ),
+                'text-yellow-500 bg-black border border-yellow-500':
+                  activeFilters.features.includes(
+                    'accessibility-wheelchair-accessible'
+                  ),
                 'border-black': !activeFilters.features.includes(
-                  'accessibility_wheelchair_accessible'
+                  'accessibility-wheelchair-accessible'
                 ),
               }"
             >
               Wheelchair Friendly
             </button>
             <button
-              @click="handleFeatureToggle('service_options_outdoor_seating')"
+              @click="handleFeatureToggle('service-options-outdoor-seating')"
               class="text-white border border-white mt-2 px-3 sm:px-4 py-1 sm:py-2 rounded-full flex items-center gap-2 text-xs sm:text-base cursor-pointer touch-manipulation"
               :class="{
-                'text-yellow-500 bg-black border border-yellow-500': activeFilters.features.includes(
-                  'service_options_outdoor_seating'
-                ),
+                'text-yellow-500 bg-black border border-yellow-500':
+                  activeFilters.features.includes(
+                    'service-options-outdoor-seating'
+                  ),
                 'border-black': !activeFilters.features.includes(
-                  'service_options_outdoor_seating'
+                  'service-options-outdoor-seating'
                 ),
               }"
             >
               Outdoor
+            </button>
+            <button
+              v-if="activeFilters.features.length > 0"
+              class="text-white border border-white mt-2 px-3 sm:px-4 py-1 sm:py-2 rounded-full flex items-center gap-2 text-xs sm:text-base cursor-pointer touch-manipulation"
+              @click="resetFeatureFilter"
+            >
+              @dicky Reset Filter
             </button>
             <!-- <button
               class="text-white border border-white mt-2 px-3 sm:px-4 py-1 sm:py-2 rounded-full flex items-center gap-2 text-xs sm:text-base cursor-pointer touch-manipulation"
