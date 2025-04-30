@@ -11,7 +11,7 @@ export function useSeo(options: {
   const defaults = {
     title: 'Website Paling Lengkap buat Cari Tempat Ngopi!',
     description: 'Satu Klik, Ribuan Cafe! Temukan yang Pas untuk Kamu.',
-    image: '/img/OG-img.png',
+    image: '/img/og-img.png',
     url: 'https://ngopi.di-mana.com',
     type: 'website',
     fbAppId: '2385267795184767' // Replace with your actual Facebook App ID
