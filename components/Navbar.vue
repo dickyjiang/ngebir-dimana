@@ -1,5 +1,16 @@
 <template>
   <div class="flex items-center justify-center sm:justify-between w-full p-2 max-w-[90%] lg:max-w-[98%] mx-auto bg-white border-t-2 border-b-2 border-gray-800 my-2">
+    <!-- Add back arrow for mobile -->
+    <button 
+      @click="goBack" 
+      class="sm:hidden absolute left-4 flex items-center justify-center"
+      aria-label="Go back"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+      </svg>
+    </button>
+    
     <a href="/">
       <!-- <img src="/src/assets/img/logo_ndm.svg" alt="logo" class="h-6"> -->
       <div class="flex items-center">
@@ -21,6 +32,11 @@ import { onMounted, onBeforeUnmount } from 'vue';
 import animationData from '../public/animations/coffee-shop.json';
 
 let anim = null;
+
+// Add goBack function
+const goBack = () => {
+  window.history.back();
+};
 
 onMounted(async () => {
   if (typeof window !== 'undefined') {
