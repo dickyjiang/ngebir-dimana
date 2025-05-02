@@ -75,7 +75,7 @@
                 Visit
               </button>
             </div>
-            <p class="text-lg text-gray-700 my-2">
+            <p class="text-md text-gray-500 my-2">
               {{ cafe.data.description }}
             </p>
             <div>
