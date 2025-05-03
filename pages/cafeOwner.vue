@@ -14,313 +14,346 @@
           <section class="mb-8">
             <div class="bg-white shadow-md rounded px-4 pt-2 pb-8 mb-8">
               <div class="mt-10">
-                <form class="grid grid-cols-1 sm:grid-cols-2 gap-8 sm:gap-0">
-                  <div class=" border-b sm:border-b-0 border-r-0 sm:border-r border-gray-300 px-4">
-                      <div class="mb-8">
-                    <label for="cafeName">Nama Cafe:</label>
-                    <input
-                      class="input-base"
-                      :class="{ 'input-error': hasError('cafeName') }"
-                      type="text"
-                      id="cafeName"
-                      name="cafeName"
-                      required
-                    />
-                    <span v-if="hasError('cafeName')" class="text-red-500 text-sm">
-                      {{ formErrors.cafeName.join(", ") }}
-                    </span>
-                    <p class="text-gray-500 text-sm mt-1">
-                      <strong>Note:</strong> Ini adalah nama cafe Anda. Pastikan Nama
-                      cafe yang akan ditampilkan di aplikasi. Pastikan nama ini sesuai
-                      dengan nama cafe Anda.
-                    </p>
-                  </div>
-                  <div class="mb-8">
-                    <label for="street">Alamat Cafe:</label>
-                    <input
-                      class="input-base"
-                      :class="{ 'input-error': hasError('street') }"
-                      type="text"
-                      id="street"
-                      name="street"
-                      required
-                    />
-                    <span v-if="hasError('street')" class="text-red-500 text-sm">
-                      {{ formErrors.street.join(", ") }}
-                    </span>
-                  </div>
-                  <!-- @budi jigana alamat lengkap iyeu teu kudu ditulis ku user nya - bakal badUX euy-solana hese -->
-                  <!-- <div class="mb-8">
-                    <label for="full_address">Alamat Lengkap:</label>
-                    <textarea
-                      class="input-base"
-                      :class="{ 'input-error': hasError('full_address') }"
-                      id="full_address"
-                      name="full_address"
-                      required
-                    ></textarea>
-                    <span
-                      v-if="hasError('full_address')"
-                      class="text-red-500 text-sm"
-                    >
-                      {{ formErrors.full_address.join(", ") }}
-                    </span>
-                    <p class="text-gray-500 text-sm mt-1">
-                      <strong>Note:</strong> Ini adalah alamat lengkap cafe Anda.
-                      contoh alamat lengkap : Jl. Gajah Mada No.1, Dauh Puri Kangin, Kec. Denpasar Utara, Kota Denpasar, Bali 80231.
-                    </p>
-                  </div> -->
-                  <div class="mb-8">
-                    <label for="description">Deskripsi:</label>
-                    <textarea
-                      class="input-base"
-                      :class="{ 'input-error': hasError('description') }"
-                      id="description"
-                      name="description"
-                      required
-                    ></textarea>
-                    <span v-if="hasError('description')" class="text-red-500 text-sm">
-                      {{ formErrors.description.join(", ") }}
-                    </span>
-                    <p class="text-gray-500 text-sm mt-1">
-                      <strong>Note:</strong> Ini adalah deskripsi cafe Anda. Pastikan
-                      deskripsi yang akan ditampilkan di aplikasi. Pastikan deskripsi
-                      ini sesuai dengan deskripsi cafe Anda.
-                    </p>
-                  </div>
-                  <div class="mb-8">
-                    <label for="site">Website atau Instagram:</label>
-                    <input
-                      class="input-base"
-                      :class="{ 'input-error': hasError('site') }"
-                      type="url"
-                      id="site"
-                      name="site"
-                      required
-                    />
-                    <span v-if="hasError('site')" class="text-red-500 text-sm">
-                      {{ formErrors.site.join(", ") }}
-                    </span>
-                    <p class="text-gray-500 text-sm mt-1">
-                      <strong>Note:</strong> Untuk menghindari kesalahan, pastikan
-                      untuk menyalin tautan (copy & paste) dari aplikasi Instagram atau website Anda.
-                    </p>
-                  </div>
-                  <div class="mb-8">
-                    <label for="phone">Phone:</label>
-                    <input
-                      class="input-base"
-                      :class="{ 'input-error': hasError('phone') }"
-                      type="tel"
-                      id="phone"
-                      name="phone"
-                      v-model="phoneNumber"
-                      @input="formatPhoneNumber"
-                      placeholder="+62 "
-                      required
-                    />
-                    <span v-if="hasError('phone')" class="text-red-500 text-sm">
-                      {{ formErrors.phone.join(", ") }}
-                    </span>
-                  </div>
-                  <div class="mb-8">
-                    <label for="borough">Area:</label>
-                    <input
-                      class="input-base"
-                      :class="{ 'input-error': hasError('borough') }"
-                      type="text"
-                      id="borough"
-                      name="borough"
-                      required
-                    />
-                    <span v-if="hasError('borough')" class="text-red-500 text-sm">
-                      {{ formErrors.borough.join(", ") }}
-                    </span>
-                    <p class="text-gray-500 text-sm mt-1">
-                      <strong>Note:</strong> Area bisa kecamatan atau kabupaten. Contoh: Jakarta Selatan, Dago, Lembang, dll.
-                    </p>
-                  </div>
-                  <div class="mb-8">
-                    <label for="state">Provinsi:</label>
-                    <select
-                      class="input-base"
-                      :class="{ 'input-error': hasError('state') }"
-                      id="state"
-                      name="state"
-                      v-model="selectedProvince"
-                      required
-                    >
-                      <option value="" disabled>Pilih Provinsi</option>
-                      <option v-for="province in provinces" :key="province" :value="province">
-                        {{ province }}
-                      </option>
-                    </select>
-                    <span v-if="hasError('state')" class="text-red-500 text-sm">
-                      {{ formErrors.state.join(", ") }}
-                    </span>
-                  </div>
-                  <div class="flex flex-col sm:flex-row gap-2">
-                      <div class="mb-8 w-3/4">
-                        <label for="city">Kota:</label>
-                        <select
-                          class="input-base"
-                          :class="{ 'input-error': hasError('city') }"
-                          id="city"
-                          name="city"
-                          v-model="selectedCity"
-                          required
-                          :disabled="!selectedProvince"
-                        >
-                          <option value="" disabled>Pilih Kota</option>
-                          <option v-for="city in availableCities" :key="city" :value="city">
-                            {{ city }}
-                          </option>
-                        </select>
-                        <span v-if="hasError('city')" class="text-red-500 text-sm">
-                          {{ formErrors.city.join(", ") }}
-                        </span>
-                      </div>
-                      <div class="mb-8">
-                        <label for="postal_code">Kode Pos:</label>
-                        <input
-                          class="input-base"
-                          :class="{ 'input-error': hasError('postal_code') }"
-                          type="text"
-                          id="postal_code"
-                          name="postal_code"
-                          required
-                        />
-                        <span v-if="hasError('postal_code')" class="text-red-500 text-sm">
-                          {{ formErrors.postal_code.join(", ") }}
-                        </span>
-                      </div>
-                      
-                  </div>
-                  <div class="flex gap-4">
-                      <div class="mb-8">
-                        <label for="lat">Latitude:</label>
-                        <input
-                          class="input-base"
-                          :class="{ 'input-error': hasError('lat') }"
-                          type="number"
-                          step="any"
-                          id="lat"
-                          name="lat"
-                          required
-                        />
-                        <span v-if="hasError('lat')" class="text-red-500 text-sm">
-                          {{ formErrors.lat.join(", ") }}
-                        </span>
-                      </div>
-                      <div class="mb-8">
-                        <label for="long">Longitude:</label>
-                        <input
-                          class="input-base"
-                          :class="{ 'input-error': hasError('long') }"
-                          type="number"
-                          step="any"
-                          id="long"
-                          name="long"
-                          required
-                        />
-                        <span v-if="hasError('long')" class="text-red-500 text-sm">
-                          {{ formErrors.long.join(", ") }}
-                        </span>
-                      </div>
-                  </div>
-                  <div class="mb-8">
-                    <label for="time_zone">Time Zone:</label>
-                    <input
-                      class="input-base"
-                      :class="{ 'input-error': hasError('time_zone') }"
-                      type="text"
-                      id="time_zone"
-                      name="time_zone"
-                      required
-                    />
-                    <span v-if="hasError('time_zone')" class="text-red-500 text-sm">
-                      {{ formErrors.time_zone.join(", ") }}
-                    </span>
-                  </div>
-                  <div class="mb-8">
-                    <label for="rating">Rating:</label>
-                    <input
-                      class="input-base"
-                      :class="{ 'input-error': hasError('rating') }"
-                      type="number"
-                      step="0.1"
-                      min="0"
-                      max="5"
-                      id="rating"
-                      name="rating"
-                      required
-                    />
-                    <span v-if="hasError('rating')" class="text-red-500 text-sm">
-                      {{ formErrors.rating.join(", ") }}
-                    </span>
-                  </div>
-                  <div class="mb-8">
-                    <label for="">location_link:</label>
-                    <input
-                      class="input-base"
-                    />
-                  </div>
-                  </div>
-                  <div class="px-4">
-                      <div class="flex flex-col space-y-2 mb-8">
-                    <label for="logo">Logo Cafe:</label>
-                    <input
-                      type="file"
-                      :class="{ 'input-error': hasError('logo') }"
-                      id="logo"
-                      name="logo"
-                      accept="image/*"
-                      multiple
-                      required
-                    />
-                    <span v-if="hasError('logo')" class="text-red-500 text-sm">
-                      {{ formErrors.logo.join(", ") }}
-                    </span>
-                  </div>
-                  <div class="flex flex-col space-y-2 mb-8">
-                    <label for="cafeImage">Gambar utama:</label>
-                    <input
-                      type="file"
-                      id="cafeImage"
-                      name="cafeImage"
-                      accept="image/*"
-                    />
-                    <p class="text-gray-500 text-sm mt-1">
-                      <strong>Note:</strong> Upload foto yang menarik. Format yang
-                      didukung: JPG atau PNG. Ukuran maksimal: 5MB.
-                  </p>
-                  </div>
-                  <div class="mb-8">
-                    <label for="working_hours">Working Hours:</label>
-                    <textarea
-                      class="input-base"
-                      :class="{ 'input-error': hasError('working_hours') }"
-                      id="working_hours"
-                      name="working_hours"
-                      placeholder="Monday: 9:00 AM - 5:00 PM&#10;Tuesday: 9:00 AM - 5:00 PM..."
-                      required
-                    ></textarea>
-                    <span
-                      v-if="hasError('working_hours')"
-                      class="text-red-500 text-sm"
-                    >
-                      {{ formErrors.working_hours.join(", ") }}
-                    </span>
-                  </div> 
-                  </div>
-                </form>
-                <div class="flex justify-center  sm:justify-end px-8 mt-8">
-                    <button
-                      class="text-black font-semibold border border-black px-4 py-2 rounded-full "
-                      type="submit">
-                      Update Cafe Information
-                    </button>
+                <form>
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-8 sm:gap-0">
+                    <div class=" border-b sm:border-b-0 border-r-0 sm:border-r border-gray-300 px-4">
+                        <div class="mb-8">
+                      <label for="cafeName">Nama Cafe:</label>
+                      <input
+                        class="input-base"
+                        :class="{ 'input-error': hasError('cafeName') }"
+                        type="text"
+                        id="cafeName"
+                        name="cafeName"
+                        required
+                      />
+                      <span v-if="hasError('cafeName')" class="text-red-500 text-sm">
+                        {{ formErrors.cafeName.join(", ") }}
+                      </span>
+                      <p class="text-gray-500 text-sm mt-1">
+                        <strong>Note:</strong> Ini adalah nama cafe Anda. Pastikan Nama
+                        cafe yang akan ditampilkan di aplikasi. Pastikan nama ini sesuai
+                        dengan nama cafe Anda.
+                      </p>
+                    </div>
+                    <div class="mb-8">
+                      <label for="street">Alamat Cafe:</label>
+                      <input
+                        class="input-base"
+                        :class="{ 'input-error': hasError('street') }"
+                        type="text"
+                        id="street"
+                        name="street"
+                        required
+                      />
+                      <span v-if="hasError('street')" class="text-red-500 text-sm">
+                        {{ formErrors.street.join(", ") }}
+                      </span>
+                    </div>
+                    <!-- @budi jigana alamat lengkap iyeu teu kudu ditulis ku user nya - bakal badUX euy-solana hese -->
+                    <!-- <div class="mb-8">
+                      <label for="full_address">Alamat Lengkap:</label>
+                      <textarea
+                        class="input-base"
+                        :class="{ 'input-error': hasError('full_address') }"
+                        id="full_address"
+                        name="full_address"
+                        required
+                      ></textarea>
+                      <span
+                        v-if="hasError('full_address')"
+                        class="text-red-500 text-sm"
+                      >
+                        {{ formErrors.full_address.join(", ") }}
+                      </span>
+                      <p class="text-gray-500 text-sm mt-1">
+                        <strong>Note:</strong> Ini adalah alamat lengkap cafe Anda.
+                        contoh alamat lengkap : Jl. Gajah Mada No.1, Dauh Puri Kangin, Kec. Denpasar Utara, Kota Denpasar, Bali 80231.
+                      </p>
+                    </div> -->
+                    <div class="mb-8">
+                      <label for="description">Deskripsi:</label>
+                      <textarea
+                        class="input-base"
+                        :class="{ 'input-error': hasError('description') }"
+                        id="description"
+                        name="description"
+                        required
+                      ></textarea>
+                      <span v-if="hasError('description')" class="text-red-500 text-sm">
+                        {{ formErrors.description.join(", ") }}
+                      </span>
+                      <p class="text-gray-500 text-sm mt-1">
+                        <strong>Note:</strong> Ini adalah deskripsi cafe Anda. Pastikan
+                        deskripsi yang akan ditampilkan di aplikasi. Pastikan deskripsi
+                        ini sesuai dengan deskripsi cafe Anda.
+                      </p>
+                    </div>
+                    <div class="mb-8">
+                      <label for="site">Website atau Instagram:</label>
+                      <input
+                        class="input-base"
+                        :class="{ 'input-error': hasError('site') }"
+                        type="url"
+                        id="site"
+                        name="site"
+                        required
+                      />
+                      <span v-if="hasError('site')" class="text-red-500 text-sm">
+                        {{ formErrors.site.join(", ") }}
+                      </span>
+                      <p class="text-gray-500 text-sm mt-1">
+                        <strong>Note:</strong> Untuk menghindari kesalahan, pastikan
+                        untuk menyalin tautan (copy & paste) dari aplikasi Instagram atau website Anda.
+                      </p>
+                    </div>
+                    <div class="mb-8">
+                      <label for="phone">Phone:</label>
+                      <input
+                        class="input-base"
+                        :class="{ 'input-error': hasError('phone') }"
+                        type="tel"
+                        id="phone"
+                        name="phone"
+                        v-model="phoneNumber"
+                        @input="formatPhoneNumber"
+                        placeholder="+62 "
+                        required
+                      />
+                      <span v-if="hasError('phone')" class="text-red-500 text-sm">
+                        {{ formErrors.phone.join(", ") }}
+                      </span>
+                    </div>
+                    <div class="mb-8">
+                      <label for="borough">Area:</label>
+                      <input
+                        class="input-base"
+                        :class="{ 'input-error': hasError('borough') }"
+                        type="text"
+                        id="borough"
+                        name="borough"
+                        required
+                      />
+                      <span v-if="hasError('borough')" class="text-red-500 text-sm">
+                        {{ formErrors.borough.join(", ") }}
+                      </span>
+                      <p class="text-gray-500 text-sm mt-1">
+                        <strong>Note:</strong> Area bisa kecamatan atau kabupaten. Contoh: Jakarta Selatan, Dago, Lembang, dll.
+                      </p>
+                    </div>
+                    <div class="mb-8">
+                      <label for="state">Provinsi:</label>
+                      <select
+                        class="input-base"
+                        :class="{ 'input-error': hasError('state') }"
+                        id="state"
+                        name="state"
+                        v-model="selectedProvince"
+                        required
+                      >
+                        <option value="" disabled>Pilih Provinsi</option>
+                        <option v-for="province in provinces" :key="province" :value="province">
+                          {{ province }}
+                        </option>
+                      </select>
+                      <span v-if="hasError('state')" class="text-red-500 text-sm">
+                        {{ formErrors.state.join(", ") }}
+                      </span>
+                    </div>
+                    <div class="flex flex-col sm:flex-row gap-2">
+                        <div class="mb-8 w-3/4">
+                          <label for="city">Kota:</label>
+                          <select
+                            class="input-base"
+                            :class="{ 'input-error': hasError('city') }"
+                            id="city"
+                            name="city"
+                            v-model="selectedCity"
+                            required
+                            :disabled="!selectedProvince"
+                          >
+                            <option value="" disabled>Pilih Kota</option>
+                            <option v-for="city in availableCities" :key="city" :value="city">
+                              {{ city }}
+                            </option>
+                          </select>
+                          <span v-if="hasError('city')" class="text-red-500 text-sm">
+                            {{ formErrors.city.join(", ") }}
+                          </span>
+                        </div>
+                        <div class="mb-8">
+                          <label for="postal_code">Kode Pos:</label>
+                          <input
+                            class="input-base"
+                            :class="{ 'input-error': hasError('postal_code') }"
+                            type="text"
+                            id="postal_code"
+                            name="postal_code"
+                            required
+                          />
+                          <span v-if="hasError('postal_code')" class="text-red-500 text-sm">
+                            {{ formErrors.postal_code.join(", ") }}
+                          </span>
+                        </div>
+                        
+                    </div>
+                    <div class="flex gap-4">
+                        <div class="mb-8">
+                          <label for="lat">Latitude:</label>
+                          <input
+                            class="input-base"
+                            :class="{ 'input-error': hasError('lat') }"
+                            type="number"
+                            step="any"
+                            id="lat"
+                            name="lat"
+                            required
+                          />
+                          <span v-if="hasError('lat')" class="text-red-500 text-sm">
+                            {{ formErrors.lat.join(", ") }}
+                          </span>
+                        </div>
+                        <div class="mb-8">
+                          <label for="long">Longitude:</label>
+                          <input
+                            class="input-base"
+                            :class="{ 'input-error': hasError('long') }"
+                            type="number"
+                            step="any"
+                            id="long"
+                            name="long"
+                            required
+                          />
+                          <span v-if="hasError('long')" class="text-red-500 text-sm">
+                            {{ formErrors.long.join(", ") }}
+                          </span>
+                        </div>
+                    </div>
+                    <div class="mb-8">
+                      <label for="time_zone">Time Zone:</label>
+                      <input
+                        class="input-base"
+                        :class="{ 'input-error': hasError('time_zone') }"
+                        type="text"
+                        id="time_zone"
+                        name="time_zone"
+                        required
+                      />
+                      <span v-if="hasError('time_zone')" class="text-red-500 text-sm">
+                        {{ formErrors.time_zone.join(", ") }}
+                      </span>
+                    </div>
+                    <div class="mb-8">
+                      <label for="rating">Rating:</label>
+                      <input
+                        class="input-base"
+                        :class="{ 'input-error': hasError('rating') }"
+                        type="number"
+                        step="0.1"
+                        min="0"
+                        max="5"
+                        id="rating"
+                        name="rating"
+                        required
+                      />
+                      <span v-if="hasError('rating')" class="text-red-500 text-sm">
+                        {{ formErrors.rating.join(", ") }}
+                      </span>
+                    </div>
+                    <div class="mb-8">
+                      <label for="">location_link:</label>
+                      <input
+                        class="input-base"
+                      />
+                    </div>
+                    </div>
+                    <div class="px-4 ">
+                        <div class="flex flex-col space-y-2 mb-8">
+                            <label for="logo">Logo Cafe:</label>
+                            <input
+                            type="file"
+                            :class="{ 'input-error': hasError('logo') }"
+                            id="logo"
+                            name="logo"
+                            accept="image/*"
+                            multiple required/>
+                            <span v-if="hasError('logo')" class="text-red-500 text-sm">
+                            {{ formErrors.logo.join(", ") }}
+                            </span>
+                        </div>
+                        <div class="flex flex-col space-y-2 mb-8">
+                          <label for="cafeImage">Gambar utama:</label>
+                          <input
+                            type="file"
+                            id="cafeImage"
+                            name="cafeImage"
+                            accept="image/*"
+                          />
+                          <p class="text-gray-500 text-sm mt-1">
+                            <strong>Note:</strong> Upload foto yang menarik. Format yang
+                            didukung: JPG atau PNG. Ukuran maksimal: 5MB.</p>
+                        </div>
+
+                        <div class="mb-8">
+                          <label class="block mb-4">Working Hours:</label>
+                          <div class="flex flex-col space-y-4">
+                            <div v-for="day in days" :key="day.id" class="border-b pb-4 last:border-b-0">
+                              <div class="flex items-center justify-between">
+                                <span class="font-medium">{{ day.name }}</span>
+                                <div class="flex items-center space-x-4">
+                                  <label class="relative inline-flex items-center cursor-pointer">
+                                    <input 
+                                      type="checkbox" 
+                                      v-model="day.isOpen" 
+                                      class="sr-only peer"
+                                    >
+                                    <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:bg-blue-600 peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
+                                  </label>
+                                  <span class="text-gray-600">{{ day.isOpen ? 'Open' : 'Closed' }}</span>
+                                </div>
+                              </div>
+    
+                              <div v-if="day.isOpen" class="flex items-center space-x-6 pl-4 mt-4">
+                                <div class="flex items-center space-x-2">
+                                  <span class="text-sm text-gray-600">Opens at</span>
+                                  <select 
+                                    v-model="day.openTime"
+                                    class="input-base py-1 px-2"
+                                  >
+                                    <option v-for="time in timeOptions" 
+                                            :key="time.value" 
+                                            :value="time.value">
+                                      {{ time.label }}
+                                    </option>
+                                  </select>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                  <span class="text-sm text-gray-600">Closes at</span>
+                                  <select 
+                                    v-model="day.closeTime"
+                                    class="input-base py-1 px-2"
+                                  >
+                                    <option v-for="time in timeOptions" 
+                                            :key="time.value" 
+                                            :value="time.value">
+                                      {{ time.label }}
+                                    </option>
+                                  </select>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                    </div>
                 </div>
+                </form>
+                  <div class="flex justify-center  sm:justify-end px-8 mt-8">
+                      <button
+                        class="text-black font-semibold border border-black px-4 py-2 rounded-full "
+                        type="submit">
+                        Update Cafe Information
+                      </button>
+                  </div>
               </div>
             </div>
           </section>
@@ -371,7 +404,6 @@ interface FormErrors {
   time_zone: string[];
   rating: string[];
   logo: string[];
-  working_hours: string[];
 }
 
 const formErrors = ref<FormErrors>({
@@ -391,7 +423,6 @@ const formErrors = ref<FormErrors>({
   time_zone: [],
   rating: [],
   logo: [],
-  working_hours: [],
 });
 
 const hasError = (field: keyof FormErrors): boolean => {
@@ -493,6 +524,49 @@ const updateAvailableCities = () => {
 };
 
 watch(selectedProvince, updateAvailableCities);
+
+interface DaySchedule {
+  id: string;
+  name: string;
+  isOpen: boolean;
+  openTime: string;
+  closeTime: string;
+}
+
+const days = ref([
+  { id: 'sunday', name: 'Sunday', isOpen: false, openTime: '', closeTime: '' },
+  { id: 'monday', name: 'Monday', isOpen: false, openTime: '', closeTime: '' },
+  { id: 'tuesday', name: 'Tuesday', isOpen: false, openTime: '', closeTime: '' },
+  { id: 'wednesday', name: 'Wednesday', isOpen: false, openTime: '', closeTime: '' },
+  { id: 'thursday', name: 'Thursday', isOpen: false, openTime: '', closeTime: '' },
+  { id: 'friday', name: 'Friday', isOpen: false, openTime: '', closeTime: '' },
+  { id: 'saturday', name: 'Saturday', isOpen: false, openTime: '', closeTime: '' }
+]);
+
+const generateTimeOptions = () => {
+  const options = [{ value: "24", label: "24 hours" }];
+  
+  for (let hour = 0; hour < 24; hour++) {
+    const hour12 = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour;
+    const period = hour < 12 ? "AM" : "PM";
+    
+    // Full hour
+    options.push({
+      value: `${hour.toString().padStart(2, "0")}:00`,
+      label: `${hour12}:00 ${period}`
+    });
+    
+    // Half hour
+    options.push({
+      value: `${hour.toString().padStart(2, "0")}:30`,
+      label: `${hour12}:30 ${period}`
+    });
+  }
+  
+  return options;
+};
+
+const timeOptions = ref(generateTimeOptions());
 </script>
 
 <style scoped>
