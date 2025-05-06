@@ -87,7 +87,7 @@
                     :href="`/cafes?features=${feature.feature_slug}`"
                     class="px-3 py-2 flex text-white text-xs items-center gap-2 border rounded-full border-gray-300 bg-blue-500 hover:bg-blue-600 transition-colors"
                   >
-                    {{ formatFeatureName(feature.name) }}
+                    {{ feature.name }}
                   </a>
                 </div>
               </div>
@@ -208,15 +208,6 @@
     url: `https://ngopi.di-mana.com/cafes/${route.params.id}`,
     type: 'article',
   });
-
-  function formatFeatureName(name) {
-    // Extract the part after the dash and trim
-    const parts = name.split('-');
-    if (parts.length > 1) {
-      return parts[1].trim();
-    }
-    return name;
-  }
 
   function openInGoogleMaps() {
     // encan
