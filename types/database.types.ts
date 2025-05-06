@@ -50,6 +50,7 @@ export type Database = {
           cid: string | null
           city: string | null
           city_slug: string | null
+          datetime: string | null
           description: string | null
           full_address: string | null
           google_id: string | null
@@ -117,6 +118,7 @@ export type Database = {
           cid?: string | null
           city?: string | null
           city_slug?: string | null
+          datetime?: string | null
           description?: string | null
           full_address?: string | null
           google_id?: string | null
@@ -184,6 +186,7 @@ export type Database = {
           cid?: string | null
           city?: string | null
           city_slug?: string | null
+          datetime?: string | null
           description?: string | null
           full_address?: string | null
           google_id?: string | null
@@ -426,6 +429,24 @@ export type Database = {
           verified?: boolean | null
           working_hours?: string | null
           working_hours_old_format?: string | null
+        }
+        Relationships: []
+      }
+      city: {
+        Row: {
+          city_name: string | null
+          city_parent: string | null
+          city_slug: string
+        }
+        Insert: {
+          city_name?: string | null
+          city_parent?: string | null
+          city_slug: string
+        }
+        Update: {
+          city_name?: string | null
+          city_parent?: string | null
+          city_slug?: string
         }
         Relationships: []
       }

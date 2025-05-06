@@ -26,6 +26,7 @@
                       type="text"
                       id="cafeName"
                       name="cafeName"
+                      v-model="cafeName"
                       required
                     />
                     <span
@@ -156,48 +157,53 @@
                       Contoh: Jakarta Selatan, Dago, Lembang, dll.
                     </p>
                   </div>
+
                   <div class="mb-8">
-                    <label for="state">Provinsi:</label>
+                    <label for="state">Provinsi/Kota Besar:</label>
                     <select
                       class="input-base"
                       :class="{ 'input-error': hasError('state') }"
                       id="state"
                       name="state"
-                      v-model="selectedProvince"
+                      v-model="selectedParentCity"
                       required
                     >
-                      <option value="" disabled>Pilih Provinsi</option>
+                      <option value="" disabled>
+                        Pilih Provinsi/Kota Besar
+                      </option>
                       <option
-                        v-for="province in provinces"
-                        :key="province"
-                        :value="province"
+                        v-for="city in parentCities"
+                        :key="city.city_slug"
+                        :value="city.city_slug"
                       >
-                        {{ province }}
+                        {{ city.city_name }}
                       </option>
                     </select>
                     <span v-if="hasError('state')" class="text-red-500 text-sm">
                       {{ formErrors.state.join(', ') }}
                     </span>
                   </div>
+
+                  <!-- Replace the city select -->
                   <div class="flex flex-col sm:flex-row gap-2">
                     <div class="mb-8 w-3/4">
-                      <label for="city">Kota:</label>
+                      <label for="city">Kota/Kabupaten:</label>
                       <select
                         class="input-base"
                         :class="{ 'input-error': hasError('city') }"
                         id="city"
                         name="city"
-                        v-model="selectedCity"
+                        v-model="selectedChildCity"
                         required
-                        :disabled="!selectedProvince"
+                        :disabled="!selectedParentCity"
                       >
-                        <option value="" disabled>Pilih Kota</option>
+                        <option value="" disabled>Pilih Kota/Kabupaten</option>
                         <option
-                          v-for="city in availableCities"
-                          :key="city"
-                          :value="city"
+                          v-for="city in availableChildCities"
+                          :key="city.city_slug"
+                          :value="city.city_slug"
                         >
-                          {{ city }}
+                          {{ city.city_name }}
                         </option>
                       </select>
                       <span
@@ -207,22 +213,11 @@
                         {{ formErrors.city.join(', ') }}
                       </span>
                     </div>
+
+                    <!-- Keep the postal code as is -->
                     <div class="mb-8">
                       <label for="postal_code">Kode Pos:</label>
-                      <input
-                        class="input-base"
-                        :class="{ 'input-error': hasError('postal_code') }"
-                        type="text"
-                        id="postal_code"
-                        name="postal_code"
-                        required
-                      />
-                      <span
-                        v-if="hasError('postal_code')"
-                        class="text-red-500 text-sm"
-                      >
-                        {{ formErrors.postal_code.join(', ') }}
-                      </span>
+                      <!-- ... existing postal code input ... -->
                     </div>
                   </div>
                   <div class="flex gap-4">
@@ -328,6 +323,18 @@
                       multiple
                       @change="handleImageUpload"
                     />
+
+                    <!-- Display validation errors -->
+                    <div
+                      v-if="imageErrors.length > 0"
+                      class="text-red-500 text-sm mt-2"
+                    >
+                      <p v-for="(error, index) in imageErrors" :key="index">
+                        {{ error }}
+                      </p>
+                    </div>
+
+                    <!-- Image preview section -->
                     <div
                       v-if="imagePreviews.length > 0"
                       class="mt-4 grid grid-cols-2 sm:grid-cols-3 gap-4"
@@ -350,10 +357,11 @@
                         </button>
                       </div>
                     </div>
+
                     <p class="text-gray-500 text-sm mt-1">
                       <strong>Note:</strong> Upload beberapa foto yang menarik.
                       Format yang didukung: JPG atau PNG. Ukuran maksimal per
-                      file: 5MB.
+                      file: 5MB. (Maksimal {{ maxImageCount }} gambar)
                     </p>
                   </div>
 
@@ -431,6 +439,7 @@
               <button
                 class="text-black font-semibold border border-black px-4 py-2 rounded-full"
                 type="submit"
+                @click="submitForm"
               >
                 Update Cafe Information
               </button>
@@ -505,30 +514,129 @@
     logo: [],
   });
 
+  interface ChildCity {
+    city_name: string;
+    city_slug: string;
+  }
+
+  interface ParentCity {
+    city_name: string;
+    city_slug: string;
+    childCities: ChildCity[];
+  }
+
+  // Replace previous province/city refs
+  const parentCities = ref<ParentCity[]>([]);
+  const selectedParentCity = ref('');
+  const selectedChildCity = ref('');
+  const availableChildCities = ref<ChildCity[]>([]);
+  // Add these to your ref declarations
+  const cafeName = ref('');
+  const cafeSlug = ref('');
+
+  const citiesByProvince = ref([]);
+
+  const selectedProvince = ref('');
+  const selectedCity = ref('');
+  const availableCities = ref<string[]>([]);
+
+  const fetchCityData = async () => {
+    try {
+      const response = await fetch('/api/city/parent');
+      const data = await response.json();
+      parentCities.value = data.parentCities || [];
+    } catch (error) {
+      console.error('Error fetching city data:', error);
+    }
+  };
+
+  onMounted(() => {
+    // Fetch data or perform any setup actions here
+    console.log('Component mounted');
+    fetchCityData();
+  });
+
+  // Add this watch effect to automatically generate the slug when cafeName changes
   // Add these after other ref imports
   const imagePreviews = ref<string[]>([]);
   const uploadedImages = ref<File[]>([]);
 
+  const imageFiles = ref<File[]>([]); // Store the actual File objects
+  const imageErrors = ref<string[]>([]); // Store validation errors
+  const imageUploadProgress = ref<number[]>([]); // Track upload progress
+  const maxFileSize = 5 * 1024 * 1024; // 5MB in bytes
+  const maxImageCount = 5; // Maximum number of images allowed
+  // Add this function to your script section
+
+  const updateAvailableChildCities = () => {
+    selectedChildCity.value = '';
+    if (selectedParentCity.value) {
+      const parent = parentCities.value.find(
+        (p) => p.city_slug === selectedParentCity.value
+      );
+      availableChildCities.value = parent?.childCities || [];
+    } else {
+      availableChildCities.value = [];
+    }
+  };
+
+  const createSlug = (name: string): string => {
+    return name
+      .toLowerCase()
+      .trim()
+      .replace(/[^\w\s-]/g, '') // Remove special characters
+      .replace(/\s+/g, '-') // Replace spaces with hyphens
+      .replace(/-+/g, '-'); // Remove consecutive hyphens
+  };
   // Add these methods before the component ends
   const handleImageUpload = (event: Event) => {
     const input = event.target as HTMLInputElement;
     const files = Array.from(input.files || []);
 
+    // Clear previous errors
+    imageErrors.value = [];
+
+    // Check if adding these files would exceed the maximum
+    if (imageFiles.value.length + files.length > maxImageCount) {
+      imageErrors.value.push(
+        `You can upload a maximum of ${maxImageCount} images.`
+      );
+      return;
+    }
+
     files.forEach((file) => {
-      if (file.type.startsWith('image/')) {
-        uploadedImages.value.push(file);
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          imagePreviews.value.push(e.target?.result as string);
-        };
-        reader.readAsDataURL(file);
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        imageErrors.value.push(`${file.name} is not an image file.`);
+        return;
       }
+
+      // Validate file size
+      if (file.size > maxFileSize) {
+        imageErrors.value.push(`${file.name} exceeds the 5MB file size limit.`);
+        return;
+      }
+
+      // Add file to our array
+      imageFiles.value.push(file);
+      imageUploadProgress.value.push(0);
+
+      // Create preview
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        imagePreviews.value.push(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
     });
+
+    // Clear the input to allow selecting the same files again if needed
+    input.value = '';
   };
 
   const removeImage = (index: number) => {
     imagePreviews.value.splice(index, 1);
-    uploadedImages.value.splice(index, 1);
+    imageFiles.value.splice(index, 1);
+    imageUploadProgress.value.splice(index, 1);
   };
 
   const hasError = (field: keyof FormErrors): boolean => {
@@ -566,124 +674,9 @@
     }
   };
 
-  const provinces = ref([
-    'Aceh',
-    'Sumatera Utara',
-    'Sumatera Barat',
-    'Riau',
-    'Kepulauan Riau',
-    'Jambi',
-    'Sumatera Selatan',
-    'Kepulauan Bangka Belitung',
-    'Bengkulu',
-    'Lampung',
-    'DKI Jakarta',
-    'Banten',
-    'Jawa Barat',
-    'Jawa Tengah',
-    'DI Yogyakarta',
-    'Jawa Timur',
-    'Bali',
-    'Nusa Tenggara Barat',
-    'Nusa Tenggara Timur',
-    'Kalimantan Barat',
-    'Kalimantan Tengah',
-    'Kalimantan Selatan',
-    'Kalimantan Timur',
-    'Kalimantan Utara',
-    'Sulawesi Utara',
-    'Gorontalo',
-    'Sulawesi Tengah',
-    'Sulawesi Barat',
-    'Sulawesi Selatan',
-    'Sulawesi Tenggara',
-    'Maluku',
-    'Maluku Utara',
-    'Papua',
-    'Papua Barat',
-  ]);
-
-  const citiesByProvince = ref({
-    Aceh: ['Banda Aceh', 'Langsa', 'Lhokseumawe', 'Sabang', 'Subulussalam'],
-    'Sumatera Utara': [
-      'Medan',
-      'Binjai',
-      'Padang Sidempuan',
-      'Pematangsiantar',
-      'Sibolga',
-      'Tanjungbalai',
-      'Tebing Tinggi',
-    ],
-    'Sumatera Barat': [
-      'Padang',
-      'Bukittinggi',
-      'Payakumbuh',
-      'Sawahlunto',
-      'Solok',
-      'Pariaman',
-    ],
-    'DKI Jakarta': [
-      'Jakarta Pusat',
-      'Jakarta Utara',
-      'Jakarta Barat',
-      'Jakarta Selatan',
-      'Jakarta Timur',
-    ],
-    'Jawa Barat': [
-      'Bandung',
-      'Bekasi',
-      'Bogor',
-      'Cimahi',
-      'Cirebon',
-      'Depok',
-      'Sukabumi',
-      'Tasikmalaya',
-    ],
-    'Jawa Tengah': [
-      'Semarang',
-      'Surakarta',
-      'Magelang',
-      'Pekalongan',
-      'Salatiga',
-      'Tegal',
-    ],
-    'DI Yogyakarta': [
-      'Yogyakarta',
-      'Bantul',
-      'Sleman',
-      'Kulon Progo',
-      'Gunung Kidul',
-    ],
-    'Jawa Timur': [
-      'Surabaya',
-      'Malang',
-      'Madiun',
-      'Kediri',
-      'Mojokerto',
-      'Pasuruan',
-      'Probolinggo',
-      'Blitar',
-    ],
-    Bali: [
-      'Denpasar',
-      'Badung',
-      'Gianyar',
-      'Bangli',
-      'Klungkung',
-      'Karangasem',
-      'Buleleng',
-      'Tabanan',
-      'Jembrana',
-    ],
-    // Add other provinces and their cities...
-  });
-
-  const selectedProvince = ref('');
-  const selectedCity = ref('');
-  const availableCities = ref<string[]>([]);
-
   const updateAvailableCities = () => {
     selectedCity.value = ''; // Reset selected city
+    console.log('Selected Province:', selectedProvince.value);
     if (selectedProvince.value) {
       availableCities.value =
         citiesByProvince.value[selectedProvince.value] || [];
@@ -692,7 +685,14 @@
     }
   };
 
+  //   watch(selectedProvince, updateAvailableCities);
+
+  watch(cafeName, (newName) => {
+    cafeSlug.value = createSlug(newName);
+  });
+
   watch(selectedProvince, updateAvailableCities);
+  watch(selectedParentCity, updateAvailableChildCities);
 
   interface DaySchedule {
     id: string;
@@ -778,6 +778,26 @@
   };
 
   const timeOptions = ref(generateTimeOptions());
+
+  const submitForm = () => {
+    // Create form data with parent and child city information
+    const formData = {
+      // ... other form fields
+      parentCity: selectedParentCity.value,
+      childCity: selectedChildCity.value,
+      // You may want to also include the display names
+      parentCityName: parentCities.value.find(
+        (p) => p.city_slug === selectedParentCity.value
+      )?.city_name,
+      childCityName: availableChildCities.value.find(
+        (c) => c.city_slug === selectedChildCity.value
+      )?.city_name,
+      // ... other form fields
+    };
+
+    // Submit the form
+    // ...
+  };
 </script>
 
 <style scoped>
