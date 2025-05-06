@@ -24,6 +24,15 @@
     <div class="flex items-center gap-2">
       <p class="hidden sm:flex mt-3 font-semibold text-sm">Satu Klik, Ribuan Cafe! Temukan yang Pas untuk Kamu.</p>
     </div>
+    <div class="flex items-center gap-2">
+      <button>
+        login
+      </button>
+      <button>
+        logout
+      </button>
+
+    </div>
   </div>
 </template>
 
