@@ -282,17 +282,32 @@
                             </span>
                         </div>
                         <div class="flex flex-col space-y-2 mb-8">
-                          <label for="cafeImage">Gambar utama:</label>
+                          <label for="cafeImage">Gambar Cafe:</label>
                           <input
                             type="file"
                             id="cafeImage"
                             name="cafeImage"
                             accept="image/*"
+                            multiple
+                            @change="handleImageUpload"
                           />
+                          <div v-if="imagePreviews.length > 0" class="mt-4 grid grid-cols-2 sm:grid-cols-3 gap-4">
+                            <div v-for="(preview, index) in imagePreviews" :key="index" class="relative">
+                              <img :src="preview" class="w-full h-32 object-cover rounded-lg"/>
+                              <button 
+                                @click="removeImage(index)" 
+                                class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center"
+                                type="button">
+                                ×
+                              </button>
+                            </div>
+                          </div>
                           <p class="text-gray-500 text-sm mt-1">
-                            <strong>Note:</strong> Upload foto yang menarik. Format yang
-                            didukung: JPG atau PNG. Ukuran maksimal: 5MB.</p>
+                            <strong>Note:</strong> Upload beberapa foto yang menarik. Format yang
+                            didukung: JPG atau PNG. Ukuran maksimal per file: 5MB.
+                          </p>
                         </div>
+
 
                         <div class="mb-8">
                           <label class="block mb-4">Working Hours:</label>
@@ -424,6 +439,33 @@ const formErrors = ref<FormErrors>({
   rating: [],
   logo: [],
 });
+
+// Add these after other ref imports
+const imagePreviews = ref<string[]>([]);
+const uploadedImages = ref<File[]>([]);
+
+// Add these methods before the component ends
+const handleImageUpload = (event: Event) => {
+  const input = event.target as HTMLInputElement;
+  const files = Array.from(input.files || []);
+  
+  files.forEach(file => {
+    if (file.type.startsWith('image/')) {
+      uploadedImages.value.push(file);
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        imagePreviews.value.push(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+};
+
+const removeImage = (index: number) => {
+  imagePreviews.value.splice(index, 1);
+  uploadedImages.value.splice(index, 1);
+};
+
 
 const hasError = (field: keyof FormErrors): boolean => {
   return formErrors.value[field].length > 0;
