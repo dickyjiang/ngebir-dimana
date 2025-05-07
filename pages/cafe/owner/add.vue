@@ -292,56 +292,97 @@
                   <div class="mb-8">
                     <label for="features">Features:</label>
                     <div class="relative">
-                      <input
-                        type="text"
-                        id="features-search"
-                        class="input-base mb-2"
-                        placeholder="Search for features..."
-                        v-model="featureSearchQuery"
-                        @input="searchFeatures"
-                        @focus="showFeatureDropdown = true"
-                        @blur="handleBlur"
-                      />
-                      <div
-                        v-if="
-                          showFeatureDropdown && filteredFeatures.length > 0
-                        "
-                        class="absolute z-10 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto"
-                        ref="dropdownRef"
-                      >
+                      <div class="hs-dropdown relative w-full">
                         <div
-                          v-for="feature in filteredFeatures"
-                          :key="feature.id"
-                          class="px-4 py-2 hover:bg-blue-50 cursor-pointer flex items-center"
-                          @click="handleFeatureClick(feature)"
+                          class="flex flex-wrap items-center border border-gray-300 rounded-md p-2 bg-white"
                         >
+                          <!-- Selected tags -->
+                          <div
+                            v-for="feature in selectedFeatures"
+                            :key="feature.id"
+                            class="inline-flex items-center px-2.5 py-0.5 m-0.5 rounded-full text-sm bg-blue-100 text-blue-800"
+                          >
+                            <span>{{ feature.name }}</span>
+                            <button
+                              type="button"
+                              class="flex-shrink-0 ml-1 h-4 w-4 inline-flex items-center justify-center rounded-full text-blue-600 hover:bg-blue-200 hover:text-blue-800 focus:outline-none focus:bg-blue-200 focus:text-blue-800"
+                              @click="removeSelectedFeature(feature)"
+                            >
+                              <span class="sr-only">Remove feature</span>
+                              <svg
+                                class="h-3 w-3"
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 20 20"
+                                fill="currentColor"
+                                aria-hidden="true"
+                              >
+                                <path
+                                  fill-rule="evenodd"
+                                  d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                                  clip-rule="evenodd"
+                                />
+                              </svg>
+                            </button>
+                          </div>
+
+                          <!-- Search input -->
                           <input
-                            type="checkbox"
-                            :checked="isFeatureSelected(feature)"
-                            class="mr-2"
-                            @click.stop
+                            type="text"
+                            id="features-search"
+                            class="flex-grow min-w-[80px] border-0 p-0 pl-1 focus:ring-0 focus:outline-none text-sm"
+                            placeholder="Search and select features..."
+                            v-model="featureSearchQuery"
+                            @input="searchFeatures"
+                            @focus="showFeatureDropdown = true"
+                            @blur="handleBlur"
+                            @keydown.down="focusNextDropdownItem"
+                            @keydown.up="focusPreviousDropdownItem"
+                            @keydown.enter.prevent="selectFocusedFeature"
+                            @keydown.escape="hideDropdown"
                           />
-                          <span>{{ feature.name }}</span>
+                        </div>
+
+                        <!-- Dropdown -->
+                        <div
+                          v-if="
+                            showFeatureDropdown && filteredFeatures.length > 0
+                          "
+                          class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto"
+                          ref="dropdownRef"
+                        >
+                          <div
+                            v-for="(feature, index) in filteredFeatures"
+                            :key="feature.id"
+                            :class="[
+                              'px-4 py-2 hover:bg-blue-50 cursor-pointer flex items-center',
+                              focusedFeatureIndex === index ? 'bg-blue-50' : '',
+                              isFeatureSelected(feature) ? 'bg-blue-100' : '',
+                            ]"
+                            @click="handleFeatureClick(feature)"
+                            @mouseover="focusedFeatureIndex = index"
+                            :id="`feature-item-${index}`"
+                          >
+                            <div class="flex-shrink-0 mr-2">
+                              <svg
+                                class="h-4 w-4 text-blue-600"
+                                v-if="isFeatureSelected(feature)"
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 20 20"
+                                fill="currentColor"
+                              >
+                                <path
+                                  fill-rule="evenodd"
+                                  d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                  clip-rule="evenodd"
+                                />
+                              </svg>
+                            </div>
+                            <span>{{ feature.name }}</span>
+                          </div>
                         </div>
                       </div>
                     </div>
 
-                    <div class="mt-2 flex flex-wrap gap-2">
-                      <div
-                        v-for="feature in selectedFeatures"
-                        :key="feature.id"
-                        class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm flex items-center"
-                      >
-                        <span>{{ feature.name }}</span>
-                        <button
-                          type="button"
-                          class="ml-2 text-blue-600 hover:text-blue-800 font-bold"
-                          @click="removeSelectedFeature(feature)"
-                        >
-                          ×
-                        </button>
-                      </div>
-                    </div>
                     <p class="text-gray-500 text-sm mt-1">
                       <strong>Note:</strong> Select all features that your cafe
                       offers.
@@ -490,6 +531,13 @@
   import { ref, watch, onMounted } from 'vue';
   // Import the new composable
   import { useFetchFeatures } from '~/composables/useFetchFeatures';
+
+  // Define Feature interface
+  interface Feature {
+    id: number;
+    name: string | null;
+    feature_slug: string | null;
+  }
 
   interface FormErrors {
     cafeName: string[];
@@ -964,13 +1012,14 @@
   };
 
   const { features } = await useFetchFeatures();
-  const allFeatures = ref(features || []);
+  const allFeatures = ref<Feature[]>(features || []);
 
   const featureSearchQuery = ref('');
   const showFeatureDropdown = ref(false);
-  const filteredFeatures = ref([]);
-  const selectedFeatures = ref([]);
-  const dropdownRef = ref(null);
+  const filteredFeatures = ref<Feature[]>([]);
+  const selectedFeatures = ref<Feature[]>([]);
+  const dropdownRef = ref<HTMLElement | null>(null);
+  const focusedFeatureIndex = ref(-1);
 
   // Update searchFeatures function to work with the actual data structure
   const searchFeatures = () => {
@@ -979,13 +1028,13 @@
     } else {
       filteredFeatures.value = allFeatures.value.filter((feature) =>
         feature.name
-          .toLowerCase()
+          ?.toLowerCase()
           .includes(featureSearchQuery.value.toLowerCase())
       );
     }
   };
 
-  const toggleFeatureSelection = (feature) => {
+  const toggleFeatureSelection = (feature: Feature) => {
     const index = selectedFeatures.value.findIndex(
       (selected) => selected.id === feature.id
     );
@@ -996,13 +1045,13 @@
     }
   };
 
-  const isFeatureSelected = (feature) => {
+  const isFeatureSelected = (feature: Feature): boolean => {
     return selectedFeatures.value.some(
       (selected) => selected.id === feature.id
     );
   };
 
-  const removeSelectedFeature = (feature) => {
+  const removeSelectedFeature = (feature: Feature) => {
     const index = selectedFeatures.value.findIndex(
       (selected) => selected.id === feature.id
     );
@@ -1011,49 +1060,117 @@
     }
   };
 
-  const handleBlur = (event) => {
+  const handleBlur = (event: FocusEvent) => {
     // Use a small timeout to allow click events on dropdown items to finish
     // before determining if we should hide the dropdown
     setTimeout(() => {
-      // Check if the click is outside both the input and dropdown
-      if (!dropdownRef.value?.contains(document.activeElement)) {
+      // Check if the active element is not the input or any dropdown item
+      if (
+        !document
+          .getElementById('features-search')
+          ?.contains(document.activeElement) &&
+        !dropdownRef.value?.contains(document.activeElement)
+      ) {
         showFeatureDropdown.value = false;
       }
     }, 150);
   };
 
   // Add click handler to dropdown items to prevent immediate closure
-  const handleFeatureClick = (feature) => {
+  const handleFeatureClick = (feature: Feature) => {
     toggleFeatureSelection(feature);
-    // Reset the search query after selection
-    // featureSearchQuery.value = '';
-    // Update the filtered features to show all features again
+    // Clear the search input after selection
+    featureSearchQuery.value = '';
     // Keep focus on the input to prevent dropdown from closing
     document.getElementById('features-search')?.focus();
+    // Refresh the available features to show all options again
+    filteredFeatures.value = allFeatures.value;
+  };
+
+  const focusNextDropdownItem = () => {
+    if (filteredFeatures.value.length === 0) return;
+    focusedFeatureIndex.value =
+      (focusedFeatureIndex.value + 1) % filteredFeatures.value.length;
+    scrollToFocusedItem();
+  };
+
+  const focusPreviousDropdownItem = () => {
+    if (filteredFeatures.value.length === 0) return;
+    focusedFeatureIndex.value =
+      (focusedFeatureIndex.value - 1 + filteredFeatures.value.length) %
+      filteredFeatures.value.length;
+    scrollToFocusedItem();
+  };
+
+  const selectFocusedFeature = () => {
+    if (
+      focusedFeatureIndex.value >= 0 &&
+      focusedFeatureIndex.value < filteredFeatures.value.length
+    ) {
+      handleFeatureClick(filteredFeatures.value[focusedFeatureIndex.value]);
+    }
+  };
+
+  const hideDropdown = () => {
+    showFeatureDropdown.value = false;
+  };
+
+  const scrollToFocusedItem = () => {
+    const focusedItem = document.getElementById(
+      `feature-item-${focusedFeatureIndex.value}`
+    );
+    if (focusedItem) {
+      focusedItem.scrollIntoView({
+        block: 'nearest',
+        behavior: 'smooth',
+      });
+    }
   };
 </script>
 
 <style scoped>
   .input-base {
-    @apply mt-2 pl-2 py-1 border rounded-sm bg-gray-50 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200;
+    margin-top: 0.5rem;
+    padding-left: 0.5rem;
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+    border: 1px solid;
+    border-radius: 0.125rem;
+    background-color: rgb(249 250 251);
+    border-color: rgb(209 213 219);
+    transition-property: all;
+    transition-duration: 200ms;
     outline: none;
     width: 100%;
   }
 
   .input-base:hover {
-    @apply border-gray-400;
+    border-color: rgb(156 163 175);
   }
 
   .input-base:focus {
-    @apply bg-white;
+    background-color: white;
+    border-color: rgb(59 130 246);
+    --tw-ring-opacity: 1;
+    --tw-ring-color: rgb(191 219 254 / var(--tw-ring-opacity));
+    --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0
+      var(--tw-ring-offset-width) var(--tw-ring-offset-color);
+    --tw-ring-shadow: var(--tw-ring-inset) 0 0 0
+      calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);
+    box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow),
+      var(--tw-shadow, 0 0 #0000);
   }
 
   .input-error {
-    @apply border-red-500 bg-red-50;
+    border-color: rgb(239 68 68);
+    background-color: rgb(254 242 242);
   }
 
   select.input-base {
-    @apply appearance-none bg-no-repeat bg-right pr-8;
+    appearance: none;
+    background-repeat: no-repeat;
+    background-position: right;
+    padding-right: 2rem;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
     background-size: 1.5em;
   }
