@@ -1,6 +1,11 @@
 pass dev : C1vWpiS90zZWkXMs
 
+prod
 supabase gen types typescript --project-id iblcxviqmqiutjzxnblx > ./types/database.types.ts
+
+dev
+supabase gen types typescript --project-id fhvpfdcvtkyaatvoxpff > ./types/database.types.ts
+
 ----
 kolom location
 update cafes

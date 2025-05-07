@@ -27,6 +27,7 @@
                       id="cafeName"
                       name="cafeName"
                       v-model="cafeName"
+                      @input="validateOnChangeForm"
                       required
                     />
                     <span
@@ -49,6 +50,7 @@
                       type="text"
                       id="street"
                       name="street"
+                      v-model="cafeStreet"
                       required
                     />
                     <span
@@ -58,27 +60,6 @@
                       {{ formErrors.street.join(', ') }}
                     </span>
                   </div>
-                  <!-- @budi jigana alamat lengkap iyeu teu kudu ditulis ku user nya - bakal badUX euy-solana hese -->
-                  <!-- <div class="mb-8">
-                      <label for="full_address">Alamat Lengkap:</label>
-                      <textarea
-                        class="input-base"
-                        :class="{ 'input-error': hasError('full_address') }"
-                        id="full_address"
-                        name="full_address"
-                        required
-                      ></textarea>
-                      <span
-                        v-if="hasError('full_address')"
-                        class="text-red-500 text-sm"
-                      >
-                        {{ formErrors.full_address.join(", ") }}
-                      </span>
-                      <p class="text-gray-500 text-sm mt-1">
-                        <strong>Note:</strong> Ini adalah alamat lengkap cafe Anda.
-                        contoh alamat lengkap : Jl. Gajah Mada No.1, Dauh Puri Kangin, Kec. Denpasar Utara, Kota Denpasar, Bali 80231.
-                      </p>
-                    </div> -->
                   <div class="mb-8">
                     <label for="description">Deskripsi:</label>
                     <textarea
@@ -87,6 +68,7 @@
                       id="description"
                       name="description"
                       required
+                      v-model="cafeDescription"
                     ></textarea>
                     <span
                       v-if="hasError('description')"
@@ -109,6 +91,7 @@
                       id="site"
                       name="site"
                       required
+                      v-model="cafeSite"
                     />
                     <span v-if="hasError('site')" class="text-red-500 text-sm">
                       {{ formErrors.site.join(', ') }}
@@ -136,27 +119,6 @@
                       {{ formErrors.phone.join(', ') }}
                     </span>
                   </div>
-                  <div class="mb-8">
-                    <label for="borough">Area:</label>
-                    <input
-                      class="input-base"
-                      :class="{ 'input-error': hasError('borough') }"
-                      type="text"
-                      id="borough"
-                      name="borough"
-                      required
-                    />
-                    <span
-                      v-if="hasError('borough')"
-                      class="text-red-500 text-sm"
-                    >
-                      {{ formErrors.borough.join(', ') }}
-                    </span>
-                    <p class="text-gray-500 text-sm mt-1">
-                      <strong>Note:</strong> Area bisa kecamatan atau kabupaten.
-                      Contoh: Jakarta Selatan, Dago, Lembang, dll.
-                    </p>
-                  </div>
 
                   <div class="mb-8">
                     <label for="state">Provinsi/Kota Besar:</label>
@@ -166,6 +128,7 @@
                       id="state"
                       name="state"
                       v-model="selectedParentCity"
+                      @change="validateOnChangeForm"
                       required
                     >
                       <option value="" disabled>
@@ -195,6 +158,7 @@
                         name="city"
                         v-model="selectedChildCity"
                         required
+                        @change="validateOnChangeForm"
                         :disabled="!selectedParentCity"
                       >
                         <option value="" disabled>Pilih Kota/Kabupaten</option>
@@ -220,81 +184,18 @@
                       <!-- ... existing postal code input ... -->
                     </div>
                   </div>
-                  <div class="flex gap-4">
-                    <div class="mb-8">
-                      <label for="lat">Latitude:</label>
-                      <input
-                        class="input-base"
-                        :class="{ 'input-error': hasError('lat') }"
-                        type="number"
-                        step="any"
-                        id="lat"
-                        name="lat"
-                        required
-                      />
-                      <span v-if="hasError('lat')" class="text-red-500 text-sm">
-                        {{ formErrors.lat.join(', ') }}
-                      </span>
-                    </div>
-                    <div class="mb-8">
-                      <label for="long">Longitude:</label>
-                      <input
-                        class="input-base"
-                        :class="{ 'input-error': hasError('long') }"
-                        type="number"
-                        step="any"
-                        id="long"
-                        name="long"
-                        required
-                      />
-                      <span
-                        v-if="hasError('long')"
-                        class="text-red-500 text-sm"
-                      >
-                        {{ formErrors.long.join(', ') }}
-                      </span>
-                    </div>
-                  </div>
-                  <div class="mb-8">
-                    <label for="time_zone">Time Zone:</label>
-                    <input
-                      class="input-base"
-                      :class="{ 'input-error': hasError('time_zone') }"
-                      type="text"
-                      id="time_zone"
-                      name="time_zone"
-                      required
-                    />
-                    <span
-                      v-if="hasError('time_zone')"
-                      class="text-red-500 text-sm"
-                    >
-                      {{ formErrors.time_zone.join(', ') }}
-                    </span>
-                  </div>
-                  <div class="mb-8">
-                    <label for="rating">Rating:</label>
-                    <input
-                      class="input-base"
-                      :class="{ 'input-error': hasError('rating') }"
-                      type="number"
-                      step="0.1"
-                      min="0"
-                      max="5"
-                      id="rating"
-                      name="rating"
-                      required
-                    />
-                    <span
-                      v-if="hasError('rating')"
-                      class="text-red-500 text-sm"
-                    >
-                      {{ formErrors.rating.join(', ') }}
-                    </span>
-                  </div>
                   <div class="mb-8">
                     <label for="">location_link:</label>
-                    <input class="input-base" />
+                    <input
+                      class="input-base"
+                      :class="{ 'input-error': hasError('location_link') }"
+                      type="text"
+                      id="location_link"
+                      name="location_link"
+                      v-model="locationLink"
+                      required
+                      @input="validateOnChangeForm"
+                    />
                   </div>
                 </div>
                 <div class="px-4">
@@ -306,12 +207,35 @@
                       id="logo"
                       name="logo"
                       accept="image/*"
-                      multiple
                       required
+                      @change="handleLogoUpload"
                     />
                     <span v-if="hasError('logo')" class="text-red-500 text-sm">
                       {{ formErrors.logo.join(', ') }}
                     </span>
+                    <!-- Logo preview section -->
+                    <div v-if="logoPreview" class="mt-4">
+                      <div class="relative inline-block">
+                        <img
+                          :src="logoPreview"
+                          class="w-32 h-32 object-cover rounded-lg"
+                          alt="Logo preview"
+                        />
+                        <button
+                          @click="removeLogo"
+                          class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center"
+                          type="button"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    </div>
+
+                    <p class="text-gray-500 text-sm mt-1">
+                      <strong>Note:</strong> Logo akan ditampilkan di halaman
+                      utama cafe. Format yang didukung: JPG atau PNG. Ukuran
+                      maksimal: 5MB.
+                    </p>
                   </div>
                   <div class="flex flex-col space-y-2 mb-8">
                     <label for="cafeImage">Gambar Cafe:</label>
@@ -436,12 +360,42 @@
               </div>
             </form>
             <div class="flex justify-center sm:justify-end px-8 mt-8">
+              hasAnyErrors:{{ hasAnyErrors() }} isSubmitting:{{ isSubmitting }}
               <button
-                class="text-black font-semibold border border-black px-4 py-2 rounded-full"
+                class="text-black font-semibold border border-black px-4 py-2 rounded-full relative"
                 type="submit"
                 @click="submitForm"
+                :disabled="isSubmitting || hasAnyErrors()"
+                :class="{ 'opacity-50 cursor-not-allowed': hasAnyErrors() }"
               >
-                Update Cafe Information
+                <span :class="{ 'opacity-0': isSubmitting }">
+                  Submit Cafe Information
+                </span>
+                <div
+                  v-if="isSubmitting"
+                  class="absolute inset-0 flex items-center justify-center"
+                >
+                  <svg
+                    class="animate-spin h-5 w-5 text-black"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      class="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      stroke-width="4"
+                    ></circle>
+                    <path
+                      class="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
+                  </svg>
+                </div>
               </button>
             </div>
           </div>
@@ -490,9 +444,9 @@
     state: string[];
     lat: string[];
     long: string[];
-    time_zone: string[];
     rating: string[];
     logo: string[];
+    location_link: string[];
   }
 
   const formErrors = ref<FormErrors>({
@@ -509,7 +463,7 @@
     state: [],
     lat: [],
     long: [],
-    time_zone: [],
+    location_link: [],
     rating: [],
     logo: [],
   });
@@ -525,6 +479,8 @@
     childCities: ChildCity[];
   }
 
+  const isSubmitting = ref(false);
+
   // Replace previous province/city refs
   const parentCities = ref<ParentCity[]>([]);
   const selectedParentCity = ref('');
@@ -532,14 +488,62 @@
   const availableChildCities = ref<ChildCity[]>([]);
   // Add these to your ref declarations
   const cafeName = ref('');
-  const cafeSlug = ref('');
+  const locationLink = ref('');
+  const cafeDescription = ref('');
+  const cafeStreet = ref('');
+  const cafeSite = ref('');
 
   const citiesByProvince = ref([]);
 
   const selectedProvince = ref('');
   const selectedCity = ref('');
   const availableCities = ref<string[]>([]);
+  const logoFile = ref<File | null>(null);
+  const logoPreview = ref<string | null>(null);
 
+  // Add this method to handle logo uploads
+  const handleLogoUpload = (event: Event) => {
+    const input = event.target as HTMLInputElement;
+    if (!input.files || input.files.length === 0) return;
+
+    const file = input.files[0];
+
+    // Clear previous errors
+    formErrors.value.logo = [];
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      formErrors.value.logo.push(`${file.name} is not an image file.`);
+      return;
+    }
+
+    // Validate file size
+    if (file.size > maxFileSize) {
+      formErrors.value.logo.push(
+        `${file.name} exceeds the 5MB file size limit.`
+      );
+      return;
+    }
+
+    // Store the file
+    logoFile.value = file;
+
+    // Create preview
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      logoPreview.value = e.target?.result as string;
+    };
+    reader.readAsDataURL(file);
+  };
+
+  // Add method to remove logo
+  const removeLogo = () => {
+    logoPreview.value = null;
+    logoFile.value = null;
+    // Reset the file input
+    const input = document.getElementById('logo') as HTMLInputElement;
+    if (input) input.value = '';
+  };
   const fetchCityData = async () => {
     try {
       const response = await fetch('/api/city/parent');
@@ -549,10 +553,20 @@
       console.error('Error fetching city data:', error);
     }
   };
+  const validateOnChangeForm = () => {
+    // Clear previous errors for this field
+    formErrors.value.cafeName = [];
+    formErrors.value.state = [];
+    formErrors.value.city = [];
+    formErrors.value.location_link = [];
+    imageErrors.value = [];
 
+    // Validate the café name
+    if (!cafeName.value || cafeName.value.trim() === '') {
+      formErrors.value.cafeName.push('Nama cafe tidak boleh kosong');
+    }
+  };
   onMounted(() => {
-    // Fetch data or perform any setup actions here
-    console.log('Component mounted');
     fetchCityData();
   });
 
@@ -580,14 +594,6 @@
     }
   };
 
-  const createSlug = (name: string): string => {
-    return name
-      .toLowerCase()
-      .trim()
-      .replace(/[^\w\s-]/g, '') // Remove special characters
-      .replace(/\s+/g, '-') // Replace spaces with hyphens
-      .replace(/-+/g, '-'); // Remove consecutive hyphens
-  };
   // Add these methods before the component ends
   const handleImageUpload = (event: Event) => {
     const input = event.target as HTMLInputElement;
@@ -642,7 +648,10 @@
   const hasError = (field: keyof FormErrors): boolean => {
     return formErrors.value[field].length > 0;
   };
-
+  const hasAnyErrors = (): boolean => {
+    // Check if any field has errors
+    return Object.values(formErrors.value).some((errors) => errors.length > 0);
+  };
   const phoneNumber = ref('+62 '); // Initialize with space
 
   const formatPhoneNumber = (event: Event) => {
@@ -686,10 +695,6 @@
   };
 
   //   watch(selectedProvince, updateAvailableCities);
-
-  watch(cafeName, (newName) => {
-    cafeSlug.value = createSlug(newName);
-  });
 
   watch(selectedProvince, updateAvailableCities);
   watch(selectedParentCity, updateAvailableChildCities);
@@ -779,24 +784,118 @@
 
   const timeOptions = ref(generateTimeOptions());
 
-  const submitForm = () => {
+  const validateForm = (): boolean => {
+    let isValid = true;
+
+    // Reset all previous errors
+    Object.keys(formErrors.value).forEach((key) => {
+      formErrors.value[key as keyof FormErrors] = [];
+    });
+
+    // Validate cafe name
+    if (!cafeName.value || cafeName.value.trim() === '') {
+      formErrors.value.cafeName.push('Nama cafe tidak boleh kosong');
+      isValid = false;
+    }
+
+    if (!selectedParentCity.value) {
+      formErrors.value.state.push('Provinsi/Kota Besar tidak boleh kosong');
+      isValid = false;
+    }
+    if (!selectedChildCity.value) {
+      formErrors.value.city.push('Kota/Kabupaten tidak boleh kosong');
+      isValid = false;
+    }
+    if (!locationLink.value) {
+      formErrors.value.location_link.push('Location link tidak boleh kosong');
+      isValid = false;
+    }
+
+    if (!imageFiles.value.length) {
+      imageErrors.value.push(
+        'Gambar cafe tidak boleh kosong. Silakan pilih file gambar.'
+      );
+      isValid = false;
+    } else {
+      imageFiles.value.forEach((file) => {
+        if (!file.type.startsWith('image/')) {
+          formErrors.value.logo.push(`${file.name} bukan file gambar`);
+          isValid = false;
+        }
+        if (file.size > maxFileSize) {
+          formErrors.value.logo.push(`${file.name} melebihi batas ukuran 5MB`);
+          isValid = false;
+        }
+      });
+    }
+    return isValid;
+  };
+  const submitForm = async () => {
+    // Validate the form first
+    if (!validateForm()) {
+      // Form is invalid, don't proceed with submission
+      return;
+    }
+
     // Create form data with parent and child city information
-    const formData = {
-      // ... other form fields
-      parentCity: selectedParentCity.value,
-      childCity: selectedChildCity.value,
-      // You may want to also include the display names
-      parentCityName: parentCities.value.find(
-        (p) => p.city_slug === selectedParentCity.value
-      )?.city_name,
-      childCityName: availableChildCities.value.find(
-        (c) => c.city_slug === selectedChildCity.value
-      )?.city_name,
-      // ... other form fields
-    };
+    isSubmitting.value = true;
+
+    const formData = new FormData();
+
+    formData.append('parentCity', selectedParentCity.value);
+    formData.append('childCity', selectedChildCity.value);
+
+    // Append city names
+    const parentCityName = parentCities.value.find(
+      (p) => p.city_slug === selectedParentCity.value
+    )?.city_name;
+    const childCityName = availableChildCities.value.find(
+      (c) => c.city_slug === selectedChildCity.value
+    )?.city_name;
+
+    formData.append('cafeName', cafeName.value);
+    formData.append('cafeStreet', cafeStreet.value);
+    formData.append('cafeDescription', cafeDescription.value);
+    formData.append('cafeSite', cafeSite.value);
+    formData.append('cafePhoneNumber', phoneNumber.value);
+    formData.append('cafeCity', childCityName || '');
+    formData.append('cafeState', parentCityName || '');
+    formData.append('cafeLocationLink', locationLink.value);
+
+    if (logoFile.value) {
+      formData.append('cafeLogo', logoFile.value);
+    }
+
+    if (imageFiles.value.length > 0) {
+      formData.append('image', imageFiles.value[0]);
+
+      for (let i = 1; i < imageFiles.value.length; i++) {
+        formData.append('images', imageFiles.value[i]);
+      }
+    }
+    formData.append('cafeWorkingHours', JSON.stringify(days.value));
 
     // Submit the form
     // ...
+    try {
+      // Simulate form submission
+      console.log('Form submitted:', formData);
+      const data = await fetch('/api/cafe/owner', {
+        method: 'POST',
+        body: formData,
+      });
+      if (!data.ok) {
+        throw new Error('Network response was not ok');
+      } else {
+        navigateTo('/cafe/owner/list');
+        // Handle success
+      }
+      // Reset the form or show success message
+    } catch (error) {
+      console.error('Error submitting form:', error);
+    } finally {
+      isSubmitting.value = false;
+    }
   };
 </script>
 
