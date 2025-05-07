@@ -290,6 +290,65 @@
                   </div>
 
                   <div class="mb-8">
+                    <label for="features">Features:</label>
+                    <div class="relative">
+                      <input
+                        type="text"
+                        id="features-search"
+                        class="input-base mb-2"
+                        placeholder="Search for features..."
+                        v-model="featureSearchQuery"
+                        @input="searchFeatures"
+                        @focus="showFeatureDropdown = true"
+                        @blur="handleBlur"
+                      />
+                      <div
+                        v-if="
+                          showFeatureDropdown && filteredFeatures.length > 0
+                        "
+                        class="absolute z-10 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto"
+                        ref="dropdownRef"
+                      >
+                        <div
+                          v-for="feature in filteredFeatures"
+                          :key="feature.id"
+                          class="px-4 py-2 hover:bg-blue-50 cursor-pointer flex items-center"
+                          @click="handleFeatureClick(feature)"
+                        >
+                          <input
+                            type="checkbox"
+                            :checked="isFeatureSelected(feature)"
+                            class="mr-2"
+                            @click.stop
+                          />
+                          <span>{{ feature.name }}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="mt-2 flex flex-wrap gap-2">
+                      <div
+                        v-for="feature in selectedFeatures"
+                        :key="feature.id"
+                        class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm flex items-center"
+                      >
+                        <span>{{ feature.name }}</span>
+                        <button
+                          type="button"
+                          class="ml-2 text-blue-600 hover:text-blue-800 font-bold"
+                          @click="removeSelectedFeature(feature)"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    </div>
+                    <p class="text-gray-500 text-sm mt-1">
+                      <strong>Note:</strong> Select all features that your cafe
+                      offers.
+                    </p>
+                  </div>
+
+                  <div class="mb-8">
                     <label class="block mb-4">Working Hours:</label>
                     <div class="flex flex-col space-y-4">
                       <div
@@ -428,7 +487,9 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, watch } from 'vue';
+  import { ref, watch, onMounted } from 'vue';
+  // Import the new composable
+  import { useFetchFeatures } from '~/composables/useFetchFeatures';
 
   interface FormErrors {
     cafeName: string[];
@@ -566,8 +627,12 @@
       formErrors.value.cafeName.push('Nama cafe tidak boleh kosong');
     }
   };
-  onMounted(() => {
+  onMounted(async () => {
     fetchCityData();
+    // Fetch features data when the component mounts
+    searchFeatures();
+    // Show all features initially in the dropdown when input is focused
+    filteredFeatures.value = allFeatures.value;
   });
 
   // Add this watch effect to automatically generate the slug when cafeName changes
@@ -896,6 +961,75 @@
     } finally {
       isSubmitting.value = false;
     }
+  };
+
+  const { features } = await useFetchFeatures();
+  const allFeatures = ref(features || []);
+
+  const featureSearchQuery = ref('');
+  const showFeatureDropdown = ref(false);
+  const filteredFeatures = ref([]);
+  const selectedFeatures = ref([]);
+  const dropdownRef = ref(null);
+
+  // Update searchFeatures function to work with the actual data structure
+  const searchFeatures = () => {
+    if (featureSearchQuery.value.trim() === '') {
+      filteredFeatures.value = allFeatures.value;
+    } else {
+      filteredFeatures.value = allFeatures.value.filter((feature) =>
+        feature.name
+          .toLowerCase()
+          .includes(featureSearchQuery.value.toLowerCase())
+      );
+    }
+  };
+
+  const toggleFeatureSelection = (feature) => {
+    const index = selectedFeatures.value.findIndex(
+      (selected) => selected.id === feature.id
+    );
+    if (index === -1) {
+      selectedFeatures.value.push(feature);
+    } else {
+      selectedFeatures.value.splice(index, 1);
+    }
+  };
+
+  const isFeatureSelected = (feature) => {
+    return selectedFeatures.value.some(
+      (selected) => selected.id === feature.id
+    );
+  };
+
+  const removeSelectedFeature = (feature) => {
+    const index = selectedFeatures.value.findIndex(
+      (selected) => selected.id === feature.id
+    );
+    if (index !== -1) {
+      selectedFeatures.value.splice(index, 1);
+    }
+  };
+
+  const handleBlur = (event) => {
+    // Use a small timeout to allow click events on dropdown items to finish
+    // before determining if we should hide the dropdown
+    setTimeout(() => {
+      // Check if the click is outside both the input and dropdown
+      if (!dropdownRef.value?.contains(document.activeElement)) {
+        showFeatureDropdown.value = false;
+      }
+    }, 150);
+  };
+
+  // Add click handler to dropdown items to prevent immediate closure
+  const handleFeatureClick = (feature) => {
+    toggleFeatureSelection(feature);
+    // Reset the search query after selection
+    // featureSearchQuery.value = '';
+    // Update the filtered features to show all features again
+    // Keep focus on the input to prevent dropdown from closing
+    document.getElementById('features-search')?.focus();
   };
 </script>
 
