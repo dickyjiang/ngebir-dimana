@@ -134,6 +134,18 @@
               24 hours
             </button>
             <button
+              @click="handleFeatureToggle('specialty-coffee')"
+              :class="{
+                'text-yellow-500 bg-black border border-yellow-500':
+                  activeFilters.features.includes('specialty-coffee'),
+                'text-gray-100 border-gray-400':
+                  !activeFilters.features.includes('specialty-coffee'),
+              }"
+              class="text-white border border-white mt-2 px-3 sm:px-4 py-1 sm:py-2 rounded-full flex items-center gap-2 text-xs sm:text-base cursor-pointer touch-manipulation"
+            >
+              Specialty | Artisan
+            </button>
+            <button
               @click="handleFeatureToggle('pets-dogs-allowed')"
               :class="{
                 'text-yellow-500 bg-black border border-yellow-500':
