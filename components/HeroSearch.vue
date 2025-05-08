@@ -3,6 +3,7 @@
   import '@fortawesome/fontawesome-free/css/all.css';
   import hoursAnimationData from '../public/animations/24-hours.json';
   import goldenRetrieverAnimationData from '../public/animations/golden-retriever.json';
+  import coffeeBeansAnimationData from '../public/animations/coffee-beans.json';
 
   const { resetFiltersFeature } = useFilterToggle();
 
@@ -64,6 +65,7 @@
 
   let hoursAnim = null;
   let petAnim = null;
+  let specialtyAnim = null;
 
   // Modify the play animation function to handle active state
   function playAnimation(anim) {
@@ -85,12 +87,13 @@
       
       const hoursContainer = document.getElementById('hours-animate');
       const petContainer = document.getElementById('pet-animate');
+      const specialtyContainer = document.getElementById('specialty-animate');
       
       hoursAnim = lottie.loadAnimation({
         container: hoursContainer,
         renderer: 'svg',
         loop: true,
-        autoplay: props.activeFilters.features.includes('24-hours'), // Start playing if active
+        autoplay: props.activeFilters.features.includes('24-hours'),
         animationData: hoursAnimationData
       });
 
@@ -98,19 +101,24 @@
         container: petContainer,
         renderer: 'svg',
         loop: true,
-        autoplay: props.activeFilters.features.includes('pets-dogs-allowed'), // Start playing if active
+        autoplay: props.activeFilters.features.includes('pets-dogs-allowed'),
         animationData: goldenRetrieverAnimationData
+      });
+
+      specialtyAnim = lottie.loadAnimation({
+        container: specialtyContainer,
+        renderer: 'svg',
+        loop: true,
+        autoplay: props.activeFilters.features.includes('specialty-coffee'),
+        animationData: coffeeBeansAnimationData
       });
     }
   });
 
   onBeforeUnmount(() => {
-    if (hoursAnim) {
-      hoursAnim.destroy();
-    }
-    if (petAnim) {
-      petAnim.destroy();
-    }
+    if (hoursAnim) hoursAnim.destroy();
+    if (petAnim) petAnim.destroy();
+    if (specialtyAnim) specialtyAnim.destroy();
   });
 </script>
 
@@ -191,15 +199,18 @@
             </button>
             <button
               @click="handleFeatureToggle('specialty-coffee')"
+              @mouseenter="playAnimation(specialtyAnim)"
+              @mouseleave="pauseAnimation(specialtyAnim, activeFilters.features.includes('specialty-coffee'))"
               :class="{
                 'text-yellow-500 bg-black border border-yellow-500':
                   activeFilters.features.includes('specialty-coffee'),
                 'text-gray-100 border-gray-400':
                   !activeFilters.features.includes('specialty-coffee'),
               }"
-              class="text-white border border-white mt-2 px-3 sm:px-4 py-1 sm:py-2 rounded-full flex items-center gap-2 text-xs sm:text-base cursor-pointer touch-manipulation"
+              class="text-white border border-white mt-2 px-3 sm:px-4 py-0 sm:py-1 rounded-full flex items-center gap-2 text-xs sm:text-base cursor-pointer touch-manipulation"
             >
-              Specialty | Artisan
+              <span id="specialty-animate" class="w-8 h-8"></span>
+              <span>Specialty | Artisan</span>
             </button>
             <button
               @click="handleFeatureToggle('pets-dogs-allowed')"
