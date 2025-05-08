@@ -1,6 +1,8 @@
 <script setup lang="ts">
-  import { ref, defineProps, defineEmits } from 'vue';
+  import { ref, defineProps, defineEmits, onMounted, onBeforeUnmount } from 'vue';
   import '@fortawesome/fontawesome-free/css/all.css';
+  import hoursAnimationData from '../public/animations/24-hours.json';
+  import goldenRetrieverAnimationData from '../public/animations/golden-retriever.json';
 
   const { resetFiltersFeature } = useFilterToggle();
 
@@ -59,6 +61,43 @@
   async function resetFeatureFilter() {
     await resetFiltersFeature(props.activeFilters);
   }
+
+  let hoursAnim = null;
+  let petAnim = null;
+
+  onMounted(async () => {
+    if (typeof window !== 'undefined') {
+      const lottie = (await import('lottie-web')).default;
+      
+      const hoursContainer = document.getElementById('hours-animate');
+      const petContainer = document.getElementById('pet-animate');
+      
+      hoursAnim = lottie.loadAnimation({
+        container: hoursContainer,
+        renderer: 'svg',
+        loop: true,
+        autoplay: true,
+        animationData: hoursAnimationData
+      });
+
+      petAnim = lottie.loadAnimation({
+        container: petContainer,
+        renderer: 'svg',
+        loop: true,
+        autoplay: true,
+        animationData: goldenRetrieverAnimationData
+      });
+    }
+  });
+
+  onBeforeUnmount(() => {
+    if (hoursAnim) {
+      hoursAnim.destroy();
+    }
+    if (petAnim) {
+      petAnim.destroy();
+    }
+  });
 </script>
 
 <template>
@@ -129,9 +168,10 @@
                 'text-gray-100 border-gray-400':
                   !activeFilters.features.includes('24-hours'),
               }"
-              class="text-white border border-white mt-2 px-3 sm:px-4 py-1 sm:py-2 rounded-full flex items-center gap-2 text-xs sm:text-base cursor-pointer touch-manipulation"
+              class="text-white border border-white mt-2 px-3 sm:px-4 py-0 sm:py-1 rounded-full flex items-center gap-2 text-xs sm:text-base cursor-pointer touch-manipulation"
             >
-              24 hours
+              <span id="hours-animate" class="w-8 h-8"></span>
+              <span>24 hours</span>
             </button>
             <button
               @click="handleFeatureToggle('specialty-coffee')"
@@ -153,9 +193,10 @@
                 'text-gray-100 border-gray-400':
                   !activeFilters.features.includes('pets-dogs-allowed'),
               }"
-              class="text-white border border-white mt-2 px-3 sm:px-4 py-1 sm:py-2 rounded-full flex items-center gap-2 text-xs sm:text-base cursor-pointer touch-manipulation"
+              class="text-white border border-white mt-2 px-3 sm:px-4 py-0 sm:py-1 rounded-full flex items-center gap-2 text-xs sm:text-base cursor-pointer touch-manipulation"
             >
-              Pet Friendly
+              <span id="pet-animate" class="w-8 h-8"></span>
+              <span>Pet Friendly</span>
             </button>
             <button
               @click="handleFeatureToggle('crowd-family-friendly')"
@@ -209,31 +250,6 @@
             >
               Reset Filter
             </button>
-            <!-- <button
-              class="text-white border border-white mt-2 px-3 sm:px-4 py-1 sm:py-2 rounded-full flex items-center gap-2 text-xs sm:text-base cursor-pointer touch-manipulation"
-            >
-              WFC Friendly
-            </button>
-            <button
-              class="text-white border border-white mt-2 px-3 sm:px-4 py-1 sm:py-2 rounded-full flex items-center gap-2 text-xs sm:text-base cursor-pointer touch-manipulation"
-            >
-              24 jam
-            </button>
-            <button
-              class="text-white border border-white mt-2 px-3 sm:px-4 py-1 sm:py-2 rounded-full flex items-center gap-2 text-xs sm:text-base cursor-pointer touch-manipulation"
-            >
-              tempat nongkrong hits
-            </button>
-            <button
-              class="text-white border border-white mt-2 px-3 sm:px-4 py-1 sm:py-2 rounded-full flex items-center gap-2 text-xs sm:text-base cursor-pointer touch-manipulation"
-            >
-              pemandangan
-            </button>
-            <button
-              class="text-white border border-white mt-2 px-3 sm:px-4 py-1 sm:py-2 rounded-full flex items-center gap-2 text-xs sm:text-base cursor-pointer touch-manipulation"
-            >
-              instagramable
-            </button> -->
           </div>
         </div>
       </div>
