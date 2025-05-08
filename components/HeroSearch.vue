@@ -65,6 +65,20 @@
   let hoursAnim = null;
   let petAnim = null;
 
+  // Modify the play animation function to handle active state
+  function playAnimation(anim) {
+    if (anim && anim.isPaused) {
+      anim.play();
+    }
+  }
+
+  // Modify the pause animation function to check for active state
+  function pauseAnimation(anim, isActive = false) {
+    if (anim && !anim.isPaused && !isActive) {
+      anim.pause();
+    }
+  }
+
   onMounted(async () => {
     if (typeof window !== 'undefined') {
       const lottie = (await import('lottie-web')).default;
@@ -76,7 +90,7 @@
         container: hoursContainer,
         renderer: 'svg',
         loop: true,
-        autoplay: true,
+        autoplay: props.activeFilters.features.includes('24-hours'), // Start playing if active
         animationData: hoursAnimationData
       });
 
@@ -84,7 +98,7 @@
         container: petContainer,
         renderer: 'svg',
         loop: true,
-        autoplay: true,
+        autoplay: props.activeFilters.features.includes('pets-dogs-allowed'), // Start playing if active
         animationData: goldenRetrieverAnimationData
       });
     }
@@ -162,6 +176,8 @@
             <!-- Cafe Terbaru filter -->
             <button
               @click="handleFeatureToggle('24-hours')"
+              @mouseenter="playAnimation(hoursAnim)"
+              @mouseleave="pauseAnimation(hoursAnim, activeFilters.features.includes('24-hours'))"
               :class="{
                 'text-yellow-500 bg-black border border-yellow-500':
                   activeFilters.features.includes('24-hours'),
@@ -187,6 +203,8 @@
             </button>
             <button
               @click="handleFeatureToggle('pets-dogs-allowed')"
+              @mouseenter="playAnimation(petAnim)"
+              @mouseleave="pauseAnimation(petAnim, activeFilters.features.includes('pets-dogs-allowed'))"
               :class="{
                 'text-yellow-500 bg-black border border-yellow-500':
                   activeFilters.features.includes('pets-dogs-allowed'),
