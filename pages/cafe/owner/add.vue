@@ -197,17 +197,30 @@
                   </div>
                 </div>
                 <div class="px-4">
-                  <div class="flex flex-col space-y-2 mb-8">
+                  <div class="mb-8">
                     <label for="logo">Logo Cafe:</label>
-                    <input
-                      type="file"
-                      :class="{ 'input-error': hasError('logo') }"
-                      id="logo"
-                      name="logo"
-                      accept="image/*"
-                      required
-                      @change="handleLogoUpload"
-                    />
+                    <div class="mt-2 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg">
+                      <div class="space-y-1 text-center">
+                        <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                          <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                        <div class="flex items-center flex-col text-sm text-gray-600">
+                          <label for="logo" class="relative cursor-pointer rounded font-medium text-gray-800 hover:text-gray-500 ">
+                            <span>Upload a file</span>
+                            <input 
+                              type="file" 
+                              id="logo" 
+                              name="logo"
+                              accept="image/*"
+                              required
+                              @change="handleLogoUpload"
+                              class="sr-only"
+                            />
+                          </label>
+                        </div>
+                        <p class="text-xs text-gray-500">JPG, JPEG, PNG and WEBP up to 5MB</p>
+                      </div>
+                    </div>
                     <span v-if="hasError('logo')" class="text-red-500 text-sm">
                       {{ formErrors.logo.join(', ') }}
                     </span>
@@ -221,70 +234,62 @@
                         />
                         <button
                           @click="removeLogo"
-                          class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center"
+                          class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center"
                           type="button"
                         >
                           ×
                         </button>
                       </div>
                     </div>
-
-                    <p class="text-gray-500 text-sm mt-1">
-                      <strong>Note:</strong> Logo akan ditampilkan di halaman
-                      utama cafe. Format yang didukung: JPG atau PNG. Ukuran
-                      maksimal: 5MB.
-                    </p>
                   </div>
                   <div class="flex flex-col space-y-2 mb-8">
-                    <label for="cafeImage">Gambar Cafe:</label>
-                    <input
-                      type="file"
-                      id="cafeImage"
-                      name="cafeImage"
-                      accept="image/*"
-                      multiple
-                      @change="handleImageUpload"
-                    />
+                    <label for="cafeImage">Photo Cafe:</label>
+                    <div class="mt-2 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg">
+                      <div class="space-y-1 text-center">
+                        <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                          <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                        <div class="flex flex-col items-center text-sm text-gray-600">
+                          <label for="cafeImage" class="relative cursor-pointer rounded-md font-medium text-gray-800 hover:text-gray-500 ">
+                            <span>Upload files</span>
+                            <input
+                              type="file"
+                              id="cafeImage"
+                              name="cafeImage"
+                              accept="image/*"
+                              multiple
+                              @change="handleImageUpload"
+                              class="sr-only"
+                            />
+                          </label>
+                        </div>
+                        <p class="text-xs text-gray-500">JPG, JPEG, PNG and WEBP up to 20MB</p>
+                      </div>
+                    </div>
 
                     <!-- Display validation errors -->
-                    <div
-                      v-if="imageErrors.length > 0"
-                      class="text-red-500 text-sm mt-2"
-                    >
+                    <div v-if="imageErrors.length > 0" class="text-red-500 text-sm mt-2">
                       <p v-for="(error, index) in imageErrors" :key="index">
                         {{ error }}
                       </p>
                     </div>
 
                     <!-- Image preview section -->
-                    <div
-                      v-if="imagePreviews.length > 0"
-                      class="mt-4 grid grid-cols-2 sm:grid-cols-3 gap-4"
-                    >
-                      <div
-                        v-for="(preview, index) in imagePreviews"
-                        :key="index"
-                        class="relative"
-                      >
+                    <div v-if="imagePreviews.length > 0" class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                      <div v-for="(preview, index) in imagePreviews" :key="index" class="relative">
                         <img
                           :src="preview"
                           class="w-full h-32 object-cover rounded-lg"
                         />
                         <button
                           @click="removeImage(index)"
-                          class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center"
+                          class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center"
                           type="button"
                         >
                           ×
                         </button>
                       </div>
                     </div>
-
-                    <p class="text-gray-500 text-sm mt-1">
-                      <strong>Note:</strong> Upload beberapa foto yang menarik.
-                      Format yang didukung: JPG atau PNG. Ukuran maksimal per
-                      file: 5MB. (Maksimal {{ maxImageCount }} gambar)
-                    </p>
                   </div>
 
                   <div class="mb-8">
