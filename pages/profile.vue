@@ -6,8 +6,8 @@
         <button class="logout-button" @click="handleLogout">Logout</button>
       </div>
   
-      {{ userData }}
-      awal{{ avatarUrl }}akhir
+      <!-- {{ userData }}
+      awal{{ avatarUrl }}akhir -->
       <div class="profile-content">
         <div class="avatar-section">
           <div class="avatar-container">

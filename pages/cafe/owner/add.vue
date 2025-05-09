@@ -121,7 +121,7 @@
                   </div>
 
                   <div class="mb-8">
-                    <label for="state">Provinsi/Kota Besar:</label>
+                    <label for="state">Provinsi / Kota Besar:</label>
                     <select
                       class="input-base"
                       :class="{ 'input-error': hasError('state') }"
@@ -150,7 +150,7 @@
                   <!-- Replace the city select -->
                   <div class="flex flex-col sm:flex-row gap-2">
                     <div class="mb-8 w-3/4">
-                      <label for="city">Kota/Kabupaten:</label>
+                      <label for="city">Kota / Kabupaten:</label>
                       <select
                         class="input-base"
                         :class="{ 'input-error': hasError('city') }"
@@ -178,11 +178,9 @@
                       </span>
                     </div>
 
-                    <!-- Keep the postal code as is -->
-                    <div class="mb-8">
+                    <!-- <div class="mb-8">
                       <label for="postal_code">Kode Pos:</label>
-                      <!-- ... existing postal code input ... -->
-                    </div>
+                    </div> -->
                   </div>
                   <div class="mb-8">
                     <label for="">location_link:</label>
@@ -460,7 +458,7 @@
               </div>
             </form>
             <div class="flex justify-center sm:justify-end px-8 mt-8">
-              hasAnyErrors:{{ hasAnyErrors() }} isSubmitting:{{ isSubmitting }}
+              <!-- hasAnyErrors:{{ hasAnyErrors() }} isSubmitting:{{ isSubmitting }} -->
               <button
                 class="text-black font-semibold border border-black px-4 py-2 rounded-full relative"
                 type="submit"
@@ -1129,49 +1127,25 @@
 </script>
 
 <style scoped>
-  .input-base {
-    margin-top: 0.5rem;
-    padding-left: 0.5rem;
-    padding-top: 0.25rem;
-    padding-bottom: 0.25rem;
-    border: 1px solid;
-    border-radius: 0.125rem;
-    background-color: rgb(249 250 251);
-    border-color: rgb(209 213 219);
-    transition-property: all;
-    transition-duration: 200ms;
-    outline: none;
-    width: 100%;
+.input-base {
+  @apply mt-2 pl-2 py-1 border border-gray-300 rounded bg-gray-50 w-full outline-none transition-all duration-200;
+
+  &:hover {
+    @apply border-gray-400;
   }
 
-  .input-base:hover {
-    border-color: rgb(156 163 175);
+  &:focus {
+    @apply bg-white border-blue-500 ring-2 ring-blue-200;
   }
+}
 
-  .input-base:focus {
-    background-color: white;
-    border-color: rgb(59 130 246);
-    --tw-ring-opacity: 1;
-    --tw-ring-color: rgb(191 219 254 / var(--tw-ring-opacity));
-    --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0
-      var(--tw-ring-offset-width) var(--tw-ring-offset-color);
-    --tw-ring-shadow: var(--tw-ring-inset) 0 0 0
-      calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);
-    box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow),
-      var(--tw-shadow, 0 0 #0000);
-  }
+.input-error {
+  @apply border-red-500 bg-red-50;
+}
 
-  .input-error {
-    border-color: rgb(239 68 68);
-    background-color: rgb(254 242 242);
-  }
-
-  select.input-base {
-    appearance: none;
-    background-repeat: no-repeat;
-    background-position: right;
-    padding-right: 2rem;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
-    background-size: 1.5em;
-  }
+select.input-base {
+  @apply appearance-none bg-no-repeat bg-right pr-8;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+  background-size: 1.5em;
+}
 </style>
