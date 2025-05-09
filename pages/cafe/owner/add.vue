@@ -197,14 +197,14 @@
                       @input="validateOnChangeForm"
                     />
                     <p class="text-gray-500 text-sm mt-2">Masukan tautan URL (URL link) dari Google Business anda disini (diawalin dengan: <span class="font-semibold text-gray-700">https://maps.app.goo.gl/</span>)</p>
-                    <div class="mt-2 border border-gray-300 rounded-md px-3 py-2">
-                      <p class="text-gray-500 text-sm">Click untuk panduan cara menemukan Google location_link anda</p> 
+                    <div class="flex flex-col items-center mt-2 border bg-gray-100 border-gray-300 rounded-md px-3 py-2">
+                      <p class="text-gray-500 text-sm ">Click untuk panduan cara menemukan Google location_link anda</p> 
                       <button 
                         @click="showPopup = true" 
                         type="button"
-                        class="text-sm rounded border border-gray-400 mt-2 px-3 py-2"
+                        class="text-sm rounded-lg border border-gray-400 mt-3 text-gray-500 px-3 py-2"
                       >
-                        Click untuk panduan
+                        Cara mendapatkan Google location_link
                       </button>
                       <div v-if="showPopup" class="popup" @click.self="showPopup = false">
                         <div class="popup-content">
@@ -1193,9 +1193,10 @@ select.input-base {
   position: relative;
   background-color: #fff;
   padding: 20px;
-  max-width: 600px;
-  width: 90%;
+  max-width: 900px; /* Increased from 600px */
+  width: 95%; /* Increased from 90% */
   border-radius: 5px;
+  margin: 20px; /* Added to ensure some spacing on very small screens */
 }
 
 .close-btn {
@@ -1216,5 +1217,6 @@ select.input-base {
 .popup-content img {
   width: 100%;
   height: auto;
+  object-fit: contain; /* This ensures the image maintains its aspect ratio */
 }
 </style>
