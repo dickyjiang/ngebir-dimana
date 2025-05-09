@@ -1,8 +1,15 @@
 <template>
-  <div class="login-container">
-    <div class="login-card">
-      <h1 class="title">Welcome Back</h1>
+  <div class="login-container bg-gray-800 min-h-full flex items-center justify-center relative">
+    <img
+      class="absolute object-cover object-center w-full h-full"
+      src="/src/assets/img/hero.webp"
+      alt="hero image"
+    />
+    <div class="absolute inset-0 bg-black opacity-60 z-[1]"></div>
+    <div class="login-card z-[2]">
+      <h1 class="title">Selamat datang {user}</h1>
       <p class="subtitle">Sign in to your account</p>
+      
 
       <div class="auth-buttons">
         <button
@@ -16,7 +23,10 @@
           />
           {{ loading ? 'Signing in...' : 'Sign in with Google' }}
         </button>
+        
       </div>
+      <!-- @budi link to signup -->
+      <p class=" mt-8">Belum punya account? <span>Sign up</span></p>
     </div>
   </div>
 </template>
@@ -52,11 +62,16 @@
 
 <style scoped>
   .login-container {
+    min-height: 80vh;
+    padding: 1rem;
+    overflow: hidden;
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 80vh;
-    padding: 1rem;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    position: relative;
   }
 
   .login-card {
@@ -67,6 +82,8 @@
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     text-align: center;
+    position: relative;
+    z-index: 2;
   }
 
   .title {
@@ -115,5 +132,21 @@
   .google-button img {
     width: 20px;
     height: 20px;
+  }
+
+  .login-container > img {
+    position: absolute;
+    object-fit: cover;
+    object-position: center;
+    width: 100%;
+    height: 100%;
+  }
+
+  .login-container .bg-black {
+    position: absolute;
+    inset: 0;
+    background-color: black;
+    opacity: 0.6;
+    z-index: 1;
   }
 </style>
