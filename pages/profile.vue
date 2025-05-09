@@ -1,85 +1,87 @@
 <template>
-  <div class="profile-container" v-if="user">
-    <div class="profile-header">
-      <h1>Your Profile</h1>
-      <button class="logout-button" @click="handleLogout">Logout</button>
-    </div>
-
-    {{ userData }}
-    awal{{ avatarUrl }}akhir
-    <div class="profile-content">
-      <div class="avatar-section">
-        <div class="avatar-container">
-          <img
-            v-if="avatarUrl"
-            :src="avatarUrl"
-            alt="Avatar"
-            class="avatar-image"
-          />
-          <div v-else class="avatar-placeholder">
-            {{ user.email ? user.email.charAt(0).toUpperCase() : '?' }}
-          </div>
-          <div class="avatar-overlay" @click="selectFile">
-            <span>Change</span>
-          </div>
-        </div>
-        <input
-          type="file"
-          ref="fileInput"
-          accept="image/*"
-          class="hidden"
-          @change="uploadAvatar"
-        />
-        <p v-if="uploading" class="uploading-text">Uploading...</p>
+  <div class="bg-gray-100 min-h-screen py-8">
+    <div class="max-w-4xl mx-auto py-8 px-10 rounded-2xl bg-white" v-if="user">
+      <div class="profile-header">
+        <h1>Your Profile</h1>
+        <button class="logout-button" @click="handleLogout">Logout</button>
       </div>
-
-      <div class="profile-form">
-        <div class="form-group">
-          <label for="name">Full Name</label>
+  
+      {{ userData }}
+      awal{{ avatarUrl }}akhir
+      <div class="profile-content">
+        <div class="avatar-section">
+          <div class="avatar-container">
+            <img
+              v-if="avatarUrl"
+              :src="avatarUrl"
+              alt="Avatar"
+              class="avatar-image"
+            />
+            <div v-else class="avatar-placeholder">
+              {{ user.email ? user.email.charAt(0).toUpperCase() : '?' }}
+            </div>
+            <div class="avatar-overlay" @click="selectFile">
+              <span>Change</span>
+            </div>
+          </div>
           <input
-            type="text"
-            id="name"
-            v-model="userData.name"
-            placeholder="Your name"
+            type="file"
+            ref="fileInput"
+            accept="image/*"
+            class="hidden"
+            @change="uploadAvatar"
           />
+          <p v-if="uploading" class="uploading-text">Uploading...</p>
         </div>
-        <img
-          src="https://lh3.googleusercontent.com/a/ACg8ocKgHHXX8mLRoTkYeFWAM4Vje-HSVruXxc3FVZXIZrHE0JWyJprL2A=s96-c"
-          alt="Profile"
-          class="profile-image"
-        />
-        {{ userData.avatarUrl }}
-        <NuxtImg
-          src="https://lh3.googleusercontent.com/a/ACg8ocKgHHXX8mLRoTkYeFWAM4Vje-HSVruXxc3FVZXIZrHE0JWyJprL2A=s96-c"
-          alt="Profile"
-          class="profile-image"
-        />
-        <NuxtImg
-          src="https://lh3.googleusercontent.com/p/AF1QipPuOYWgYIRfozMaeuqCalZKFeIxEhL13BAOtx7P=w800-h500-k-no"
-        />
-        <div class="form-group">
-          <label for="email">Email</label>
-          <input type="email" id="email" :value="user.email" disabled />
+  
+        <div class="profile-form">
+          <div class="form-group">
+            <label for="name">Full Name</label>
+            <input
+              type="text"
+              id="name"
+              v-model="userData.name"
+              placeholder="Your name"
+            />
+          </div>
+          <img
+            src="https://lh3.googleusercontent.com/a/ACg8ocKgHHXX8mLRoTkYeFWAM4Vje-HSVruXxc3FVZXIZrHE0JWyJprL2A=s96-c"
+            alt="Profile"
+            class="profile-image"
+          />
+          {{ userData.avatarUrl }}
+          <NuxtImg
+            src="https://lh3.googleusercontent.com/a/ACg8ocKgHHXX8mLRoTkYeFWAM4Vje-HSVruXxc3FVZXIZrHE0JWyJprL2A=s96-c"
+            alt="Profile"
+            class="profile-image"
+          />
+          <NuxtImg
+            src="https://lh3.googleusercontent.com/p/AF1QipPuOYWgYIRfozMaeuqCalZKFeIxEhL13BAOtx7P=w800-h500-k-no"
+          />
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" :value="user.email" disabled />
+          </div>
+  
+          <div class="form-group">
+            <label for="bio">Bio</label>
+            <textarea
+              id="bio"
+              v-model="userData.bio"
+              placeholder="Tell us about yourself"
+              rows="4"
+            ></textarea>
+          </div>
+  
+          <button class="save-button" @click="updateProfile" :disabled="saving">
+            {{ saving ? 'Saving...' : 'Save Changes' }}
+          </button>
         </div>
-
-        <div class="form-group">
-          <label for="bio">Bio</label>
-          <textarea
-            id="bio"
-            v-model="userData.bio"
-            placeholder="Tell us about yourself"
-            rows="4"
-          ></textarea>
-        </div>
-
-        <button class="save-button" @click="updateProfile" :disabled="saving">
-          {{ saving ? 'Saving...' : 'Save Changes' }}
-        </button>
       </div>
     </div>
-  </div>
-  <div v-else class="loading-container">
-    <p>Loading profile...</p>
+    <div v-else class="loading-container">
+      <p>Loading profile...</p>
+    </div>
   </div>
 </template>
 
