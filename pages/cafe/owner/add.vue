@@ -119,68 +119,70 @@
                       {{ formErrors.phone.join(', ') }}
                     </span>
                   </div>
-
-                  <div class="mb-8">
-                    <label for="state">Provinsi / Kota Besar:</label>
-                    <select
-                      class="input-base"
-                      :class="{ 'input-error': hasError('state') }"
-                      id="state"
-                      name="state"
-                      v-model="selectedParentCity"
-                      @change="validateOnChangeForm"
-                      required
-                    >
-                      <option value="" disabled>
-                        Pilih Provinsi/Kota Besar
-                      </option>
-                      <option
-                        v-for="city in parentCities"
-                        :key="city.city_slug"
-                        :value="city.city_slug"
-                      >
-                        {{ city.city_name }}
-                      </option>
-                    </select>
-                    <span v-if="hasError('state')" class="text-red-500 text-sm">
-                      {{ formErrors.state.join(', ') }}
-                    </span>
-                  </div>
-
-                  <!-- Replace the city select -->
-                  <div class="flex flex-col sm:flex-row gap-2">
-                    <div class="mb-8 w-3/4">
-                      <label for="city">Kota / Kabupaten:</label>
+                  <div class="flex gap-4">
+                    <div class="mb-8">
+                      <label for="state">Provinsi / Kota Besar:</label>
                       <select
                         class="input-base"
-                        :class="{ 'input-error': hasError('city') }"
-                        id="city"
-                        name="city"
-                        v-model="selectedChildCity"
-                        required
+                        :class="{ 'input-error': hasError('state') }"
+                        id="state"
+                        name="state"
+                        v-model="selectedParentCity"
                         @change="validateOnChangeForm"
-                        :disabled="!selectedParentCity"
+                        required
                       >
-                        <option value="" disabled>Pilih Kota/Kabupaten</option>
+                        <option value="" disabled>
+                          Pilih Provinsi/Kota Besar
+                        </option>
                         <option
-                          v-for="city in availableChildCities"
+                          v-for="city in parentCities"
                           :key="city.city_slug"
                           :value="city.city_slug"
                         >
                           {{ city.city_name }}
                         </option>
                       </select>
-                      <span
-                        v-if="hasError('city')"
-                        class="text-red-500 text-sm"
-                      >
-                        {{ formErrors.city.join(', ') }}
+                      <span v-if="hasError('state')" class="text-red-500 text-sm">
+                        {{ formErrors.state.join(', ') }}
                       </span>
                     </div>
+  
+                    <!-- Replace the city select -->
+                    <div class="flex flex-col sm:flex-row gap-2">
+                      <div class="mb-8">
+                        <label for="city">Kota / Kabupaten:</label>
+                        <select
+                          class="input-base"
+                          :class="{ 'input-error': hasError('city') }"
+                          id="city"
+                          name="city"
+                          v-model="selectedChildCity"
+                          required
+                          @change="validateOnChangeForm"
+                          :disabled="!selectedParentCity"
+                        >
+                          <option value="" disabled>Pilih Kota/Kabupaten</option>
+                          <option
+                            v-for="city in availableChildCities"
+                            :key="city.city_slug"
+                            :value="city.city_slug"
+                          >
+                            {{ city.city_name }}
+                          </option>
+                        </select>
+                        <span
+                          v-if="hasError('city')"
+                          class="text-red-500 text-sm"
+                        >
+                          {{ formErrors.city.join(', ') }}
+                        </span>
+                      </div>
+  
+                      <!-- <div class="mb-8">
+                        <label for="postal_code">Kode Pos:</label>
+                      </div> -->
+                    </div>
 
-                    <!-- <div class="mb-8">
-                      <label for="postal_code">Kode Pos:</label>
-                    </div> -->
                   </div>
                   <div class="mb-8">
                     <label for="">location_link:</label>
@@ -194,6 +196,23 @@
                       required
                       @input="validateOnChangeForm"
                     />
+                    <p class="text-gray-500 text-sm mt-2">Masukan tautan URL (URL link) dari Google Business anda disini (diawalin dengan: <span class="font-semibold text-gray-700">https://maps.app.goo.gl/</span>)</p>
+                    <div class="mt-2 border border-gray-300 rounded-md px-3 py-2">
+                      <p class="text-gray-500 text-sm">Click untuk panduan cara menemukan Google location_link anda</p> 
+                      <button 
+                        @click="showPopup = true" 
+                        type="button"
+                        class="text-sm rounded border border-gray-400 mt-2 px-3 py-2"
+                      >
+                        Click untuk panduan
+                      </button>
+                      <div v-if="showPopup" class="popup" @click.self="showPopup = false">
+                        <div class="popup-content">
+                          <span class="close-btn" @click="showPopup = false">&times;</span>
+                          <img src="/public/img/tutorial_location_link.png" alt="Tutorial Location" />
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
                 <div class="px-4">
@@ -292,10 +311,10 @@
                     </div>
                   </div>
 
-                  <div class="mb-8">
+                  <div class="mb-10">
                     <label for="features">Features:</label>
-                    <div class="relative">
-                      <div class="hs-dropdown relative w-full">
+                    <div class="relative mt-2">
+                      <div class="hs-dropdown  relative w-full">
                         <div
                           class="flex flex-wrap items-center border border-gray-300 rounded-md p-2 bg-white"
                         >
@@ -386,9 +405,8 @@
                       </div>
                     </div>
 
-                    <p class="text-gray-500 text-sm mt-1">
-                      <strong>Note:</strong> Select all features that your cafe
-                      offers.
+                    <p class="text-gray-500 text-sm mt-2">
+                      <strong>Note:</strong> Pilih semua fitur yang sesuai dengan café anda.
                     </p>
                   </div>
 
@@ -1129,6 +1147,9 @@
       });
     }
   };
+
+  // Add this with your other refs in the script section
+  const showPopup = ref(false);
 </script>
 
 <style scoped>
@@ -1152,5 +1173,48 @@ select.input-base {
   @apply appearance-none bg-no-repeat bg-right pr-8;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
   background-size: 1.5em;
+}
+
+/* Add this to your CSS */
+.popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.popup-content {
+  position: relative;
+  background-color: #fff;
+  padding: 20px;
+  max-width: 600px;
+  width: 90%;
+  border-radius: 5px;
+}
+
+.close-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 24px;
+  cursor: pointer;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f3f4f6;
+  border-radius: 50%;
+}
+
+.popup-content img {
+  width: 100%;
+  height: auto;
 }
 </style>
