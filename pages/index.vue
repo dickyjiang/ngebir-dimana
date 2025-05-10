@@ -43,7 +43,7 @@
   const loadingNewCafes = ref(false);
 
   const currentPage = ref(1);
-  const itemsPerPage = 12;
+  const itemsPerPage = 24;
   const searchQuery = ref('');
 
   // Initialize filter options with empty arrays
@@ -347,6 +347,7 @@
         :itemsPerPage="itemsPerPage"
         :currentPage="currentPage"
         :totalPages="totalPages"
+        :bannerPosition="12" Add this prop to specify banner position
         @page-change="changePage"
       />
     </div>
