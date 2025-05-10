@@ -1,6 +1,9 @@
 <script setup lang="ts">
-  import { ref, defineProps, defineEmits } from 'vue';
+  import { ref, defineProps, defineEmits, onMounted, onBeforeUnmount } from 'vue';
   import '@fortawesome/fontawesome-free/css/all.css';
+  import hoursAnimationData from '../public/animations/24-hours.json';
+  import goldenRetrieverAnimationData from '../public/animations/golden-retriever.json';
+  import coffeeBeansAnimationData from '../public/animations/coffee-beans.json';
 
   const { resetFiltersFeature } = useFilterToggle();
 
@@ -59,6 +62,64 @@
   async function resetFeatureFilter() {
     await resetFiltersFeature(props.activeFilters);
   }
+
+  let hoursAnim = null;
+  let petAnim = null;
+  let specialtyAnim = null;
+
+  // Modify the play animation function to handle active state
+  function playAnimation(anim) {
+    if (anim && anim.isPaused) {
+      anim.play();
+    }
+  }
+
+  // Modify the pause animation function to check for active state
+  function pauseAnimation(anim, isActive = false) {
+    if (anim && !anim.isPaused && !isActive) {
+      anim.pause();
+    }
+  }
+
+  onMounted(async () => {
+    if (typeof window !== 'undefined') {
+      const lottie = (await import('lottie-web')).default;
+      
+      const hoursContainer = document.getElementById('hours-animate');
+      const petContainer = document.getElementById('pet-animate');
+      const specialtyContainer = document.getElementById('specialty-animate');
+      
+      hoursAnim = lottie.loadAnimation({
+        container: hoursContainer,
+        renderer: 'svg',
+        loop: true,
+        autoplay: props.activeFilters.features.includes('24-hours'),
+        animationData: hoursAnimationData
+      });
+
+      petAnim = lottie.loadAnimation({
+        container: petContainer,
+        renderer: 'svg',
+        loop: true,
+        autoplay: props.activeFilters.features.includes('pets-dogs-allowed'),
+        animationData: goldenRetrieverAnimationData
+      });
+
+      specialtyAnim = lottie.loadAnimation({
+        container: specialtyContainer,
+        renderer: 'svg',
+        loop: true,
+        autoplay: props.activeFilters.features.includes('specialty-coffee'),
+        animationData: coffeeBeansAnimationData
+      });
+    }
+  });
+
+  onBeforeUnmount(() => {
+    if (hoursAnim) hoursAnim.destroy();
+    if (petAnim) petAnim.destroy();
+    if (specialtyAnim) specialtyAnim.destroy();
+  });
 </script>
 
 <template>
@@ -122,16 +183,49 @@
             </button>
             <!-- Cafe Terbaru filter -->
             <button
+              @click="handleFeatureToggle('24-hours')"
+              @mouseenter="playAnimation(hoursAnim)"
+              @mouseleave="pauseAnimation(hoursAnim, activeFilters.features.includes('24-hours'))"
+              :class="{
+                'text-yellow-500 bg-black border border-yellow-500':
+                  activeFilters.features.includes('24-hours'),
+                'text-gray-100 border-gray-400':
+                  !activeFilters.features.includes('24-hours'),
+              }"
+              class="text-white border border-white mt-2 px-3 sm:px-4 py-0 sm:py-1 rounded-full flex items-center gap-2 text-xs sm:text-base cursor-pointer touch-manipulation"
+            >
+              <span id="hours-animate" class="w-8 h-8"></span>
+              <span>24 hours</span>
+            </button>
+            <button
+              @click="handleFeatureToggle('specialty-coffee')"
+              @mouseenter="playAnimation(specialtyAnim)"
+              @mouseleave="pauseAnimation(specialtyAnim, activeFilters.features.includes('specialty-coffee'))"
+              :class="{
+                'text-yellow-500 bg-black border border-yellow-500':
+                  activeFilters.features.includes('specialty-coffee'),
+                'text-gray-100 border-gray-400':
+                  !activeFilters.features.includes('specialty-coffee'),
+              }"
+              class="text-white border border-white mt-2 px-3 sm:px-4 py-0 sm:py-1 rounded-full flex items-center gap-2 text-xs sm:text-base cursor-pointer touch-manipulation"
+            >
+              <span id="specialty-animate" class="w-8 h-8"></span>
+              <span>Specialty | Artisan</span>
+            </button>
+            <button
               @click="handleFeatureToggle('pets-dogs-allowed')"
+              @mouseenter="playAnimation(petAnim)"
+              @mouseleave="pauseAnimation(petAnim, activeFilters.features.includes('pets-dogs-allowed'))"
               :class="{
                 'text-yellow-500 bg-black border border-yellow-500':
                   activeFilters.features.includes('pets-dogs-allowed'),
                 'text-gray-100 border-gray-400':
                   !activeFilters.features.includes('pets-dogs-allowed'),
               }"
-              class="text-white border border-white mt-2 px-3 sm:px-4 py-1 sm:py-2 rounded-full flex items-center gap-2 text-xs sm:text-base cursor-pointer touch-manipulation"
+              class="text-white border border-white mt-2 px-3 sm:px-4 py-0 sm:py-1 rounded-full flex items-center gap-2 text-xs sm:text-base cursor-pointer touch-manipulation"
             >
-              Pet Friendly
+              <span id="pet-animate" class="w-8 h-8"></span>
+              <span>Pet Friendly</span>
             </button>
             <button
               @click="handleFeatureToggle('crowd-family-friendly')"
@@ -185,31 +279,6 @@
             >
               Reset Filter
             </button>
-            <!-- <button
-              class="text-white border border-white mt-2 px-3 sm:px-4 py-1 sm:py-2 rounded-full flex items-center gap-2 text-xs sm:text-base cursor-pointer touch-manipulation"
-            >
-              WFC Friendly
-            </button>
-            <button
-              class="text-white border border-white mt-2 px-3 sm:px-4 py-1 sm:py-2 rounded-full flex items-center gap-2 text-xs sm:text-base cursor-pointer touch-manipulation"
-            >
-              24 jam
-            </button>
-            <button
-              class="text-white border border-white mt-2 px-3 sm:px-4 py-1 sm:py-2 rounded-full flex items-center gap-2 text-xs sm:text-base cursor-pointer touch-manipulation"
-            >
-              tempat nongkrong hits
-            </button>
-            <button
-              class="text-white border border-white mt-2 px-3 sm:px-4 py-1 sm:py-2 rounded-full flex items-center gap-2 text-xs sm:text-base cursor-pointer touch-manipulation"
-            >
-              pemandangan
-            </button>
-            <button
-              class="text-white border border-white mt-2 px-3 sm:px-4 py-1 sm:py-2 rounded-full flex items-center gap-2 text-xs sm:text-base cursor-pointer touch-manipulation"
-            >
-              instagramable
-            </button> -->
           </div>
         </div>
       </div>
