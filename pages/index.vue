@@ -347,7 +347,7 @@
         :itemsPerPage="itemsPerPage"
         :currentPage="currentPage"
         :totalPages="totalPages"
-        :bannerPosition="12" Add this prop to specify banner position
+        :bannerPosition="12" 
         @page-change="changePage"
       />
     </div>
