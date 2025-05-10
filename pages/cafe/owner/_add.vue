@@ -230,10 +230,10 @@
                           <span class="close-btn" @click="showPopup = false"
                             >&times;</span
                           >
-                          <!-- <img
+                          <img
                             src="/public/img/tutorial_location_link.png"
                             alt="Tutorial Location"
-                          /> -->
+                          />
                         </div>
                       </div>
                     </div>
