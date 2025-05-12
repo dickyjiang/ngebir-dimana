@@ -63,13 +63,11 @@
   <div ref="listContainer">
     <div
       v-if="loading"
-      class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3"
-    >
+      class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
       <div
         v-for="n in itemsPerPage"
         :key="n"
-        class="rounded-md flex flex-col h-full pb-4 border overflow-hidden"
-      >
+        class="rounded-md flex flex-col h-full pb-4 border overflow-hidden">
         <div class="skeleton skeleton-image"></div>
         <div class="flex-1 flex-col px-4">
           <div class="skeleton skeleton-text"></div>

@@ -18,6 +18,41 @@
                 <div
                   class="border-b sm:border-b-0 border-r-0 sm:border-r border-gray-300 px-4"
                 >
+                    <div class="mb-8">
+                    <label class="block mb-2">Jenis usaha: <span class="text-sm text-gray-400">(Pilih semua yang sesuai)</span></label>
+                    <div class="space-y-2">
+                      <label class="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        v-model="businessTypes"
+                        value="cafe"
+                        class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                      />
+                      <span>Cafe</span>
+                      </label>
+                      <label class="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        v-model="businessTypes"
+                        value="roastery"
+                        class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                      />
+                      <span>Roastery</span>
+                      </label>
+                      <label class="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        v-model="businessTypes"
+                        value="supplier"
+                        class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                      />
+                      <span>Supplier Alat-alat</span>
+                      </label>
+                    </div>
+                    <!-- <span v-if="hasError('businessTypes')" class="text-red-500 text-sm">
+                      {{ formErrors.businessTypes?.join(', ') }}
+                    </span> -->
+                    </div>
                   <div class="mb-8">
                     <label for="cafeName">Nama Cafe:</label>
                     <input
@@ -36,11 +71,6 @@
                     >
                       {{ formErrors.cafeName.join(', ') }}
                     </span>
-                    <p class="text-gray-500 text-sm mt-1">
-                      <strong>Note:</strong> Ini adalah nama cafe Anda. Pastikan
-                      Nama cafe yang akan ditampilkan di aplikasi. Pastikan nama
-                      ini sesuai dengan nama cafe Anda.
-                    </p>
                   </div>
                   <div class="mb-8">
                     <label for="street">Alamat Cafe:</label>
@@ -77,9 +107,7 @@
                       {{ formErrors.description.join(', ') }}
                     </span>
                     <p class="text-gray-500 text-sm mt-1">
-                      <strong>Note:</strong> Ini adalah deskripsi cafe Anda.
-                      Pastikan deskripsi yang akan ditampilkan di aplikasi.
-                      Pastikan deskripsi ini sesuai dengan deskripsi cafe Anda.
+                      <strong>Note:</strong> Pastikan deskripsi ini sesuai dengan deskripsi cafe Anda.
                     </p>
                   </div>
                   <div class="mb-8">
@@ -184,7 +212,7 @@
                     </div>
 
                   </div>
-                  <div class="mb-8">
+                  <div class="mb-8 p-4 border border-gray-300 rounded-md">
                     <label for="">location_link:</label>
                     <input
                       class="input-base"
@@ -196,13 +224,12 @@
                       required
                       @input="validateOnChangeForm"
                     />
-                    <p class="text-gray-500 text-sm mt-2">Masukan tautan URL (URL link) dari Google Business anda disini (diawalin dengan: <span class="font-semibold text-gray-700">https://maps.app.goo.gl/</span>)</p>
-                    <div class="flex flex-col items-center mt-2 border bg-gray-100 border-gray-300 rounded-md px-3 py-2">
-                      <p class="text-gray-500 text-sm ">Click untuk panduan cara menemukan Google location_link anda</p> 
+                    <p class="text-gray-500 text-sm mt-2 text-center">Masukan tautan URL (URL link) dari Google Business anda disini (diawalin dengan: <span class="font-semibold text-gray-700">https://maps.app.goo.gl/</span>) Click button di bawah untuk panduan cara menemukan Google location_link anda</p>
+                    <div class="flex flex-col items-center  justify-center">
                       <button 
                         @click="showPopup = true" 
                         type="button"
-                        class="text-sm rounded-lg border border-gray-400 mt-3 text-gray-500 px-3 py-2"
+                        class="text-sm rounded-lg border bg-gray-100 border-gray-400 mt-3 text-gray-500 px-3 py-2 hover:bg-gray-200 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
                       >
                         Cara mendapatkan Google location_link
                       </button>
@@ -522,7 +549,7 @@
           </div>
         </div>
       </section>
-      <section>
+      <!-- <section>
         <div class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-8">
           <h2>Customer Feedback</h2>
           <p>View and respond to customer feedback.</p>
@@ -543,7 +570,7 @@
             <li>Average Rating: 4.5/5</li>
           </ul>
         </div>
-      </section>
+      </section> -->
     </div>
   </div>
 </template>

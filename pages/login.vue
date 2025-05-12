@@ -7,8 +7,8 @@
     />
     <div class="absolute inset-0 bg-black opacity-60 z-[1]"></div>
     <div class="login-card z-[2]">
-      <h1 class="title">Selamat datang {user}</h1>
-      <p class="subtitle">Sign in to your account</p>
+      <h1 class="title">Selamat datang</h1>
+      <p class="subtitle">Masuk ke akun anda</p>
       
 
       <div class="auth-buttons">
@@ -26,7 +26,7 @@
         
       </div>
       <!-- @budi link to signup -->
-      <p class=" mt-8">Belum punya account? <span>Sign up</span></p>
+      <p class=" mt-8">Belum punya akun? <span>Sign up</span></p>
     </div>
   </div>
 </template>
