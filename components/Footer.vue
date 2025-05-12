@@ -6,11 +6,12 @@
         </div>
         <div>
           <p class="text-gray-500 px-7 text-sm text-center sm:text-left">
-            ©2025 ISUKJADI All rights reserved | email: <span><a href="mailto:dicky@dickyjiang.com">SI DIKKI</a></span> atau <span><a href="mailto:budi@avasoft.co">SI BUDI</a></span>
+            ©2025 ISUKJADI All rights reserved | email: <span><a href="mailto:dicky@dickyjiang.com">si DIKKI</a></span> atau <span><a href="mailto:budi@avasoft.co">si BUDI</a></span>
           </p>
         </div>
-        <div>
+        <div class="flex gap-4">
             <NuxtLink to="/privacy-policy" class="text-gray-500 hover:text-gray-400">Privacy Policy</NuxtLink>
+            <NuxtLink to="/about-us" class="text-gray-500 hover:text-gray-400">About Us</NuxtLink>
         </div>
       </div>
     </div>
