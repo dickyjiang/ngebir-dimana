@@ -1,10 +1,11 @@
-import { serverSupabaseClient } from "#supabase/server";
+import { serverSupabaseClient, serverSupabaseUser } from "#supabase/server";
 import { uploadToR2 } from "../../../utils/cloudflare";
 import { v4 as uuidv4 } from "uuid";
 import { createError, type MultiPartData } from "h3";
 
 export default defineEventHandler(async (event) => {
 	const client = await serverSupabaseClient(event);
+	const user = await serverSupabaseUser(event);
 	const formData = await readMultipartFormData(event);
 
 	if (!formData) throw createError({ statusCode: 400, message: "Missing form data" });
@@ -159,7 +160,8 @@ export default defineEventHandler(async (event) => {
 			location_link: cafeLocationLink,
 			logo: logoUrl,
 			slug_name: finalSlug,
-			photo: primaryImageUrl
+			photo: primaryImageUrl,
+			uuid: user?.id,
 		})
 		.select()
 		.single();

@@ -8,6 +8,12 @@ export default defineEventHandler(async (event) => {
     query = query.eq('slug_name', slug)
     query = query.single();
 
+    const user = await serverSupabaseUser(event);
+    let is_admin = false;
+    if (user?.email == 'b.budi.sentosa@gmail.com' || user?.email == 'dicky.juwono@gmail.com') {
+        is_admin = true;
+    }
+
     const { data, error, count } = await query
     if (error) throw createError({ statusMessage: error.message });
 
@@ -29,5 +35,5 @@ export default defineEventHandler(async (event) => {
     const { data: data2, error: error2, count: count2 } = await query2
     if (error2) throw createError({ statusMessage: error2.message });
 
-    return { 'data': data, 'count': count, 'features': data2 };
+    return { 'data': data, 'count': count, 'features': data2, 'is_admin': is_admin };
 })

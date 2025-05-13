@@ -18,41 +18,46 @@
                 <div
                   class="border-b sm:border-b-0 border-r-0 sm:border-r border-gray-300 px-4"
                 >
-                    <div class="mb-8">
-                    <label class="block mb-2">Jenis usaha: <span class="text-sm text-gray-400">(Pilih semua yang sesuai)</span></label>
+                  <div class="mb-8">
+                    <label class="block mb-2"
+                      >Jenis usaha:
+                      <span class="text-sm text-gray-400"
+                        >(Pilih semua yang sesuai)</span
+                      ></label
+                    >
                     <div class="space-y-2">
                       <label class="flex items-center space-x-2">
-                      <input
-                        type="checkbox"
-                        v-model="businessTypes"
-                        value="cafe"
-                        class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
-                      />
-                      <span>Cafe</span>
+                        <input
+                          type="checkbox"
+                          v-model="businessTypes"
+                          value="cafe"
+                          class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                        />
+                        <span>Cafe</span>
                       </label>
                       <label class="flex items-center space-x-2">
-                      <input
-                        type="checkbox"
-                        v-model="businessTypes"
-                        value="roastery"
-                        class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
-                      />
-                      <span>Roastery</span>
+                        <input
+                          type="checkbox"
+                          v-model="businessTypes"
+                          value="roastery"
+                          class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                        />
+                        <span>Roastery</span>
                       </label>
                       <label class="flex items-center space-x-2">
-                      <input
-                        type="checkbox"
-                        v-model="businessTypes"
-                        value="supplier"
-                        class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
-                      />
-                      <span>Supplier Alat-alat</span>
+                        <input
+                          type="checkbox"
+                          v-model="businessTypes"
+                          value="supplier"
+                          class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                        />
+                        <span>Supplier Alat-alat</span>
                       </label>
                     </div>
                     <!-- <span v-if="hasError('businessTypes')" class="text-red-500 text-sm">
                       {{ formErrors.businessTypes?.join(', ') }}
                     </span> -->
-                    </div>
+                  </div>
                   <div class="mb-8">
                     <label for="cafeName">Nama Cafe:</label>
                     <input
@@ -107,7 +112,8 @@
                       {{ formErrors.description.join(', ') }}
                     </span>
                     <p class="text-gray-500 text-sm mt-1">
-                      <strong>Note:</strong> Pastikan deskripsi ini sesuai dengan deskripsi cafe Anda.
+                      <strong>Note:</strong> Pastikan deskripsi ini sesuai
+                      dengan deskripsi cafe Anda.
                     </p>
                   </div>
                   <div class="mb-8">
@@ -170,11 +176,14 @@
                           {{ city.city_name }}
                         </option>
                       </select>
-                      <span v-if="hasError('state')" class="text-red-500 text-sm">
+                      <span
+                        v-if="hasError('state')"
+                        class="text-red-500 text-sm"
+                      >
                         {{ formErrors.state.join(', ') }}
                       </span>
                     </div>
-  
+
                     <!-- Replace the city select -->
                     <div class="flex flex-col sm:flex-row gap-2">
                       <div class="mb-8">
@@ -189,7 +198,9 @@
                           @change="validateOnChangeForm"
                           :disabled="!selectedParentCity"
                         >
-                          <option value="" disabled>Pilih Kota/Kabupaten</option>
+                          <option value="" disabled>
+                            Pilih Kota/Kabupaten
+                          </option>
                           <option
                             v-for="city in availableChildCities"
                             :key="city.city_slug"
@@ -205,12 +216,11 @@
                           {{ formErrors.city.join(', ') }}
                         </span>
                       </div>
-  
+
                       <!-- <div class="mb-8">
                         <label for="postal_code">Kode Pos:</label>
                       </div> -->
                     </div>
-
                   </div>
                   <div class="mb-8 p-4 border border-gray-300 rounded-md">
                     <label for="">location_link:</label>
@@ -224,19 +234,35 @@
                       required
                       @input="validateOnChangeForm"
                     />
-                    <p class="text-gray-500 text-sm mt-2 text-center">Masukan tautan URL (URL link) dari Google Business anda disini (diawalin dengan: <span class="font-semibold text-gray-700">https://maps.app.goo.gl/</span>) Click button di bawah untuk panduan cara menemukan Google location_link anda</p>
-                    <div class="flex flex-col items-center  justify-center">
-                      <button 
-                        @click="showPopup = true" 
+                    <p class="text-gray-500 text-sm mt-2 text-center">
+                      Masukan tautan URL (URL link) dari Google Business anda
+                      disini (diawalin dengan:
+                      <span class="font-semibold text-gray-700"
+                        >https://maps.app.goo.gl/</span
+                      >) Click button di bawah untuk panduan cara menemukan
+                      Google location_link anda
+                    </p>
+                    <div class="flex flex-col items-center justify-center">
+                      <button
+                        @click="showPopup = true"
                         type="button"
                         class="text-sm rounded-lg border bg-gray-100 border-gray-400 mt-3 text-gray-500 px-3 py-2 hover:bg-gray-200 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
                       >
                         Cara mendapatkan Google location_link
                       </button>
-                      <div v-if="showPopup" class="popup" @click.self="showPopup = false">
+                      <div
+                        v-if="showPopup"
+                        class="popup"
+                        @click.self="showPopup = false"
+                      >
                         <div class="popup-content">
-                          <span class="close-btn" @click="showPopup = false">&times;</span>
-                          <img src="/public/img/tutorial_location_link.png" alt="Tutorial Location" />
+                          <span class="close-btn" @click="showPopup = false"
+                            >&times;</span
+                          >
+                          <img
+                            src="/public/img/tutorial_location_link.png"
+                            alt="Tutorial Location"
+                          />
                         </div>
                       </div>
                     </div>
@@ -245,27 +271,46 @@
                 <div class="px-4">
                   <div class="mb-8">
                     <label for="logo">Logo Cafe:</label>
-                    <div class="mt-2 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg">
-                      <div class="space-y-1 text-center">
-                        <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
-                          <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                        </svg>
-                        <div class="flex items-center flex-col text-sm text-gray-600">
-                          <label for="logo" class="relative cursor-pointer rounded font-medium text-gray-800 hover:text-gray-500 ">
-                            <span>Upload a file</span>
-                            <input 
-                              type="file" 
-                              id="logo" 
-                              name="logo"
-                              accept="image/*"
-                              required
-                              @change="handleLogoUpload"
-                              class="sr-only"
+                    <div
+                      class="mt-2 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg"
+                    >
+                      <label for="logo" class="w-full cursor-pointer">
+                        <input
+                          type="file"
+                          id="logo"
+                          name="logo"
+                          accept="image/*"
+                          required
+                          @change="handleLogoUpload"
+                          class="sr-only"
+                        />
+                        <div class="space-y-1 text-center">
+                          <svg
+                            class="mx-auto h-12 w-12 text-gray-400"
+                            stroke="currentColor"
+                            fill="none"
+                            viewBox="0 0 48 48"
+                          >
+                            <path
+                              d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
+                              stroke-width="2"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
                             />
-                          </label>
+                          </svg>
+                          <div
+                            class="flex items-center flex-col text-sm text-gray-600"
+                          >
+                            <span
+                              class="relative rounded font-medium text-gray-800 hover:text-gray-500"
+                              >Upload a file</span
+                            >
+                          </div>
+                          <p class="text-xs text-gray-500">
+                            JPG, JPEG, PNG and WEBP up to 5MB
+                          </p>
                         </div>
-                        <p class="text-xs text-gray-500">JPG, JPEG, PNG and WEBP up to 5MB</p>
-                      </div>
+                      </label>
                     </div>
                     <span v-if="hasError('logo')" class="text-red-500 text-sm">
                       {{ formErrors.logo.join(', ') }}
@@ -290,39 +335,68 @@
                   </div>
                   <div class="flex flex-col space-y-2 mb-8">
                     <label for="cafeImage">Photo Cafe:</label>
-                    <div class="mt-2 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg">
-                      <div class="space-y-1 text-center">
-                        <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
-                          <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                        </svg>
-                        <div class="flex flex-col items-center text-sm text-gray-600">
-                          <label for="cafeImage" class="relative cursor-pointer rounded-md font-medium text-gray-800 hover:text-gray-500 ">
-                            <span>Upload files</span>
-                            <input
-                              type="file"
-                              id="cafeImage"
-                              name="cafeImage"
-                              accept="image/*"
-                              multiple
-                              @change="handleImageUpload"
-                              class="sr-only"
+                    <div
+                      class="mt-2 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg"
+                    >
+                      <label for="cafeImage" class="w-full cursor-pointer">
+                        <input
+                          type="file"
+                          id="cafeImage"
+                          name="cafeImage"
+                          accept="image/*"
+                          multiple
+                          @change="handleImageUpload"
+                          class="sr-only"
+                        />
+                        <div class="space-y-1 text-center">
+                          <svg
+                            class="mx-auto h-12 w-12 text-gray-400"
+                            stroke="currentColor"
+                            fill="none"
+                            viewBox="0 0 48 48"
+                          >
+                            <path
+                              d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
+                              stroke-width="2"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
                             />
-                          </label>
+                          </svg>
+                          <div
+                            class="flex flex-col items-center text-sm text-gray-600"
+                          >
+                            <span
+                              class="relative rounded-md font-medium text-gray-800 hover:text-gray-500"
+                              >Upload files</span
+                            >
+                          </div>
+                          <p class="text-xs text-gray-500">
+                            JPG, JPEG, PNG and WEBP up to 20MB
+                          </p>
                         </div>
-                        <p class="text-xs text-gray-500">JPG, JPEG, PNG and WEBP up to 20MB</p>
-                      </div>
+                      </label>
                     </div>
 
                     <!-- Display validation errors -->
-                    <div v-if="imageErrors.length > 0" class="text-red-500 text-sm mt-2">
+                    <div
+                      v-if="imageErrors.length > 0"
+                      class="text-red-500 text-sm mt-2"
+                    >
                       <p v-for="(error, index) in imageErrors" :key="index">
                         {{ error }}
                       </p>
                     </div>
 
                     <!-- Image preview section -->
-                    <div v-if="imagePreviews.length > 0" class="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                      <div v-for="(preview, index) in imagePreviews" :key="index" class="relative">
+                    <div
+                      v-if="imagePreviews.length > 0"
+                      class="grid grid-cols-2 sm:grid-cols-3 gap-4"
+                    >
+                      <div
+                        v-for="(preview, index) in imagePreviews"
+                        :key="index"
+                        class="relative"
+                      >
                         <img
                           :src="preview"
                           class="w-full h-32 object-cover rounded-lg"
@@ -341,7 +415,7 @@
                   <div class="mb-10">
                     <label for="features">Features:</label>
                     <div class="relative mt-2">
-                      <div class="hs-dropdown  relative w-full">
+                      <div class="hs-dropdown relative w-full">
                         <div
                           class="flex flex-wrap items-center border border-gray-300 rounded-md p-2 bg-white"
                         >
@@ -433,7 +507,8 @@
                     </div>
 
                     <p class="text-gray-500 text-sm mt-2">
-                      <strong>Note:</strong> Pilih semua fitur yang sesuai dengan café anda.
+                      <strong>Note:</strong> Pilih semua fitur yang sesuai
+                      dengan café anda.
                     </p>
                   </div>
 
@@ -1180,70 +1255,70 @@
 </script>
 
 <style scoped>
-.input-base {
-  @apply mt-2 pl-2 py-1 border border-gray-300 rounded bg-gray-50 w-full outline-none transition-all duration-200;
+  .input-base {
+    @apply mt-2 pl-2 py-1 border border-gray-300 rounded bg-gray-50 w-full outline-none transition-all duration-200;
 
-  &:hover {
-    @apply border-gray-400;
+    &:hover {
+      @apply border-gray-400;
+    }
+
+    &:focus {
+      @apply bg-white border-blue-500 ring-2 ring-blue-200;
+    }
   }
 
-  &:focus {
-    @apply bg-white border-blue-500 ring-2 ring-blue-200;
+  .input-error {
+    @apply border-red-500 bg-red-50;
   }
-}
 
-.input-error {
-  @apply border-red-500 bg-red-50;
-}
+  select.input-base {
+    @apply appearance-none bg-no-repeat bg-right pr-8;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+    background-size: 1.5em;
+  }
 
-select.input-base {
-  @apply appearance-none bg-no-repeat bg-right pr-8;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
-  background-size: 1.5em;
-}
+  /* Add this to your CSS */
+  .popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 
-/* Add this to your CSS */
-.popup {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.7);
-  z-index: 1000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+  .popup-content {
+    position: relative;
+    background-color: #fff;
+    padding: 20px;
+    max-width: 900px; /* Increased from 600px */
+    width: 95%; /* Increased from 90% */
+    border-radius: 5px;
+    margin: 20px; /* Added to ensure some spacing on very small screens */
+  }
 
-.popup-content {
-  position: relative;
-  background-color: #fff;
-  padding: 20px;
-  max-width: 900px; /* Increased from 600px */
-  width: 95%; /* Increased from 90% */
-  border-radius: 5px;
-  margin: 20px; /* Added to ensure some spacing on very small screens */
-}
+  .close-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 24px;
+    cursor: pointer;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f3f4f6;
+    border-radius: 50%;
+  }
 
-.close-btn {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  font-size: 24px;
-  cursor: pointer;
-  width: 30px;
-  height: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: #f3f4f6;
-  border-radius: 50%;
-}
-
-.popup-content img {
-  width: 100%;
-  height: auto;
-  object-fit: contain; /* This ensures the image maintains its aspect ratio */
-}
+  .popup-content img {
+    width: 100%;
+    height: auto;
+    object-fit: contain; /* This ensures the image maintains its aspect ratio */
+  }
 </style>
