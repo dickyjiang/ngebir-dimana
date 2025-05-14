@@ -8,11 +8,11 @@ export default defineEventHandler(async (event) => {
     query = query.eq('slug_name', slug)
     query = query.single();
 
-    const user = await serverSupabaseUser(event);
+    // const user = await serverSupabaseUser(event);
     let is_admin = false;
-    if (user?.email == 'b.budi.sentosa@gmail.com' || user?.email == 'dicky.juwono@gmail.com') {
-        is_admin = true;
-    }
+    // if (user?.email == 'b.budi.sentosa@gmail.com' || user?.email == 'dicky.juwono@gmail.com') {
+    //     is_admin = true;
+    // }
 
     const { data, error, count } = await query
     if (error) throw createError({ statusMessage: error.message });
