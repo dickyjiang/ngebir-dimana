@@ -23,10 +23,11 @@
       type: Number,
       default: 1,
     },
-    bannerPosition: { // Add this prop
+    bannerPosition: {
+      // Add this prop
       type: Number,
-      default: 12 // Show banner after 6th item by default
-    }
+      default: 12, // Show banner after 6th item by default
+    },
   });
 
   // Define emits to pass events back to parent
@@ -63,11 +64,13 @@
   <div ref="listContainer">
     <div
       v-if="loading"
-      class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+      class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3"
+    >
       <div
         v-for="n in itemsPerPage"
         :key="n"
-        class="rounded-md flex flex-col h-full pb-4 border overflow-hidden">
+        class="rounded-md flex flex-col h-full pb-4 border overflow-hidden"
+      >
         <div class="skeleton skeleton-image"></div>
         <div class="flex-1 flex-col px-4">
           <div class="skeleton skeleton-text"></div>
@@ -81,7 +84,10 @@
           <li
             class="rounded-md flex flex-col h-full pb-4 border overflow-hidden"
           >
-            <NuxtLink :to="`/cafe/${cafe.slug_name}`" class="flex flex-col h-full">
+            <NuxtLink
+              :to="`/cafe/${cafe.slug_name}`"
+              class="flex flex-col h-full"
+            >
               <NuxtImg
                 alt="Cafe Image"
                 class="w-full h-48 object-cover mb-4"
@@ -90,14 +96,16 @@
               />
               <div class="flex-1 flex flex-col px-4">
                 <div class="flex-1">
-                  <h2 class="text-lg text-gray-800 leading-tight line-clamp-2 font-semibold">
+                  <h2
+                    class="text-lg text-gray-800 leading-tight line-clamp-2 font-semibold"
+                  >
                     {{ cafe.name }}
                   </h2>
                   <p class="text-sm text-gray-500 line-clamp-2 mt-2">
                     {{ cafe.description }}
                   </p>
                 </div>
-                
+
                 <div class="flex justify-between mt-8">
                   <div class="flex items-center gap-1">
                     <img
@@ -111,7 +119,11 @@
                     <p class="text-gray-500 text-xs">{{ cafe.range }}</p>
                   </div>
                   <div class="flex items-center gap-1">
-                    <img src="/src/assets/img/rating.svg" alt="star" class="h-3" />
+                    <img
+                      src="/src/assets/img/rating.svg"
+                      alt="star"
+                      class="h-3"
+                    />
                     <p class="text-gray-500 text-xs">{{ cafe.rating_num }}</p>
                   </div>
                 </div>
@@ -119,17 +131,6 @@
             </NuxtLink>
           </li>
           <!-- Add banner after specified position -->
-          <div v-if="index + 1 === bannerPosition" class="col-span-full">
-            <div class="bg-[#FFFDEE] shadow-lg p-2 rounded-lg text-center flex gap-4 items-center justify-between">
-              <!-- Your banner content here -->
-               <img src="/src/assets/img/world_of_coffee_jakarta_2025.png" alt="world_of_coffee_jakarta_2025" class=" h-24 object-cover">
-               <div>
-                 <h3 class="text- font-bold text-[#F15A2D] mb-2">Pameran World of Coffee 2025 Hadir di Jakarta Bersamaan dengan World Brewers Cup</h3>
-                 <p class="text-gray-600 text-sm">15-17 Mei 2025 di Jakarta International Convention Center (JICC), Indonesia</p>
-               </div>
-               <img src="/src/assets/img/world_of_coffee_jakarta_2025_wwc-jakarta.png" alt="wcc-jakarta-2025" class=" h-12 object-cover">
-            </div>
-          </div>
         </template>
       </div>
       <div class="flex justify-center mt-4 space-x-2">

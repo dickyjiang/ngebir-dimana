@@ -42,7 +42,7 @@
   const loadingNewCafes = ref(false);
 
   const currentPage = ref(1);
-  const itemsPerPage = 12;
+  const itemsPerPage = 24;
   const searchQuery = ref('');
 
   // Initialize filter options with empty arrays
@@ -72,7 +72,7 @@
     try {
       await fetchCafesFromComposable(
         1,
-        10,
+        itemsPerPage,
         {
           city: [],
           borough: [],
@@ -300,9 +300,9 @@
       @click="toggleSidebar"
       class="fixed bottom-4 right-4 z-50 md:hidden bg-gray-800 text-white px-6 py-3 rounded-full shadow-lg text-sm font-medium"
       :class="{
-    'text-yellow-500': activeFilters.city.length > 0,
-    'text-white': activeFilters.city.length === 0
-  }"
+        'text-yellow-500': activeFilters.city.length > 0,
+        'text-white': activeFilters.city.length === 0,
+      }"
     >
       {{ isSidebarOpen ? 'Tutup' : 'Lokasi' }}
     </button>
@@ -335,6 +335,7 @@
     </div>
 
     <div class="px-4 flex-1">
+      <WorldOfCoffeeBanner />
       <CafeList
         :loading="loading"
         :cafes="paginatedData"

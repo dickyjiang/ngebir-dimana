@@ -26,7 +26,7 @@ export function useFetchCafes() {
 
         // Simplify range calculation to always get correct number of items
         const from = (page - 1) * itemsPerPage;
-        const to = from + itemsPerPage; // Remove the -1 to include full range
+        const to = from + itemsPerPage - 1; // Remove the -1 to include full range
 
         try {
             let payload: any = {

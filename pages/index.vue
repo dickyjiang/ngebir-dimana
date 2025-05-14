@@ -75,7 +75,7 @@
     try {
       await fetchCafesFromComposable(
         1,
-        10,
+        itemsPerPage,
         {
           city: [],
           borough: [],
@@ -312,7 +312,7 @@
       class="fixed bottom-4 right-4 z-50 md:hidden bg-gray-800 px-6 py-3 rounded-full shadow-lg text-sm font-medium"
       :class="{
         'text-yellow-500': activeFilters.city.length > 0,
-        'text-white': activeFilters.city.length === 0
+        'text-white': activeFilters.city.length === 0,
       }"
     >
       {{ isSidebarOpen ? 'Tutup' : 'Lokasi' }}
@@ -353,7 +353,7 @@
         :itemsPerPage="itemsPerPage"
         :currentPage="currentPage"
         :totalPages="totalPages"
-        :bannerPosition="12" 
+        :bannerPosition="12"
         @page-change="changePage"
       />
     </div>
