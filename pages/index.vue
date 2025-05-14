@@ -5,6 +5,7 @@
   import CafeList from '~/components/cafe/CafeList.vue';
   import NewCafesList from '~/components/cafe/NewCafesList.vue';
   import HeroSearch from '~/components/HeroSearch.vue';
+  import WorldOfCoffeeBanner from '~/components/WorldOfCoffeeBanner.vue';
   import '@fortawesome/fontawesome-free/css/all.css';
   import { debounce } from 'lodash';
   import { useFilterToggle } from '~/composables/useFilterToggle';
@@ -308,9 +309,13 @@
     <!-- Mobile Toggle Button -->
     <button
       @click="toggleSidebar"
-      class="fixed bottom-4 right-4 z-50 md:hidden bg-gray-800 text-white px-6 py-3 rounded-full shadow-lg text-sm font-medium"
+      class="fixed bottom-4 right-4 z-50 md:hidden bg-gray-800 px-6 py-3 rounded-full shadow-lg text-sm font-medium"
+      :class="{
+        'text-yellow-500': activeFilters.city.length > 0,
+        'text-white': activeFilters.city.length === 0
+      }"
     >
-      {{ isSidebarOpen ? 'Close' : 'Filter' }}
+      {{ isSidebarOpen ? 'Tutup' : 'Lokasi' }}
     </button>
 
     <!-- Sidebar Overlay for Mobile -->
@@ -341,6 +346,7 @@
     </div>
 
     <div class="p-4 flex-1">
+      <WorldOfCoffeeBanner />
       <CafeList
         :loading="loading"
         :cafes="paginatedData"
