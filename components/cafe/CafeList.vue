@@ -79,7 +79,7 @@
       </div>
     </div>
     <div v-else>
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <template v-for="(cafe, index) in cafes" :key="cafe.id">
           <li
             class="rounded-md flex flex-col h-full pb-4 border overflow-hidden"
