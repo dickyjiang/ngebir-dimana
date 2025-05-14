@@ -37,12 +37,12 @@ export function useFetchCafes() {
             };
 
             // Add detailed request logging
-            console.log('Fetch Request:', {
-                page,
-                itemsPerPage,
-                calculatedRange: `${from}-${to}`,
-                expectedItems: to - from
-            });
+            // console.log('Fetch Request:', {
+            //     page,
+            //     itemsPerPage,
+            //     calculatedRange: `${from}-${to}`,
+            //     expectedItems: to - from
+            // });
 
             if (filters) {
                 payload = {
@@ -60,11 +60,11 @@ export function useFetchCafes() {
             });
 
             // Add response validation
-            console.log('API Response:', {
-                receivedItems: hasil.data?.length,
-                expectedItems: itemsPerPage,
-                range: `${from}-${to}`
-            });
+            // console.log('API Response:', {
+            //     receivedItems: hasil.data?.length,
+            //     expectedItems: itemsPerPage,
+            //     range: `${from}-${to}`
+            // });
 
             if (hasil.data?.length < itemsPerPage) {
                 console.warn('Pagination Mismatch:', {
