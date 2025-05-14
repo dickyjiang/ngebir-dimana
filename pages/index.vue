@@ -182,7 +182,7 @@
       }
 
       // Then fetch cafes with the initial filters
-      await fetchNewCafes();
+      // await fetchNewCafes();
       await fetchCafes(currentPage.value, activeFilters.value);
     } catch (error) {
       console.error('Error in onMounted:', error);
