@@ -1,4 +1,11 @@
+pass dev : C1vWpiS90zZWkXMs
+
+prod
 supabase gen types typescript --project-id iblcxviqmqiutjzxnblx > ./types/database.types.ts
+
+dev
+supabase gen types typescript --project-id fhvpfdcvtkyaatvoxpff > ./types/database.types.ts
+
 ----
 kolom location
 update cafes
@@ -57,3 +64,10 @@ create extension postgis with schema "gis";
 create index cafes_geo_index
   on public.cafes
   using GIST (location);
+
+select name, site, phone, full_address, borough, street, city, postal_code
+, state, latitude, longitude, time_zone, rating, photo, working_hours, about,
+  logo
+from cafes;
+Select location_link
+Select Lat ,long, city_slug, slug_name

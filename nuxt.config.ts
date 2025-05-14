@@ -17,7 +17,8 @@ export default defineNuxtConfig({
       login: '/login',
       callback: '/confirm',
       cookieRedirect: true,
-      include: ['/account/*', '/account'],
+      // exclude: ['/'],
+      include: ['/account/*', '/account', '/cafe/owner/*'],
     }
   },
   vite: {

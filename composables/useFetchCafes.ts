@@ -24,27 +24,33 @@ export function useFetchCafes() {
     ) {
         loading.value = true;
 
-        // Calculate range based on current page
+        // Simplify range calculation to always get correct number of items
         const from = (page - 1) * itemsPerPage;
-        const to = from + itemsPerPage - 1;
+        const to = from + itemsPerPage; // Remove the -1 to include full range
 
         try {
-            let payload: any = {};
+            let payload: any = {
+                from,
+                to,
+                requestedItems: itemsPerPage,
+                page
+            };
+
+            // Add detailed request logging
+            console.log('Fetch Request:', {
+                page,
+                itemsPerPage,
+                calculatedRange: `${from}-${to}`,
+                expectedItems: to - from
+            });
 
             if (filters) {
                 payload = {
+                    ...payload,
                     city: filters.city || [],
-                    from: from,
-                    to: to,
                     searchQuery: searchQuery || '',
                     features: filters.features || [],
                 };
-
-                if (isNearbyActive && userLocation) {
-                    payload.cariLocation = true;
-                    payload.latitude = userLocation.latitude || null;
-                    payload.longitude = userLocation.longitude || null;
-                }
             }
 
             const hasil = await $fetch('/api/search', {
@@ -53,10 +59,26 @@ export function useFetchCafes() {
                 headers: useRequestHeaders(['cookie']),
             });
 
+            // Add response validation
+            console.log('API Response:', {
+                receivedItems: hasil.data?.length,
+                expectedItems: itemsPerPage,
+                range: `${from}-${to}`
+            });
+
+            if (hasil.data?.length < itemsPerPage) {
+                console.warn('Pagination Mismatch:', {
+                    expected: itemsPerPage,
+                    received: hasil.data?.length,
+                    difference: itemsPerPage - hasil.data?.length
+                });
+            }
+
             totalCafes.value = hasil.count || 0;
             data.value = hasil.data || [];
+
         } catch (err) {
-            console.error('Exception while fetching cafes:', err);
+            console.error('Fetch Error:', err);
         } finally {
             loading.value = false;
         }

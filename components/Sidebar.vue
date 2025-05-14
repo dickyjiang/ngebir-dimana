@@ -16,20 +16,41 @@
         Reset Lokasi
       </button>
     </div>
-    <div class="flex flex-wrap gap-3 text-sm text-gray-500 text-nowrap my-4">
-      <!-- {{ uniqueCities }} -->
-      <button
-        v-for="city in uniqueCities"
-        :key="city.city_slug"
-        @click="handleFilterToggle('city', city.city_slug)"
-        :class="{
-          'bg-gray-800 text-white': activeFilters.city.includes(city.city_slug),
-          'bg-gray-100': !activeFilters.city.includes(city.city_slug),
-        }"
-        class="px-3 py-1 rounded-full"
-      >
-        {{ city.city }}
-      </button>
+    <div class="flex flex-wrap gap-3 text-sm text-gray-600 text-nowrap my-4">
+      <div class="w-full">
+        <div
+          v-for="parentCity in uniqueCities.parentCities"
+          :key="parentCity.city_slug"
+          class="mb-8"
+        >
+          <h3 class="font-medium mb-3">{{ parentCity.city_name }}</h3>
+          <div class="flex flex-wrap gap-2 text-sm ">
+            <!-- Child cities belonging to this parent -->
+            <button
+              v-for="childCity in getChildCities(parentCity.city_slug)"
+              :key="childCity.city_slug"
+              @click="handleFilterToggle('city', childCity.city_slug)"
+              :class="{
+                'bg-gray-800 text-white': activeFilters.city.includes(
+                  childCity.city_slug
+                ),
+                'bg-gray-100': !activeFilters.city.includes(childCity.city_slug),
+              }"
+              class="px-3 py-1 text-xs rounded-full"
+            >
+              {{ childCity.city_name }}
+            </button>
+
+            <!-- If no child cities, show a disabled indicator -->
+            <span
+              v-if="getChildCities(parentCity.city_slug).length === 0"
+              class="text-gray-400 italic px-3 py-1"
+            >
+              No sub-locations
+            </span>
+          </div>
+        </div>
+      </div>
     </div>
   </aside>
 </template>
@@ -42,7 +63,7 @@
 
   const props = defineProps({
     activeFilters: Object,
-    cities: Array,
+    cities: Object,
     onNearbyToggle: Function,
     isNearbyActive: Boolean,
     locationLoading: Boolean,
@@ -74,8 +95,15 @@
   }
 
   const uniqueCities = computed(() => {
-    return props.cities; // Use the actual city names passed as a prop
+    return props.cities || { parentCities: [], childCities: [] }; // Add a default value
   });
+
+  function getChildCities(parentSlug) {
+    if (!props.cities || !props.cities.childCities) return [];
+    return props.cities.childCities.filter(
+      (city) => city.city_parent === parentSlug
+    );
+  }
 
   async function resetCityFilters() {
     await resetFiltersCity(props.activeFilters);
