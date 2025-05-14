@@ -39,13 +39,13 @@
         Satu Klik, Ribuan Cafe! Temukan yang Pas untuk Kamu.
       </p>
     </div>
-    <div class="flex items-center gap-2">
+    <!-- <div class="flex items-center gap-2">
       <NuxtLink to="/cafe/owner/add" class="hidden sm:flex">
         add cafe
       </NuxtLink>
       <NuxtLink to="/login" class="hidden sm:flex"> login </NuxtLink>
       <button class="logout-button" @click="handleLogout">Logout</button>
-    </div>
+    </div> -->
   </div>
 </template>
 
