@@ -136,7 +136,7 @@
         <span
           v-if="currentPage > 1"
           @click="changePage(currentPage - 1)"
-          class="cursor-pointer text-blue-500 hover:underline"
+          class="cursor-pointer text-gray-500 hover:underline"
         >
           Previous
         </span>
@@ -145,7 +145,7 @@
           :key="page"
           @click="changePage(page)"
           :class="{
-            'font-bold text-blue-500': currentPage === page,
+            'font-bold text-gray-800': currentPage === page,
             'text-gray-700': currentPage !== page,
           }"
           class="cursor-pointer hover:underline"
@@ -155,14 +155,14 @@
         <span
           v-if="currentPage < totalPages"
           @click="changePage(currentPage + 1)"
-          class="cursor-pointer text-blue-500 hover:underline"
+          class="cursor-pointer text-gray-800 hover:underline"
         >
           Next
         </span>
         <span
           v-if="currentPage < totalPages && !visiblePages.includes(totalPages)"
           @click="changePage(totalPages)"
-          class="cursor-pointer text-blue-500 hover:underline"
+          class="cursor-pointer text-gray-800 hover:underline"
         >
           Last ({{ totalPages }})
         </span>
