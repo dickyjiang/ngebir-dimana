@@ -309,9 +309,13 @@
     <!-- Mobile Toggle Button -->
     <button
       @click="toggleSidebar"
-      class="fixed bottom-4 right-4 z-50 md:hidden bg-gray-800 text-white px-6 py-3 rounded-full shadow-lg text-sm font-medium"
+      class="fixed bottom-4 right-4 z-50 md:hidden bg-gray-800 px-6 py-3 rounded-full shadow-lg text-sm font-medium"
+      :class="{
+        'text-yellow-500': activeFilters.city.length > 0,
+        'text-white': activeFilters.city.length === 0
+      }"
     >
-      {{ isSidebarOpen ? 'Close' : 'Filter' }}
+      {{ isSidebarOpen ? 'Tutup' : 'Lokasi' }}
     </button>
 
     <!-- Sidebar Overlay for Mobile -->
