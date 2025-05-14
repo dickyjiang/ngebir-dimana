@@ -92,9 +92,73 @@
                 </div>
               </div>
             </div>
+            <div class="flex flex-col" v-if="cafe.data.working_hours">
+              <h2 class="text-lg font-semibold">Working Hours</h2>
+              <table
+                class="min-w-full border-collapse border border-gray-300 text-sm mt-2"
+              >
+                <thead>
+                  <tr>
+                    <th class="border border-gray-300 px-4 py-2">Day</th>
+                    <th class="border border-gray-300 px-4 py-2">Hours</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr
+                    v-for="(hours, day) in JSON.parse(cafe.data.working_hours)"
+                    :key="day"
+                  >
+                    <td class="border border-gray-300 px-4 py-2">{{ day }}</td>
+                    <td class="border border-gray-300 px-4 py-2">
+                      {{ hours }}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
+        <!-- @budisentosa thumbnail na -->
+
         <div class="w-full md:w-1/2 flex flex-col gap-8">
+          <div class="grid grid-cols-4 sm:grid-cols-4 gap-2 flex-1 items-start overflow-y-scroll">
+            <div>
+              <img
+                class="rounded-md object-cover cursor-pointer w-full h-full"
+                src="/src/assets/img/no_other-photos.png"
+                @click="openImageModal('/src/assets/img/no_other-photos.png')"
+                alt="Cafe photo 1"
+                style="aspect-ratio: 1/1"
+              />
+            </div>
+            <div>
+              <img
+                class="rounded-md object-cover cursor-pointer w-full h-full"
+                src="/src/assets/img/no_other-photos.png"
+                @click="openImageModal('/src/assets/img/no_other-photos.png')"
+                alt="Cafe photo 2"
+                style="aspect-ratio: 1/1"
+              />
+            </div>
+            <div>
+              <img
+                class="rounded-md object-cover cursor-pointer w-full h-full"
+                src="/src/assets/img/no_other-photos.png"
+                @click="openImageModal('/src/assets/img/no_other-photos.png')"
+                alt="Cafe photo 3"
+                style="aspect-ratio: 1/1"
+              />
+            </div>
+            <div>
+              <img
+                class="rounded-md object-cover cursor-pointer w-full h-full"
+                src="/src/assets/img/no_other-photos.png"
+                @click="openImageModal('/src/assets/img/no_other-photos.png')"
+                alt="Cafe photo 4"
+                style="aspect-ratio: 1/1"
+              />
+            </div>
+          </div>
           <div class="border border-gray-300 rounded-lg">
             <ClientOnly>
               <LMap
@@ -133,35 +197,31 @@
               </LMap>
             </ClientOnly>
           </div>
-          <div class="flex flex-col" v-if="cafe.data.working_hours">
-            <h2 class="text-lg font-semibold">Working Hours</h2>
-            <table
-              class="min-w-full border-collapse border border-gray-300 text-sm mt-2"
-            >
-              <thead>
-                <tr>
-                  <th class="border border-gray-300 px-4 py-2">Day</th>
-                  <th class="border border-gray-300 px-4 py-2">Hours</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr
-                  v-for="(hours, day) in JSON.parse(cafe.data.working_hours)"
-                  :key="day"
-                >
-                  <td class="border border-gray-300 px-4 py-2">{{ day }}</td>
-                  <td class="border border-gray-300 px-4 py-2">
-                    {{ hours }}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
         </div>
       </div>
     </div>
     <div v-else class="text-center text-gray-500">Cafe not found.</div>
   </div>
+  <!-- Image Modal -->
+  <Teleport to="body">
+    <div v-if="showModal" 
+         class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center" 
+         style="z-index: 9999;"
+         @click="closeModal">
+      <div class="relative max-w-4xl max-h-screen p-4" @click.stop>
+        <button @click="closeModal" 
+                class="absolute top-4 right-4 text-white hover:text-gray-300 z-50">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+        <img :src="selectedImage" 
+             class="max-h-[90vh] max-w-full object-contain" 
+             @click.stop 
+             alt="Full screen image" />
+      </div>
+    </div>
+  </Teleport>
   <!-- @budi section ini showing cafe yg realted dengan last search result - atau kalau bukan hasil search show close location dari cafe terpilih) -->
   <!-- <section id="related-cafes" class="my-4">
     <div
@@ -192,136 +252,181 @@
 </template>
 
 <script setup>
-  import { ref, onMounted } from 'vue';
-  import { useRoute, useNuxtApp } from '#app';
-  import { useSeo } from '~/composables/useSeo';
+import { ref, onMounted } from "vue";
+import { useRoute, useNuxtApp } from "#app";
+import { useSeo } from "~/composables/useSeo";
 
-  const route = useRoute();
-  const cafe = ref(null);
-  const loading = ref(true);
-  const about = ref({});
+const route = useRoute();
+const cafe = ref(null);
+const loading = ref(true);
+const about = ref({});
+const showModal = ref(false);
+const selectedImage = ref('');
 
-  useSeo({
-    title: 'Website Paling Lengkap buat Cari Tempat Ngopi!',
-    description: 'Satu Klik, Ribuan Cafe! Temukan yang Pas untuk Kamu.',
-    image: '/img/OG-img.png',
-    url: `https://ngopi.di-mana.com/cafes/${route.params.id}`,
-    type: 'article',
+function openImageModal(imageUrl) {
+  selectedImage.value = imageUrl;
+  showModal.value = true;
+  document.body.style.overflow = 'hidden'; // Prevent background scrolling
+}
+
+function closeModal() {
+  showModal.value = false;
+  selectedImage.value = '';
+  document.body.style.overflow = ''; // Restore scrolling
+}
+
+// Add event listener for escape key
+onMounted(() => {
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && showModal.value) {
+      closeModal();
+    }
   });
+});
 
-  function openInGoogleMaps() {
-    // encan
-    // First priority: use location_link if available
-    if (cafe.value?.data.location_link) {
-      console.log('Using location_link');
-      window.open(cafe.value.data.location_link, '_blank');
-      return;
-    }
+useSeo({
+  title: "Website Paling Lengkap buat Cari Tempat Ngopi!",
+  description: "Satu Klik, Ribuan Cafe! Temukan yang Pas untuk Kamu.",
+  image: "/img/OG-img.png",
+  url: `https://ngopi.di-mana.com/cafes/${route.params.id}`,
+  type: "article",
+});
 
-    // // Second priority: use place_id
-    // if (cafe.value?.place_id) {
-    //   console.log('Using place_id');
-    //   const url = `https://www.google.com/maps/place/?q=place_id:${cafe.value.place_id}`;
-    //   window.open(url, '_blank');
-    //   return;
-    // }
-
-    // // Third priority: use google_id
-    // if (cafe.value?.google_id) {
-    //   console.log('Using google_id');
-    //   const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-    //     cafe.value.name
-    //   )}&query_place_id=${cafe.value.google_id}`;
-    //   window.open(url, '_blank');
-    //   return;
-    // }
-
-    // Fallback: use coordinates if other options aren't available
-    if (cafe.value.data?.lat && cafe.value?.data.long) {
-      console.log('Using coordinates as fallback');
-      const lat = cafe.value.data.lat.toString().replace(',', '.').trim();
-      const lng = cafe.value.data.long.toString().replace(',', '.').trim();
-      const url = `https://www.google.com/maps/search/${encodeURIComponent(
-        cafe.value.data.name
-      )}/@${lat},${lng},17z`;
-      window.open(url, '_blank');
-    } else {
-      console.log('No location data available');
-    }
+function openInGoogleMaps() {
+  // encan
+  // First priority: use location_link if available
+  if (cafe.value?.data.location_link) {
+    console.log("Using location_link");
+    window.open(cafe.value.data.location_link, "_blank");
+    return;
   }
 
-  function openWebsite() {
-    if (cafe.value?.data.site) {
-      window.open(cafe.value.data.site, '_blank');
-    }
+  // // Second priority: use place_id
+  // if (cafe.value?.place_id) {
+  //   console.log('Using place_id');
+  //   const url = `https://www.google.com/maps/place/?q=place_id:${cafe.value.place_id}`;
+  //   window.open(url, '_blank');
+  //   return;
+  // }
+
+  // // Third priority: use google_id
+  // if (cafe.value?.google_id) {
+  //   console.log('Using google_id');
+  //   const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+  //     cafe.value.name
+  //   )}&query_place_id=${cafe.value.google_id}`;
+  //   window.open(url, '_blank');
+  //   return;
+  // }
+
+  // Fallback: use coordinates if other options aren't available
+  if (cafe.value.data?.lat && cafe.value?.data.long) {
+    console.log("Using coordinates as fallback");
+    const lat = cafe.value.data.lat.toString().replace(",", ".").trim();
+    const lng = cafe.value.data.long.toString().replace(",", ".").trim();
+    const url = `https://www.google.com/maps/search/${encodeURIComponent(
+      cafe.value.data.name
+    )}/@${lat},${lng},17z`;
+    window.open(url, "_blank");
+  } else {
+    console.log("No location data available");
   }
+}
 
-  onMounted(async () => {
-    // console.log('Route ID:', route.params.id);
+function openWebsite() {
+  if (cafe.value?.data.site) {
+    window.open(cafe.value.data.site, "_blank");
+  }
+}
 
-    const cafeData = await $fetch(`/api/cafe/${route.params.id}`, {
-      headers: useRequestHeaders(['cookie']),
-    });
-    // console.log('Fetched Cafe Data:', cafeData);
-    cafe.value = cafeData;
-    // const { $supabase } = useNuxtApp();
-    // const { data: cafeData, error } = await $supabase
-    //   .from('cafes')
-    //   .select('*')
-    //   .eq('id', route.params.id)
-    //   .single();
+onMounted(async () => {
+  // console.log('Route ID:', route.params.id);
 
-    // if (error) {
-    //   console.error('Error fetching cafe details:', error);
-    // } else {
-    //   console.log('Fetched Cafe Data:', cafeData);
-    //   cafe.value = cafeData;
-
-    //   // Check if cafeData.about is a string and parse it if necessary
-    //   if (typeof cafeData.about === 'string') {
-    //     about.value = JSON.parse(cafeData.about);
-    //   } else {
-    //     about.value = cafeData.about; // Assume it's already an object
-    //   }
-
-    //   // Merge additional data into the about object
-    //   const additionalData = JSON.parse(additionalAboutData);
-    //   Object.assign(about.value, additionalData);
-
-    //   console.log('About Data:', about.value); // Check the structure of the about data
-    // }
-    loading.value = false;
+  const cafeData = await $fetch(`/api/cafe/${route.params.id}`, {
+    headers: useRequestHeaders(["cookie"]),
   });
+  // console.log('Fetched Cafe Data:', cafeData);
+  cafe.value = cafeData;
+  // const { $supabase } = useNuxtApp();
+  // const { data: cafeData, error } = await $supabase
+  //   .from('cafes')
+  //   .select('*')
+  //   .eq('id', route.params.id)
+  //   .single();
+
+  // if (error) {
+  //   console.error('Error fetching cafe details:', error);
+  // } else {
+  //   console.log('Fetched Cafe Data:', cafeData);
+  //   cafe.value = cafeData;
+
+  //   // Check if cafeData.about is a string and parse it if necessary
+  //   if (typeof cafeData.about === 'string') {
+  //     about.value = JSON.parse(cafeData.about);
+  //   } else {
+  //     about.value = cafeData.about; // Assume it's already an object
+  //   }
+
+  //   // Merge additional data into the about object
+  //   const additionalData = JSON.parse(additionalAboutData);
+  //   Object.assign(about.value, additionalData);
+
+  //   console.log('About Data:', about.value); // Check the structure of the about data
+  // }
+  loading.value = false;
+});
 </script>
 
 <style scoped>
-  .skeleton {
-    background-color: #e0e0e0;
-    border-radius: 4px;
-    animation: pulse 1.5s infinite ease-in-out;
-  }
+.skeleton {
+  background-color: #e0e0e0;
+  border-radius: 4px;
+  animation: pulse 1.5s infinite ease-in-out;
+}
 
-  @keyframes pulse {
-    0% {
-      opacity: 1;
-    }
-    50% {
-      opacity: 0.4;
-    }
-    100% {
-      opacity: 1;
-    }
+@keyframes pulse {
+  0% {
+    opacity: 1;
   }
+  50% {
+    opacity: 0.4;
+  }
+  100% {
+    opacity: 1;
+  }
+}
 
-  .skeleton-text {
-    height: 1em;
-    margin-bottom: 0.5em;
-    width: 80%;
-  }
+.skeleton-text {
+  height: 1em;
+  margin-bottom: 0.5em;
+  width: 80%;
+}
 
-  .skeleton-image {
-    height: 200px;
-    width: 100%;
-    margin-bottom: 1em;
+.skeleton-image {
+  height: 200px;
+  width: 100%;
+  margin-bottom: 1em;
+}
+
+.fixed {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
   }
+  to {
+    opacity: 1;
+  }
+}
+
+img {
+  transition: transform 0.2s;
+}
+
+
+img:hover {
+  transform: scale(1.05);
+}
 </style>
