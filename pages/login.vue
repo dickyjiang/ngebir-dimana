@@ -26,7 +26,7 @@
         
       </div>
       <!-- @budi link to signup -->
-      <p class=" mt-8">Belum punya akun? <span>Sign up</span></p>
+      <p class="subtitle mt-8">Belum punya akun? <span>Sign up</span></p>
     </div>
   </div>
 </template>
@@ -96,7 +96,7 @@
   .subtitle {
     font-size: 1rem;
     color: #666;
-    margin-bottom: 2rem;
+    margin-bottom: 1rem;
   }
 
   .auth-buttons {
