@@ -153,81 +153,82 @@
 </template>
 
 <script setup>
-import { onMounted, onBeforeUnmount, ref, watch } from "vue";
-import animationData from "../public/animations/coffee-shop.json";
+  import { onMounted, onBeforeUnmount, ref, watch } from 'vue';
+  import animationData from '../public/animations/coffee-shop.json';
 
-const router = useRouter();
-const supabase = useSupabaseClient();
-let anim = null;
-const { data } = await supabase.auth.getSession();
+  const router = useRouter();
+  const supabase = useSupabaseClient();
+  let anim = null;
+  const { data } = await supabase.auth.getSession();
 
-const isMenuOpen = ref(false);
+  const isMenuOpen = ref(false);
 
-const toggleMenu = () => {
-  isMenuOpen.value = !isMenuOpen.value;
-};
+  const toggleMenu = () => {
+    isMenuOpen.value = !isMenuOpen.value;
+  };
 
-// Close menu when route changes
-watch(
-  () => router.currentRoute.value.path,
-  () => {
-    isMenuOpen.value = false;
-  }
-);
+  // Close menu when route changes
+  watch(
+    () => router.currentRoute.value.path,
+    () => {
+      isMenuOpen.value = false;
+    }
+  );
 
-// Add goBack function
-const goBack = () => {
-  window.history.back();
-};
+  // Add goBack function
+  const goBack = () => {
+    window.history.back();
+  };
 
-const handleLogout = async () => {
-  try {
-    const { error } = await supabase.auth.signOut();
-    if (error) throw error;
-    reloadNuxtApp({
-      path: "/",
-      ttl: 1000, // default 10000
-    });
-  } catch (error) {
-    console.error("Error signing out:", error);
-  }
-};
+  const handleLogout = async () => {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      reloadNuxtApp({
+        path: '/',
+        ttl: 1000, // default 10000
+      });
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
+  };
 
-onMounted(async () => {
-  if (typeof window !== "undefined") {
-    const lottie = (await import("lottie-web")).default;
-    const container = document.getElementById("logo-animate");
+  onMounted(async () => {
+    if (typeof window !== 'undefined') {
+      const lottie = (await import('lottie-web')).default;
+      const container = document.getElementById('logo-animate');
 
-    anim = lottie.loadAnimation({
-      container: container,
-      renderer: "svg",
-      loop: true,
-      autoplay: true,
-      animationData: animationData,
-    });
-  }
-});
+      anim = lottie.loadAnimation({
+        container: container,
+        renderer: 'svg',
+        loop: true,
+        autoplay: true,
+        animationData: animationData,
+      });
+    }
+  });
 
-onBeforeUnmount(() => {
-  if (anim) {
-    anim.destroy();
-  }
-});
+  onBeforeUnmount(() => {
+    if (anim) {
+      anim.destroy();
+    }
+  });
 </script>
 
 <style scoped>
-@font-face {
-  font-family: "Sharp Grotesk";
-  src: url("~/assets/fonts/sharp-grotesk-medium-25-regular.woff") format("woff");
-  font-weight: normal;
-  font-style: normal;
-}
+  @font-face {
+    font-family: 'Sharp Grotesk';
+    src: url('~/assets/fonts/sharp-grotesk-medium-25-regular.woff')
+      format('woff');
+    font-weight: normal;
+    font-style: normal;
+  }
 
-h2 {
-  font-family: "Sharp Grotesk", sans-serif; /* Fallback to sans-serif */
-}
+  h2 {
+    font-family: 'Sharp Grotesk', sans-serif; /* Fallback to sans-serif */
+  }
 
-:global(body.menu-open) {
-  overflow: hidden;
-}
+  :global(body.menu-open) {
+    overflow: hidden;
+  }
 </style>

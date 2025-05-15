@@ -266,15 +266,6 @@
     document.body.style.overflow = ''; // Restore scrolling
   }
 
-  // Add event listener for escape key
-  onMounted(() => {
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && showModal.value) {
-        closeModal();
-      }
-    });
-  });
-
   useSeo({
     title: 'Website Paling Lengkap buat Cari Tempat Ngopi!',
     description: 'Satu Klik, Ribuan Cafe! Temukan yang Pas untuk Kamu.',
@@ -327,11 +318,34 @@
   }
 
   onMounted(async () => {
-    const cafeData = await $fetch(`/api/cafe/${route.params.id}`, {
-      headers: useRequestHeaders(['cookie']),
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && showModal.value) {
+        closeModal();
+      }
     });
-    cafe.value = cafeData;
-    loading.value = false;
+    try {
+      const { cafeData, error } = await $fetch(`/api/cafe/${route.params.id}`, {
+        headers: useRequestHeaders(['cookie']),
+        onResponseError({ response }) {
+          console.error(
+            `Server error: ${response.status} ${response.statusText}`
+          );
+          loading.value = false;
+          // You could set a specific error message to display based on status code
+        },
+      });
+
+      if (error) {
+        console.error('Error fetching cafe data:', error);
+        return;
+      }
+
+      cafe.value = cafeData;
+    } catch (err) {
+      console.error('Fetch error:', err);
+    } finally {
+      loading.value = false;
+    }
   });
 </script>
 
