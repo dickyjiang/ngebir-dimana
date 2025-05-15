@@ -324,21 +324,15 @@
       }
     });
     try {
-      const { cafeData, error } = await $fetch(`/api/cafe/${route.params.id}`, {
+      const cafeData = await $fetch(`/api/cafe/${route.params.id}`, {
         headers: useRequestHeaders(['cookie']),
         onResponseError({ response }) {
           console.error(
             `Server error: ${response.status} ${response.statusText}`
           );
           loading.value = false;
-          // You could set a specific error message to display based on status code
         },
       });
-
-      if (error) {
-        console.error('Error fetching cafe data:', error);
-        return;
-      }
 
       cafe.value = cafeData;
     } catch (err) {
