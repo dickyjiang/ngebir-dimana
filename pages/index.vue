@@ -331,7 +331,7 @@
         'fixed inset-y-0 left-0 w-[80%] bg-white z-40 transform transition-transform duration-300 ease-in-out': true,
         'translate-x-0': isSidebarOpen,
         '-translate-x-full': !isSidebarOpen,
-        'md:translate-x-0 md:static md:w-[20%] md:max-w-[20%] md:sticky md:top-0': true,
+        'md:translate-x-0 md:static  md:max-w-[20%] md:sticky md:top-4': true,
       }"
       class="p-4 border border-gray-400 rounded-md"
       style="max-height: 100vh; overflow-y: auto"
@@ -345,7 +345,7 @@
       />
     </div>
 
-    <div class="p-4 flex-1">
+    <div class="px-4 flex-1">
       <WorldOfCoffeeBanner />
       <CafeList
         :loading="loading"

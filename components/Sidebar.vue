@@ -16,7 +16,7 @@
         Reset Lokasi
       </button>
     </div>
-    <div class="flex flex-wrap gap-3 text-sm text-gray-600 text-nowrap my-4">
+    <div class="flex flex-wrap gap-3 text-sm text-gray-600 text-nowrap my-4 overflow-auto">
       <div class="w-full">
         <div
           v-for="parentCity in uniqueCities.parentCities"
