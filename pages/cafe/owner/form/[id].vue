@@ -9,6 +9,10 @@
 </template>
 
 <script setup lang="ts">
+definePageMeta({
+  layout: 'member'
+})
+
   const route = useRoute();
   const cafeId = computed(() => route.params.id as string);
 </script>

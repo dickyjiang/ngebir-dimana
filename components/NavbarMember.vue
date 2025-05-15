@@ -38,7 +38,7 @@
           </div>
         </a>
         <p class="hidden sm:flex font-semibold text-sm mb-1">
-          Satu Klik, Ribuan Cafe! Temukan yang Pas untuk Kamu.
+          Satu Klik, Ribuan Cafe! Temukan yang Pas untuk Kamu. ini member
         </p>
       </div>
     </div>
@@ -106,41 +106,39 @@
       </button>
 
       <div
-        class="border flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-2 mt-12 sm:mt-0"
+        class="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-2 mt-12 sm:mt-0"
       >
+        
+
         <div
           class="flex flex-col sm:flex-row items-start sm:items-center gap-1"
         >
-          <div v-if="!data.session">
-            <div
-              class="flex flex-col sm:flex-row items-start sm:items-center gap-1"
-            >
-              <p class="text-sm text-gray-600">Mau nambah cafe kamu?</p>
-              <NuxtLink
-                to="/login"
-                class="text-sm font-semibold flex border px-3 py-2 rounded-lg border-none transition-colors hover:bg-black hover:text-yellow-500"
-                >Registrasi</NuxtLink
-              >
-            </div>
-            <p class="text-sm text-gray-600">Sudah punya akun?</p>
-            <NuxtLink
-              to="/login"
-              class="text-sm font-semibold flex border px-3 py-2 rounded-lg border-none transition-colors hover:bg-black hover:text-yellow-500"
-            >
-              Login
-            </NuxtLink>
-          </div>
+        <div v-if="!data.session">
+          <p class="text-sm text-gray-600">Sudah punya akun?</p>
+          <NuxtLink
+            to="/login"
+            class="text-sm font-semibold flex border px-3 py-2 rounded-lg border-none transition-colors hover:bg-black hover:text-yellow-500"
+          >
+            Login
+          </NuxtLink>
+        </div>
 
-          <div v-if="data.session" class="flex items-center gap-2">
-            <NuxtLink to="/profile">
-              <button
-                class="text-sm font-semibold flex border px-3 py-2 rounded-lg border-none transition-colors hover:bg-black hover:text-yellow-500"
-              >
-                Profile
-              </button>
+          <div 
+          v-if="data.session"
+           class="flex items-center gap-2">
+            <NuxtLink
+              to="/cafe/owner/form"
+              class="hidden sm:flex text-sm font-semibold flex border px-3 py-2 rounded-lg border-none transition-colors hover:bg-black hover:text-yellow-500"
+            >
+              add cafe
             </NuxtLink>
+
+            <NuxtLink to="/profile">
+            <button class="text-sm font-semibold flex border px-3 py-2 rounded-lg border-none transition-colors hover:bg-black hover:text-yellow-500">Profile</button>
+            </NuxtLink>
+
             <button
-              class="logout-button text-sm font-semibold flex border px-3 py-2 rounded-lg border-none transition-colors hover:bg-black hover:text-yellow-500"
+              class="text-sm font-semibold flex border px-3 py-2 rounded-lg border-none transition-colors hover:bg-black hover:text-yellow-500 "
               @click="handleLogout"
             >
               Logout
@@ -153,81 +151,82 @@
 </template>
 
 <script setup>
-import { onMounted, onBeforeUnmount, ref, watch } from "vue";
-import animationData from "../public/animations/coffee-shop.json";
+  import { onMounted, onBeforeUnmount, ref, watch } from 'vue';
+  import animationData from '../public/animations/coffee-shop.json';
 
-const router = useRouter();
-const supabase = useSupabaseClient();
-let anim = null;
-const { data } = await supabase.auth.getSession();
+  const router = useRouter();
+  const supabase = useSupabaseClient();
+  let anim = null;
+  const { data } = await supabase.auth.getSession();
 
-const isMenuOpen = ref(false);
+  const isMenuOpen = ref(false);
 
-const toggleMenu = () => {
-  isMenuOpen.value = !isMenuOpen.value;
-};
+  const toggleMenu = () => {
+    isMenuOpen.value = !isMenuOpen.value;
+  };
 
-// Close menu when route changes
-watch(
-  () => router.currentRoute.value.path,
-  () => {
-    isMenuOpen.value = false;
-  }
-);
+  // Close menu when route changes
+  watch(
+    () => router.currentRoute.value.path,
+    () => {
+      isMenuOpen.value = false;
+    }
+  );
 
-// Add goBack function
-const goBack = () => {
-  window.history.back();
-};
+  // Add goBack function
+  const goBack = () => {
+    window.history.back();
+  };
 
-const handleLogout = async () => {
-  try {
-    const { error } = await supabase.auth.signOut();
-    if (error) throw error;
-    reloadNuxtApp({
-      path: "/",
-      ttl: 1000, // default 10000
-    });
-  } catch (error) {
-    console.error("Error signing out:", error);
-  }
-};
+  const handleLogout = async () => {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      reloadNuxtApp({
+        path: '/',
+        ttl: 1000, // default 10000
+      });
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
+  };
 
-onMounted(async () => {
-  if (typeof window !== "undefined") {
-    const lottie = (await import("lottie-web")).default;
-    const container = document.getElementById("logo-animate");
+  onMounted(async () => {
+    if (typeof window !== 'undefined') {
+      const lottie = (await import('lottie-web')).default;
+      const container = document.getElementById('logo-animate');
 
-    anim = lottie.loadAnimation({
-      container: container,
-      renderer: "svg",
-      loop: true,
-      autoplay: true,
-      animationData: animationData,
-    });
-  }
-});
+      anim = lottie.loadAnimation({
+        container: container,
+        renderer: 'svg',
+        loop: true,
+        autoplay: true,
+        animationData: animationData,
+      });
+    }
+  });
 
-onBeforeUnmount(() => {
-  if (anim) {
-    anim.destroy();
-  }
-});
+  onBeforeUnmount(() => {
+    if (anim) {
+      anim.destroy();
+    }
+  });
 </script>
 
 <style scoped>
-@font-face {
-  font-family: "Sharp Grotesk";
-  src: url("~/assets/fonts/sharp-grotesk-medium-25-regular.woff") format("woff");
-  font-weight: normal;
-  font-style: normal;
-}
+  @font-face {
+    font-family: 'Sharp Grotesk';
+    src: url('~/assets/fonts/sharp-grotesk-medium-25-regular.woff')
+      format('woff');
+    font-weight: normal;
+    font-style: normal;
+  }
 
-h2 {
-  font-family: "Sharp Grotesk", sans-serif; /* Fallback to sans-serif */
-}
+  h2 {
+    font-family: 'Sharp Grotesk', sans-serif; /* Fallback to sans-serif */
+  }
 
-:global(body.menu-open) {
-  overflow: hidden;
-}
+  :global(body.menu-open) {
+    overflow: hidden;
+  }
 </style>

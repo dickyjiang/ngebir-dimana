@@ -90,8 +90,8 @@
             class="w-full border border-gray-300 rounded-md p-4 mb-4"
           >
             <NuxtLink :to="`/cafe/owner/form/${cafe.slug_name}`">
-              <img
-                src="/img/noimg.webp"
+              <NuxtImg
+                :src="`${cafe.photo}`"
                 alt="cafe_pic"
                 class="w-full h-64 object-cover"
               />
@@ -128,6 +128,9 @@
   import { useSupabaseClient, useSupabaseUser } from '#imports';
   import { NuxtImg } from '#components';
 
+  definePageMeta({
+  layout: 'member'
+})
   const router = useRouter();
   const supabase = useSupabaseClient();
   const user = useSupabaseUser();

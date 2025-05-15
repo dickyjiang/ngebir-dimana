@@ -237,6 +237,12 @@
                       required
                       @input="validateOnChangeForm"
                     />
+                      <span
+                          v-if="hasError('location_link')"
+                          class="text-red-500 text-sm"
+                        >
+                          {{ formErrors.location_link.join(', ') }}
+                        </span>
                     <p class="text-gray-500 text-sm mt-2 text-center">
                       Masukan tautan URL (URL link) dari Google Business anda
                       disini (diawalin dengan:
@@ -665,7 +671,7 @@
               </div>
             </form>
             <div class="flex justify-center sm:justify-end px-8 mt-8">
-              hasAnyErrors:{{ hasAnyErrors() }} isSubmitting:{{ isSubmitting }}
+              <!-- hasAnyErrors:{{ hasAnyErrors() }} isSubmitting:{{ isSubmitting }} -->
 
               <button
                 class="text-black font-semibold border border-black px-4 py-2 rounded-full relative"
@@ -1091,5 +1097,70 @@
 </script>
 
 <style scoped>
-  /* Your existing styles from add.vue */
+  .input-base {
+    @apply mt-2 pl-2 py-1 border border-gray-300 rounded bg-gray-50 w-full outline-none transition-all duration-200;
+
+    &:hover {
+      @apply border-gray-400;
+    }
+
+    &:focus {
+      @apply bg-white border-blue-500 ring-2 ring-blue-200;
+    }
+  }
+
+  .input-error {
+    @apply border-red-500 bg-red-50;
+  }
+
+  select.input-base {
+    @apply appearance-none bg-no-repeat bg-right pr-8;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+    background-size: 1.5em;
+  }
+
+  /* Add this to your CSS */
+  .popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .popup-content {
+    position: relative;
+    background-color: #fff;
+    padding: 20px;
+    max-width: 900px; /* Increased from 600px */
+    width: 95%; /* Increased from 90% */
+    border-radius: 5px;
+    margin: 20px; /* Added to ensure some spacing on very small screens */
+  }
+
+  .close-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 24px;
+    cursor: pointer;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f3f4f6;
+    border-radius: 50%;
+  }
+
+  .popup-content img {
+    width: 100%;
+    height: auto;
+    object-fit: contain; /* This ensures the image maintains its aspect ratio */
+  }
 </style>

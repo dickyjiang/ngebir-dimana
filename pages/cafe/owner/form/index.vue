@@ -9,5 +9,8 @@
 </template>
 
 <script setup lang="ts">
+definePageMeta({
+  layout: 'member'
+})
 // Simply use the shared component
 </script>
