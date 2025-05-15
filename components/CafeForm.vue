@@ -237,12 +237,12 @@
                       required
                       @input="validateOnChangeForm"
                     />
-                      <span
-                          v-if="hasError('location_link')"
-                          class="text-red-500 text-sm"
-                        >
-                          {{ formErrors.location_link.join(', ') }}
-                        </span>
+                    <span
+                      v-if="hasError('location_link')"
+                      class="text-red-500 text-sm"
+                    >
+                      {{ formErrors.location_link.join(', ') }}
+                    </span>
                     <p class="text-gray-500 text-sm mt-2 text-center">
                       Masukan tautan URL (URL link) dari Google Business anda
                       disini (diawalin dengan:
@@ -398,26 +398,20 @@
 
                     <!-- Image preview section -->
                     <div
-                      v-if="imagePreviews.length > 0"
+                      v-if="imagePreviews"
                       class="grid grid-cols-2 sm:grid-cols-3 gap-4"
                     >
-                      <div
-                        v-for="(preview, index) in imagePreviews"
-                        :key="index"
-                        class="relative"
+                      <img
+                        :src="imagePreviews"
+                        class="w-full h-32 object-cover rounded-lg"
+                      />
+                      <button
+                        @click="removeImage(index)"
+                        class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center"
+                        type="button"
                       >
-                        <img
-                          :src="preview"
-                          class="w-full h-32 object-cover rounded-lg"
-                        />
-                        <button
-                          @click="removeImage(index)"
-                          class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center"
-                          type="button"
-                        >
-                          ×
-                        </button>
-                      </div>
+                        ×
+                      </button>
                     </div>
                   </div>
 
@@ -475,7 +469,7 @@
                       </p>
                     </div>
 
-                    <!-- Image preview section -->
+                    <!-- Image preview section - modified to handle both URLs and File previews -->
                     <div
                       v-if="menuImagePreviews.length > 0"
                       class="grid grid-cols-2 sm:grid-cols-3 gap-4"
@@ -488,6 +482,7 @@
                         <img
                           :src="preview"
                           class="w-full h-32 object-cover rounded-lg"
+                          alt="Menu image preview"
                         />
                         <button
                           @click="removeMenuImage(index)"
@@ -853,11 +848,31 @@
   const submitForm = () => {
     handleSubmit();
   };
+  const loadImagePreviews = () => {
+    // Handle logo preview for existing URL
+    if (logoFile.value && typeof logoFile.value === 'string') {
+      logoPreview.value = logoFile.value;
+    }
 
+    if (imageFiles.value && typeof imageFiles.value === 'string') {
+      imagePreviews.value = imageFiles.value;
+    }
+
+    // Handle menu/additional images preview
+    if (menuImageFiles.value && menuImageFiles.value.length > 0) {
+      menuImagePreviews.value = menuImageFiles.value
+        .filter((item) => item)
+        .map((item) =>
+          typeof item === 'string' ? item : URL.createObjectURL(item)
+        );
+    }
+  };
   // Force reload data if needed
   onMounted(() => {
     if (props.isEditMode && props.cafeId) {
-      loadCafeData();
+      loadCafeData().then(() => {
+        loadImagePreviews();
+      });
     }
     searchFeatures();
   });
@@ -877,28 +892,28 @@
     }
   };
 
-  const handleLogoUpload = async (event: Event) => {
-    const input = event.target as HTMLInputElement;
-    if (!input.files || input.files.length === 0) return;
+  const handleLogoUpload = (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
 
-    const file = input.files[0];
-
-    // Clear previous errors
-    formErrors.value.logo = [];
-
-    const validation = validateImageFile(file, maxFileSize);
-    if (!validation.valid) {
-      formErrors.value.logo.push(validation.error as string);
+    // Validate file
+    if (!file.type.match('image.*')) {
+      formErrors.value.logo = ['Please upload an image file'];
       return;
     }
 
-    logoFile.value = file;
-
-    try {
-      logoPreview.value = await createImagePreview(file);
-    } catch (error) {
-      formErrors.value.logo.push('Failed to create logo preview');
+    if (file.size > 5 * 1024 * 1024) {
+      // 5MB
+      formErrors.value.logo = ['Image size must be less than 5MB'];
+      return;
     }
+
+    // Update the logo file and create preview
+    logoFile.value = file;
+    logoPreview.value = URL.createObjectURL(file);
+
+    // Clear any previous errors
+    formErrors.value.logo = [];
   };
 
   const removeLogo = () => {
@@ -909,70 +924,78 @@
     if (input) input.value = '';
   };
 
-  const handleImageUpload = async (event: Event) => {
-    const input = event.target as HTMLInputElement;
-    const files = Array.from(input.files || []);
+  const handleImageUpload = (event) => {
+    const file = event.target.files[0];
+    if (!files) return;
 
-    // Clear previous errors
-    imageErrors.value = [];
+    imageErrors.value = []; // Clear previous errors
 
-    // Check if adding these files would exceed the maximum
-    const { validFiles, previews, errors, progress } = await processImageUpload(
-      files,
-      maxFileSize,
-      maxImageCount,
-      imageFiles.value.length
-    );
-
-    if (errors.length > 0) {
-      imageErrors.value = errors;
+    // Validate file
+    if (!file.type.match('image.*')) {
+      imageErrors.value.push(`${file.name} is not a valid image file`);
+      return; // Changed from continue to return since we're not in a loop
     }
 
-    imageFiles.value = [...imageFiles.value, ...validFiles];
-    imagePreviews.value = [...imagePreviews.value, ...previews];
-    imageUploadProgress.value = [...imageUploadProgress.value, ...progress];
+    if (file.size > 5 * 1024 * 1024) {
+      // 20MB
+      imageErrors.value.push(`${file.name} exceeds the 20MB size limit`);
+      return; // Changed from continue to return since we're not in a loop
+    }
 
-    input.value = '';
+    // Add to files array and create preview
+    imageFiles.value = file;
+    imagePreviews.value = URL.createObjectURL(file);
+    // }
   };
 
   const removeImage = (index: number) => {
-    imagePreviews.value.splice(index, 1);
-    imageFiles.value.splice(index, 1);
-    imageUploadProgress.value.splice(index, 1);
+    imagePreviews.value = null;
+    imageFiles.value = null;
+    imageUploadProgress.value = null;
   };
 
-  const handleMenuImageUpload = async (event: Event) => {
-    const input = event.target as HTMLInputElement;
-    const files = Array.from(input.files || []);
+  const handleMenuImageUpload = (event) => {
+    const files = event.target.files;
+    if (!files || files.length === 0) return;
 
-    // Clear previous errors
-    menuImageErrors.value = [];
+    menuImageErrors.value = []; // Clear previous errors
 
-    const { validFiles, previews, errors, progress } = await processImageUpload(
-      files,
-      maxFileSize,
-      maxImageCount,
-      menuImageFiles.value.length
-    );
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
 
-    if (errors.length > 0) {
-      menuImageErrors.value = errors;
+      // Validate file
+      if (!file.type.match('image.*')) {
+        menuImageErrors.value.push(`${file.name} is not a valid image file`);
+        continue;
+      }
+
+      if (file.size > 20 * 1024 * 1024) {
+        // 20MB
+        menuImageErrors.value.push(`${file.name} exceeds the 20MB size limit`);
+        continue;
+      }
+
+      // Add to files array and create preview
+      menuImageFiles.value.push(file);
+      menuImagePreviews.value.push(URL.createObjectURL(file));
     }
-
-    menuImageFiles.value = [...menuImageFiles.value, ...validFiles];
-    menuImagePreviews.value = [...menuImagePreviews.value, ...previews];
-    menuImageUploadProgress.value = [
-      ...menuImageUploadProgress.value,
-      ...progress,
-    ];
-
-    input.value = '';
   };
 
   const removeMenuImage = (index: number) => {
     menuImagePreviews.value.splice(index, 1);
-    menuImageFiles.value.splice(index, 1);
-    menuImageUploadProgress.value.splice(index, 1);
+
+    // If it's a File object
+    if (index < menuImageFiles.value.length) {
+      if (typeof menuImageFiles.value[index] === 'object') {
+        menuImageFiles.value.splice(index, 1);
+        if (index < menuImageUploadProgress.value.length) {
+          menuImageUploadProgress.value.splice(index, 1);
+        }
+      } else {
+        // If it's a URL string
+        menuImageFiles.value.splice(index, 1);
+      }
+    }
   };
 
   const removeSelectedFeature = (feature: Feature) => {

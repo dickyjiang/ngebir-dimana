@@ -4,7 +4,7 @@ import { serverSupabaseClient, serverSupabaseUser } from "#supabase/server";
 export default defineEventHandler(async (event) => {
     const { slug } = event.context.params;
     const client = await serverSupabaseClient<Database>(event);
-    let query = client.from("cafes").select("id,name,city, photo, city, slug_name, description, city_slug,rating, range, rating_num, logo, lat, long, working_hours, location_link, site,cafe_features(cafe_id, feature_id)", { count: "exact" });
+    let query = client.from("cafes").select("id,name,city, photo, city, slug_name, description, city_slug,rating, range, rating_num, logo, lat, long, street, state, phone, site, working_hours, location_link, cafe_features(cafe_id, feature_id)", { count: "exact" });
     query = query.eq('slug_name', slug)
     query = query.single();
 
@@ -40,5 +40,11 @@ export default defineEventHandler(async (event) => {
     if (error3) throw createError({ statusMessage: error3.message });
 
 
-    return { 'data': data, 'count': count, 'features': data2, 'is_admin': is_admin, 'cafe_pics': data3 };
+    const { data: data4, error: error4, count: count4 } = await client.from("city").select("city_parent").eq('city_slug', data.city_slug)
+
+    if (error3) throw createError({ statusMessage: error3.message });
+
+
+
+    return { 'data': data, 'count': count, 'features': data2, 'is_admin': is_admin, 'cafe_pics': data3, 'city_parent': data4 };
 })

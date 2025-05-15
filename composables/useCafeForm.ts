@@ -135,6 +135,112 @@ export function useCafeForm(isEditMode: Ref<boolean>, cafeId: Ref<string | null>
   // const { features } = await useFetchFeatures();
   // ...other form fields
 
+  // Helper function to convert time format from 12.30am to 00:30 format
+  const convertTimeFormat = (timeStr) => {
+    try {
+      // Handle special case for 24h format
+      if (timeStr === '24') return '23:59';
+
+      // Trim whitespace
+      timeStr = timeStr.trim();
+
+      // Parse time like "12.30am" or "4.30pm"
+      const match = timeStr.match(/(\d+)\.?(\d*)?\s*(am|pm|AM|PM)?/);
+      if (!match) return '00:00';
+
+      let [_, hours, minutes, period] = match;
+      hours = parseInt(hours);
+
+      // Handle missing minutes
+      minutes = minutes ? minutes : '00';
+
+      // Handle missing period (assume 24h format)
+      period = period ? period.toLowerCase() : '';
+
+      // Convert 12-hour to 24-hour format
+      if (period === 'pm' && hours < 12) {
+        hours += 12;
+      } else if (period === 'am' && hours === 12) {
+        hours = 0;
+      }
+
+      // Format with leading zeros
+      return `${hours.toString().padStart(2, '0')}:${minutes.padEnd(2, '0')}`;
+    } catch (e) {
+      console.error('Error parsing time:', timeStr, e);
+      return '00:00';
+    }
+  };
+
+  // Corrected implementation of convertDaysToFormFormat
+  // Direct fix for convertDaysToFormFormat
+  // Fixed implementation of convertDaysToFormFormat to handle string input
+  const convertDaysToFormFormat = (daysData) => {
+    // Handle null or undefined daysData
+    if (!daysData) {
+      return days.value; // Return default days if no data provided
+    }
+
+    // Parse the data if it's a string
+    let parsedData = daysData;
+    if (typeof daysData === 'string') {
+      try {
+        parsedData = JSON.parse(daysData);
+      } catch (e) {
+        console.error('Error parsing days data string:', e);
+        return days.value; // Return default on parsing error
+      }
+    }
+
+    // Define the order of days
+    const dayOrder = [
+      'Sunday', 'Monday', 'Tuesday', 'Wednesday',
+      'Thursday', 'Friday', 'Saturday'
+    ];
+
+    // Create a completely new array with processed values
+    return dayOrder.map(dayName => {
+      const dayValue = parsedData[dayName];
+
+      // Set defaults
+      let isOpen = false;
+      let openTime = '00:00';
+      let closeTime = '23:59';
+
+      // 1. Check for Closed explicitly
+      if (dayValue === 'Closed') {
+        isOpen = false;
+      }
+      // 2. Check for 24-hour formats
+      else if (dayValue === '24-24' || dayValue === '24h' || dayValue === '24') {
+        isOpen = true;
+        openTime = '24'
+        closeTime = '24'
+      }
+      // 3. Check for time ranges with separators
+      else if (dayValue && (dayValue.includes('-') || dayValue.includes('to') || dayValue.includes('~'))) {
+        const separator = dayValue.includes('-') ? '-' :
+          dayValue.includes('to') ? 'to' : '~';
+
+        const times = dayValue.split(separator);
+
+        if (times.length === 2) {
+          isOpen = true;
+          openTime = convertTimeFormat(times[0]);
+          closeTime = convertTimeFormat(times[1]);
+        }
+      }
+
+      return {
+        id: dayName.toLowerCase(),
+        name: dayName,
+        isOpen,
+        openTime,
+        closeTime
+      };
+    });
+  };
+
   // Function to load cafe data when in edit mode
   const loadCafeData = async () => {
     if (isEditMode.value && cafeId.value) {
@@ -150,6 +256,13 @@ export function useCafeForm(isEditMode: Ref<boolean>, cafeId: Ref<string | null>
         cafeSite.value = data.data.site || '';
         cafeDescription.value = data.data.description || '';
         phoneNumber.value = data.data.phone || '+62 ';
+        selectedParentCity.value = data.city_parent[0].city_parent || '';
+        selectedChildCity.value = data.data.city_slug || '';
+        locationLink.value = data.data.location_link || '';
+        imageFiles.value = data.data.photo || '';
+        logoFile.value = data.data.logo || null;
+        menuImageFiles.value = data.cafe_pics.map((pic: any) => pic.url) || [];
+        days.value = convertDaysToFormFormat(data.data.working_hours) || [];
         // ...populate other fields
       } catch (error) {
         console.error('Error loading cafe data:', error);
@@ -177,8 +290,8 @@ export function useCafeForm(isEditMode: Ref<boolean>, cafeId: Ref<string | null>
 
   // Also keep the onMounted hook as a fallback
   onMounted(() => {
-    loadCafeData();
     fetchCityData()
+    loadCafeData();
   });
 
   // Validation function stub (implement your actual validation logic)
@@ -252,20 +365,14 @@ export function useCafeForm(isEditMode: Ref<boolean>, cafeId: Ref<string | null>
     // formData.append('childCity', selectedChildCity.value);
     // ... other form fields ...
 
-    const parentCityName = parentCities.value.find(
-      (p) => p.city_slug === selectedParentCity.value
-    )?.city_name;
-    const childCityName = availableChildCities.value.find(
-      (c) => c.city_slug === selectedChildCity.value
-    )?.city_name;
 
     formData.append('cafeName', cafeName.value);
     formData.append('cafeStreet', cafeStreet.value);
     formData.append('cafeDescription', cafeDescription.value);
     formData.append('cafeSite', cafeSite.value);
     formData.append('cafePhoneNumber', phoneNumber.value);
-    formData.append('cafeCity', childCityName || '');
-    formData.append('cafeState', parentCityName || '');
+    formData.append('cafeCity', selectedChildCity.value);
+    formData.append('cafeState', selectedParentCity.value);
     formData.append('cafeLocationLink', locationLink.value);
     // features: selectedFeatures.value.map(feature => feature.id),
 

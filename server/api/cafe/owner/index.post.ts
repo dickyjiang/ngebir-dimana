@@ -66,18 +66,6 @@ export default defineEventHandler(async (event) => {
 	}
 
 	// Helper function to format time from 24h to am/pm
-	const cafeCitySlug = cafeCity
-		.toLowerCase()
-		.trim()
-		.replace(/[^\w\s-]/g, '') // Remove special characters
-		.replace(/\s+/g, '-') // Replace spaces with hyphens
-		.replace(/-+/g, ''); // Remove consecutive hyphens
-	const cafeStateSlug = cafeState
-		.toLowerCase()
-		.trim()
-		.replace(/[^\w\s-]/g, '') // Remove special characters
-		.replace(/\s+/g, '-') // Replace spaces with hyphens
-		.replace(/-+/g, ''); // Remove consecutive hyphens
 
 	let slug = cafeName
 		.toLowerCase()
@@ -107,12 +95,12 @@ export default defineEventHandler(async (event) => {
 		}
 
 		// // If a duplicate exists, add first the child city
-		if (counter === 0 && cafeCitySlug) {
-			finalSlug = `${slug}-${cafeCitySlug}`;
+		if (counter === 0 && cafeCity) {
+			finalSlug = `${slug}-${cafeCity}`;
 		}
 		// // If still a duplicate, add the parent city
-		else if (counter === 1 && cafeStateSlug) {
-			finalSlug = `${slug}-${cafeCitySlug}-${cafeStateSlug}`;
+		else if (counter === 1 && cafeState) {
+			finalSlug = `${slug}-${cafeCity}-${cafeState}`;
 		}
 		// // If all else fails, add a number that increments
 		else {
@@ -166,7 +154,8 @@ export default defineEventHandler(async (event) => {
 			site: cafeSite,
 			phone: cafePhoneNumber,
 			city: cafeCity,
-			city_slug: cafeCitySlug,
+			city_slug: cafeCity,
+			state: cafeState,
 			working_hours: formattedWorkingHours,
 			location_link: cafeLocationLink,
 			logo: logoUrl,
