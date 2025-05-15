@@ -24,28 +24,36 @@
       </svg>
     </button>
 
-    <a href="/">
-      <!-- <img src="/src/assets/img/logo_ndm.svg" alt="logo" class="h-6"> -->
-      <div class="flex items-center">
-        <h2 class="mt-3">Ngopi</h2>
-        <div id="logo-animate" class="w-10">
-          <!-- Lottie animation will be rendered here -->
+    <div class="flex gap-4 items-end">
+      <a href="/">
+        <!-- <img src="/src/assets/img/logo_ndm.svg" alt="logo" class="h-6"> -->
+        <div class="flex items-center">
+          <h2 class="mt-3">Ngopi</h2>
+          <div id="logo-animate" class="w-10">
+            <!-- Lottie animation will be rendered here -->
+          </div>
+          <h2 class="mt-3">dimana</h2>
         </div>
-        <h2 class="mt-3">dimana</h2>
-      </div>
-    </a>
-    <div class="flex items-center gap-2">
-      <p class="hidden sm:flex mt-3 font-semibold text-sm">
-        Satu Klik, Ribuan Cafe! Temukan yang Pas untuk Kamu.
-      </p>
+      </a>
+        <p class="hidden sm:flex font-semibold text-sm mb-1">
+          Satu Klik, Ribuan Cafe! Temukan yang Pas untuk Kamu.
+        </p>
     </div>
-    <!-- <div class="flex items-center gap-2">
-      <NuxtLink to="/cafe/owner/add" class="hidden sm:flex">
+
+    <div id="navMenu" class="flex items-center gap-2 ">
+      <!-- <NuxtLink to="/cafe/owner/add" class="hidden sm:flex">
         add cafe
-      </NuxtLink>
-      <NuxtLink to="/login" class="hidden sm:flex"> login </NuxtLink>
-      <button class="logout-button" @click="handleLogout">Logout</button>
-    </div> -->
+      </NuxtLink> -->
+      <div class="flex items-center gap-1">
+        <p class="text-sm text-gray-600">Mau nambah cafe kamu?</p> 
+        <NuxtLink to="/login" class="text-sm font-semibold hidden sm:flex border px-3 py-2 rounded-lg border-none transition-colors hover:bg-black hover:text-yellow-500 ">Registrasi</NuxtLink> 
+      </div>
+      <div class="flex items-center gap-1">
+        <p class="text-sm text-gray-600">Sudah punya akun?</p> 
+        <NuxtLink to="/login" class="text-sm font-semibold hidden sm:flex border px-3 py-2 rounded-lg border-none transition-colors hover:bg-black hover:text-yellow-500  "> Login </NuxtLink>
+      </div>
+      <!-- <button class="logout-button" @click="handleLogout">Logout</button> -->
+    </div>
   </div>
 </template>
 
