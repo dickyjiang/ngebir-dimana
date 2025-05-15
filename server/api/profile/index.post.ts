@@ -1,10 +1,8 @@
 import { serverSupabaseClient, serverSupabaseUser } from '#supabase/server'
 
 export default defineEventHandler(async (event) => {
-    console.log('index post:')
     const supabase = await serverSupabaseClient(event)
     const user = await serverSupabaseUser(event)
-    console.log('user post:', user)
 
     if (!user) {
         throw createError({

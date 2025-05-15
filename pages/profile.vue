@@ -11,7 +11,7 @@
               <img
                 v-if="avatarUrl"
                 :src="avatarUrl"
-                alt=""
+                alt="Profile Picture"
                 class="w-full h-full object-cover"
               />
               <div
@@ -84,51 +84,34 @@
         </div>
         <div class="pl-8">
           <h1 class="text-xl text-gray-800 mb-4">List Usaha kamu</h1>
-          <div class="w-full border border-gray-300 rounded-md p-4 mb-4">
-            <img
-              src="/img/noimg.webp"
-              alt="cafe_pic"
-              class="w-full h-64 object-cover"
-            />
-            <div class="mt-4 flex flex-col gap-2">
-              <div class="w-full flex justify-between items-center">
-                <h2 class="text-xl font-semibold">Cafe name</h2>
-                <p>Cafe</p>
+          <div
+            v-for="cafe in cafesList"
+            :key="cafe.slug_name"
+            class="w-full border border-gray-300 rounded-md p-4 mb-4"
+          >
+            <NuxtLink :to="`/cafe/owner/form/${cafe.slug_name}`">
+              <img
+                src="/img/noimg.webp"
+                alt="cafe_pic"
+                class="w-full h-64 object-cover"
+              />
+              <div class="mt-4 flex flex-col gap-2">
+                <div class="w-full flex justify-between items-center">
+                  <h2 class="text-xl font-semibold">{{ cafe.name }}</h2>
+                  <p>{{ cafe.city }}</p>
+                </div>
+                <div class="flex justify-between items-center">
+                  <p>{{ cafe.description }}</p>
+                </div>
               </div>
-              <div class="flex justify-between items-center">
-                <p>Data naon deui nya?</p>
+              <div class="mt-2 flex justify-end w-full">
+                <button
+                  class="bg-blue-500 text-white py-3 px-8 rounded-md text-base font-medium hover:bg-blue-600 transition-colors disabled:bg-blue-300 disabled:cursor-not-allowed"
+                >
+                  edit
+                </button>
               </div>
-            </div>
-            <div class="mt-2 flex justify-end w-full">
-              <button
-                class="bg-blue-500 text-white py-3 px-8 rounded-md text-base font-medium hover:bg-blue-600 transition-colors disabled:bg-blue-300 disabled:cursor-not-allowed"
-              >
-                edit
-              </button>
-            </div>
-          </div>
-          <div class="w-full border border-gray-300 rounded-md p-4 mb-4">
-            <img
-              src="/img/noimg.webp"
-              alt="cafe_pic"
-              class="w-full h-64 object-cover"
-            />
-            <div class="mt-4 flex flex-col gap-2">
-              <div class="w-full flex justify-between items-center">
-                <h2 class="text-xl font-semibold">Cafe name</h2>
-                <p>Cafe</p>
-              </div>
-              <div class="flex justify-between items-center">
-                <p>Data naon deui nya?</p>
-              </div>
-            </div>
-            <div class="mt-2 flex justify-end w-full">
-              <button
-                class="bg-blue-500 text-white py-3 px-8 rounded-md text-base font-medium hover:bg-blue-600 transition-colors disabled:bg-blue-300 disabled:cursor-not-allowed"
-              >
-                edit
-              </button>
-            </div>
+            </NuxtLink>
           </div>
         </div>
       </div>
@@ -153,6 +136,7 @@
   const uploading = ref(false);
   const saving = ref(false);
   const avatarUrl = ref(null);
+  const cafesList = ref([]);
   const userData = ref({
     name: '',
     avatarUrl: null,
@@ -163,6 +147,8 @@
     if (user.value) {
       await fetchProfile();
       //   await fetchAvatar();
+    } else {
+      router.push('/');
     }
   });
 
@@ -175,34 +161,20 @@
         throw new Error('Failed to fetch profile');
       }
 
-      const { data } = await response.json();
+      const { data, cafeData } = await response.json();
+      // const data = await response.json();
 
       if (data) {
         userData.value.name = data.full_name || '';
         userData.value.avatarUrl = data.avatar_url || null;
         avatarUrl.value = data.avatar_url || null;
       }
+      if (cafeData) {
+        cafesList.value = cafeData;
+      } else {
+      }
     } catch (error) {
       console.error('Error fetching profile:', error);
-    }
-  };
-
-  // Fetch avatar
-  const fetchAvatar = async () => {
-    try {
-      const response = await fetch('/api/profile/avatar');
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch avatar');
-      }
-
-      const { url } = await response.json();
-
-      if (url) {
-        avatarUrl.value = url;
-      }
-    } catch (error) {
-      console.error('Error fetching avatar:', error);
     }
   };
 

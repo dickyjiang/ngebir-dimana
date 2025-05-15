@@ -1,5 +1,7 @@
 <template>
-  <div class="login-container bg-gray-800 min-h-full flex items-center justify-center relative">
+  <div
+    class="login-container bg-gray-800 min-h-full flex items-center justify-center relative"
+  >
     <img
       class="absolute object-cover object-center w-full h-full"
       src="/src/assets/img/hero.webp"
@@ -9,7 +11,6 @@
     <div class="login-card z-[2]">
       <h1 class="title">Selamat datang</h1>
       <p class="subtitle">Masuk ke akun anda</p>
-      
 
       <div class="auth-buttons">
         <button
@@ -23,7 +24,6 @@
           />
           {{ loading ? 'Signing in...' : 'Sign in with Google' }}
         </button>
-        
       </div>
       <!-- @budi link to signup -->
       <p class="subtitle mt-8">Belum punya akun? <span>Sign up</span></p>
@@ -58,6 +58,14 @@
       loading.value = false;
     }
   };
+
+  onMounted(async () => {
+    const { data } = await supabase.auth.getSession();
+    if (data.session) {
+      // User is already logged in, redirect to profile page
+      router.push('/profile');
+    }
+  });
 </script>
 
 <style scoped>

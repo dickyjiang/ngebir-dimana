@@ -20,7 +20,15 @@ export default defineEventHandler(async (event) => {
 
         if (error) throw error
 
-        return { data }
+        const { data: cafeData, error: cafeError } = await supabase
+            .from('cafes')
+            .select('id, name, city, photo,  slug_name, description')
+            .eq('uuid', user.id)
+            .order('datetime', { ascending: false })
+        if (cafeError) throw cafeError
+
+
+        return { 'data': data, 'cafeData': cafeData }
     } catch (error) {
         console.error('Error fetching profile:', error)
         throw createError({

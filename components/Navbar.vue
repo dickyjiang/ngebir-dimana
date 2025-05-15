@@ -44,7 +44,7 @@
     </div>
 
     <!-- Burger menu positioned at far right -->
-    <button 
+    <button
       @click="toggleMenu"
       class="sm:hidden flex items-center ml-auto"
       aria-label="Toggle menu"
@@ -66,25 +66,25 @@
     </button>
 
     <!-- Mobile menu overlay -->
-    <div 
-      v-if="isMenuOpen" 
+    <div
+      v-if="isMenuOpen"
       class="fixed inset-0 bg-black bg-opacity-50 z-40 sm:hidden"
       @click="toggleMenu"
     ></div>
 
     <!-- Modified nav menu -->
-    <div 
-      id="navMenu" 
+    <div
+      id="navMenu"
       :class="{
         'fixed right-0 top-0 h-full w-64 bg-white shadow-lg z-50 flex-col p-4 transform transition-transform duration-300 ease-in-out': true,
         'translate-x-0': isMenuOpen,
         'translate-x-full': !isMenuOpen,
-        'sm:translate-x-0 sm:static sm:h-auto sm:w-auto sm:shadow-none sm:flex-row sm:p-0': true
+        'sm:translate-x-0 sm:static sm:h-auto sm:w-auto sm:shadow-none sm:flex-row sm:p-0': true,
       }"
       class="flex items-center gap-2"
     >
       <!-- Close button for mobile menu -->
-      <button 
+      <button
         @click="toggleMenu"
         class="sm:hidden absolute top-4 right-4"
         aria-label="Close menu"
@@ -105,14 +105,48 @@
         </svg>
       </button>
 
-      <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-2 mt-12 sm:mt-0">
-        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-1">
-          <p class="text-sm text-gray-600">Mau nambah cafe kamu?</p> 
-          <NuxtLink to="/login" class="text-sm font-semibold flex border px-3 py-2 rounded-lg border-none transition-colors hover:bg-black hover:text-yellow-500">Registrasi</NuxtLink> 
+      <div
+        class="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-2 mt-12 sm:mt-0"
+      >
+        <div
+          class="flex flex-col sm:flex-row items-start sm:items-center gap-1"
+        >
+          <p class="text-sm text-gray-600">Mau nambah cafe kamu?</p>
+          <NuxtLink
+            to="/login"
+            class="text-sm font-semibold flex border px-3 py-2 rounded-lg border-none transition-colors hover:bg-black hover:text-yellow-500"
+            >Registrasi</NuxtLink
+          >
         </div>
-        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-1">
-          <p class="text-sm text-gray-600">Sudah punya akun?</p> 
-          <NuxtLink to="/login" class="text-sm font-semibold flex border px-3 py-2 rounded-lg border-none transition-colors hover:bg-black hover:text-yellow-500"> Login </NuxtLink>
+
+        <div
+          class="flex flex-col sm:flex-row items-start sm:items-center gap-1"
+        >
+          <p class="text-sm text-gray-600">Sudah punya akun?</p>
+          <NuxtLink
+            v-if="!data.session"
+            to="/login"
+            class="text-sm font-semibold flex border px-3 py-2 rounded-lg border-none transition-colors hover:bg-black hover:text-yellow-500"
+          >
+            Login
+          </NuxtLink>
+
+          <div class="flex items-center gap-2">
+            <NuxtLink
+              v-if="data.session"
+              to="/cafe/owner/form"
+              class="hidden sm:flex"
+            >
+              add cafe
+            </NuxtLink>
+            <button
+              v-if="data.session"
+              class="logout-button"
+              @click="handleLogout"
+            >
+              Logout
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -126,6 +160,7 @@
   const router = useRouter();
   const supabase = useSupabaseClient();
   let anim = null;
+  const { data } = await supabase.auth.getSession();
 
   const isMenuOpen = ref(false);
 
@@ -134,9 +169,12 @@
   };
 
   // Close menu when route changes
-  watch(() => router.currentRoute.value.path, () => {
-    isMenuOpen.value = false;
-  });
+  watch(
+    () => router.currentRoute.value.path,
+    () => {
+      isMenuOpen.value = false;
+    }
+  );
 
   // Add goBack function
   const goBack = () => {

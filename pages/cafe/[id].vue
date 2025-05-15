@@ -121,40 +121,15 @@
         <!-- @budisentosa thumbnail na -->
 
         <div class="w-full md:w-1/2 flex flex-col gap-8">
-          <div class="grid grid-cols-4 sm:grid-cols-4 gap-2 flex-1 items-start overflow-y-scroll">
-            <div>
+          <div
+            class="grid grid-cols-4 sm:grid-cols-4 gap-2 flex-1 items-start overflow-y-scroll"
+          >
+            <div v-for="(cafePic, index) in cafe.cafe_pics" :key="index">
               <img
                 class="rounded-md object-cover cursor-pointer w-full h-full"
-                src="/src/assets/img/no_other-photos.png"
-                @click="openImageModal('/src/assets/img/no_other-photos.png')"
-                alt="Cafe photo 1"
-                style="aspect-ratio: 1/1"
-              />
-            </div>
-            <div>
-              <img
-                class="rounded-md object-cover cursor-pointer w-full h-full"
-                src="/src/assets/img/no_other-photos.png"
-                @click="openImageModal('/src/assets/img/no_other-photos.png')"
-                alt="Cafe photo 2"
-                style="aspect-ratio: 1/1"
-              />
-            </div>
-            <div>
-              <img
-                class="rounded-md object-cover cursor-pointer w-full h-full"
-                src="/src/assets/img/no_other-photos.png"
-                @click="openImageModal('/src/assets/img/no_other-photos.png')"
-                alt="Cafe photo 3"
-                style="aspect-ratio: 1/1"
-              />
-            </div>
-            <div>
-              <img
-                class="rounded-md object-cover cursor-pointer w-full h-full"
-                src="/src/assets/img/no_other-photos.png"
-                @click="openImageModal('/src/assets/img/no_other-photos.png')"
-                alt="Cafe photo 4"
+                :src="cafePic.url"
+                @click="openImageModal(cafePic.url)"
+                :alt="`Cafe photo ${index + 1}`"
                 style="aspect-ratio: 1/1"
               />
             </div>
@@ -204,26 +179,42 @@
   </div>
   <!-- Image Modal -->
   <Teleport to="body">
-    <div v-if="showModal" 
-         class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center" 
-         style="z-index: 9999;"
-         @click="closeModal">
+    <div
+      v-if="showModal"
+      class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center"
+      style="z-index: 9999"
+      @click="closeModal"
+    >
       <div class="relative max-w-4xl max-h-screen p-4" @click.stop>
-        <button @click="closeModal" 
-                class="absolute top-4 right-4 text-white hover:text-gray-300 z-50">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        <button
+          @click="closeModal"
+          class="absolute top-4 right-4 text-white hover:text-gray-300 z-50"
+        >
+          <svg
+            class="w-6 h-6"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M6 18L18 6M6 6l12 12"
+            />
           </svg>
         </button>
-        <img :src="selectedImage" 
-             class="max-h-[90vh] max-w-full object-contain" 
-             @click.stop 
-             alt="Full screen image" />
+        <img
+          :src="selectedImage"
+          class="max-h-[90vh] max-w-full object-contain"
+          @click.stop
+          alt="Full screen image"
+        />
       </div>
     </div>
   </Teleport>
   <!-- @budi section ini showing cafe yg realted dengan last search result - atau kalau bukan hasil search show close location dari cafe terpilih) -->
-  <!-- <section id="related-cafes" class="my-4">
+  <section id="related-cafes" class="my-4">
     <div
       class="my-4 w-full py-2 mx-auto flex flex-row gap-4 items-center justify-center bg-gray-200"
     >
@@ -248,185 +239,151 @@
         Cafe Terbaru 4
       </div>
     </div>
-  </section> -->
+  </section>
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
-import { useRoute, useNuxtApp } from "#app";
-import { useSeo } from "~/composables/useSeo";
+  import { ref, onMounted } from 'vue';
+  import { useRoute, useNuxtApp } from '#app';
+  import { useSeo } from '~/composables/useSeo';
 
-const route = useRoute();
-const cafe = ref(null);
-const loading = ref(true);
-const about = ref({});
-const showModal = ref(false);
-const selectedImage = ref('');
+  const route = useRoute();
+  const cafe = ref(null);
+  const loading = ref(true);
+  const about = ref({});
+  const showModal = ref(false);
+  const selectedImage = ref('');
 
-function openImageModal(imageUrl) {
-  selectedImage.value = imageUrl;
-  showModal.value = true;
-  document.body.style.overflow = 'hidden'; // Prevent background scrolling
-}
+  function openImageModal(imageUrl) {
+    selectedImage.value = imageUrl;
+    showModal.value = true;
+    document.body.style.overflow = 'hidden'; // Prevent background scrolling
+  }
 
-function closeModal() {
-  showModal.value = false;
-  selectedImage.value = '';
-  document.body.style.overflow = ''; // Restore scrolling
-}
+  function closeModal() {
+    showModal.value = false;
+    selectedImage.value = '';
+    document.body.style.overflow = ''; // Restore scrolling
+  }
 
-// Add event listener for escape key
-onMounted(() => {
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && showModal.value) {
-      closeModal();
+  // Add event listener for escape key
+  onMounted(() => {
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && showModal.value) {
+        closeModal();
+      }
+    });
+  });
+
+  useSeo({
+    title: 'Website Paling Lengkap buat Cari Tempat Ngopi!',
+    description: 'Satu Klik, Ribuan Cafe! Temukan yang Pas untuk Kamu.',
+    image: '/img/OG-img.png',
+    url: `https://ngopi.di-mana.com/cafes/${route.params.id}`,
+    type: 'article',
+  });
+
+  function openInGoogleMaps() {
+    // encan
+    // First priority: use location_link if available
+    if (cafe.value?.data.location_link) {
+      window.open(cafe.value.data.location_link, '_blank');
+      return;
     }
+
+    // // Second priority: use place_id
+    // if (cafe.value?.place_id) {
+    //   const url = `https://www.google.com/maps/place/?q=place_id:${cafe.value.place_id}`;
+    //   window.open(url, '_blank');
+    //   return;
+    // }
+
+    // // Third priority: use google_id
+    // if (cafe.value?.google_id) {
+    //   const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+    //     cafe.value.name
+    //   )}&query_place_id=${cafe.value.google_id}`;
+    //   window.open(url, '_blank');
+    //   return;
+    // }
+
+    // Fallback: use coordinates if other options aren't available
+    if (cafe.value.data?.lat && cafe.value?.data.long) {
+      const lat = cafe.value.data.lat.toString().replace(',', '.').trim();
+      const lng = cafe.value.data.long.toString().replace(',', '.').trim();
+      const url = `https://www.google.com/maps/search/${encodeURIComponent(
+        cafe.value.data.name
+      )}/@${lat},${lng},17z`;
+      window.open(url, '_blank');
+    } else {
+      console.error('No location data available');
+    }
+  }
+
+  function openWebsite() {
+    if (cafe.value?.data.site) {
+      window.open(cafe.value.data.site, '_blank');
+    }
+  }
+
+  onMounted(async () => {
+    const cafeData = await $fetch(`/api/cafe/${route.params.id}`, {
+      headers: useRequestHeaders(['cookie']),
+    });
+    cafe.value = cafeData;
+    loading.value = false;
   });
-});
-
-useSeo({
-  title: "Website Paling Lengkap buat Cari Tempat Ngopi!",
-  description: "Satu Klik, Ribuan Cafe! Temukan yang Pas untuk Kamu.",
-  image: "/img/OG-img.png",
-  url: `https://ngopi.di-mana.com/cafes/${route.params.id}`,
-  type: "article",
-});
-
-function openInGoogleMaps() {
-  // encan
-  // First priority: use location_link if available
-  if (cafe.value?.data.location_link) {
-    console.log("Using location_link");
-    window.open(cafe.value.data.location_link, "_blank");
-    return;
-  }
-
-  // // Second priority: use place_id
-  // if (cafe.value?.place_id) {
-  //   console.log('Using place_id');
-  //   const url = `https://www.google.com/maps/place/?q=place_id:${cafe.value.place_id}`;
-  //   window.open(url, '_blank');
-  //   return;
-  // }
-
-  // // Third priority: use google_id
-  // if (cafe.value?.google_id) {
-  //   console.log('Using google_id');
-  //   const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-  //     cafe.value.name
-  //   )}&query_place_id=${cafe.value.google_id}`;
-  //   window.open(url, '_blank');
-  //   return;
-  // }
-
-  // Fallback: use coordinates if other options aren't available
-  if (cafe.value.data?.lat && cafe.value?.data.long) {
-    console.log("Using coordinates as fallback");
-    const lat = cafe.value.data.lat.toString().replace(",", ".").trim();
-    const lng = cafe.value.data.long.toString().replace(",", ".").trim();
-    const url = `https://www.google.com/maps/search/${encodeURIComponent(
-      cafe.value.data.name
-    )}/@${lat},${lng},17z`;
-    window.open(url, "_blank");
-  } else {
-    console.log("No location data available");
-  }
-}
-
-function openWebsite() {
-  if (cafe.value?.data.site) {
-    window.open(cafe.value.data.site, "_blank");
-  }
-}
-
-onMounted(async () => {
-  // console.log('Route ID:', route.params.id);
-
-  const cafeData = await $fetch(`/api/cafe/${route.params.id}`, {
-    headers: useRequestHeaders(["cookie"]),
-  });
-  // console.log('Fetched Cafe Data:', cafeData);
-  cafe.value = cafeData;
-  // const { $supabase } = useNuxtApp();
-  // const { data: cafeData, error } = await $supabase
-  //   .from('cafes')
-  //   .select('*')
-  //   .eq('id', route.params.id)
-  //   .single();
-
-  // if (error) {
-  //   console.error('Error fetching cafe details:', error);
-  // } else {
-  //   console.log('Fetched Cafe Data:', cafeData);
-  //   cafe.value = cafeData;
-
-  //   // Check if cafeData.about is a string and parse it if necessary
-  //   if (typeof cafeData.about === 'string') {
-  //     about.value = JSON.parse(cafeData.about);
-  //   } else {
-  //     about.value = cafeData.about; // Assume it's already an object
-  //   }
-
-  //   // Merge additional data into the about object
-  //   const additionalData = JSON.parse(additionalAboutData);
-  //   Object.assign(about.value, additionalData);
-
-  //   console.log('About Data:', about.value); // Check the structure of the about data
-  // }
-  loading.value = false;
-});
 </script>
 
 <style scoped>
-.skeleton {
-  background-color: #e0e0e0;
-  border-radius: 4px;
-  animation: pulse 1.5s infinite ease-in-out;
-}
-
-@keyframes pulse {
-  0% {
-    opacity: 1;
+  .skeleton {
+    background-color: #e0e0e0;
+    border-radius: 4px;
+    animation: pulse 1.5s infinite ease-in-out;
   }
-  50% {
-    opacity: 0.4;
+
+  @keyframes pulse {
+    0% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.4;
+    }
+    100% {
+      opacity: 1;
+    }
   }
-  100% {
-    opacity: 1;
+
+  .skeleton-text {
+    height: 1em;
+    margin-bottom: 0.5em;
+    width: 80%;
   }
-}
 
-.skeleton-text {
-  height: 1em;
-  margin-bottom: 0.5em;
-  width: 80%;
-}
-
-.skeleton-image {
-  height: 200px;
-  width: 100%;
-  margin-bottom: 1em;
-}
-
-.fixed {
-  animation: fadeIn 0.3s ease-in-out;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
+  .skeleton-image {
+    height: 200px;
+    width: 100%;
+    margin-bottom: 1em;
   }
-  to {
-    opacity: 1;
+
+  .fixed {
+    animation: fadeIn 0.3s ease-in-out;
   }
-}
 
-img {
-  transition: transform 0.2s;
-}
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
 
+  img {
+    transition: transform 0.2s;
+  }
 
-img:hover {
-  transform: scale(1.05);
-}
+  img:hover {
+    transform: scale(1.05);
+  }
 </style>

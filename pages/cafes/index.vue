@@ -117,7 +117,6 @@
 
   // Also watch search query to trigger filtering
   watch(searchQuery, (newQuery) => {
-    // console.log('Search query changed:', newQuery);
     debouncedFetchBySearch(newQuery, activeFilters.value);
   });
 

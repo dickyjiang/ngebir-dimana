@@ -8,11 +8,11 @@ export default defineEventHandler(async (event) => {
     query = query.eq('slug_name', slug)
     query = query.single();
 
-    const user = await serverSupabaseUser(event);
+    // const user = await serverSupabaseUser(event);
     let is_admin = false;
-    if (user?.email == 'b.budi.sentosa@gmail.com' || user?.email == 'dicky.juwono@gmail.com') {
-        is_admin = true;
-    }
+    // if (user?.email == 'b.budi.sentosa@gmail.com' || user?.email == 'dicky.juwono@gmail.com') {
+    //     is_admin = true;
+    // }
 
     const { data, error, count } = await query
     if (error) throw createError({ statusMessage: error.message });
@@ -33,7 +33,12 @@ export default defineEventHandler(async (event) => {
     query2 = query2.in('id', featureIds)
 
     const { data: data2, error: error2, count: count2 } = await query2
-    if (error2) throw createError({ statusMessage: error2.message });
 
-    return { 'data': data, 'count': count, 'features': data2, 'is_admin': is_admin };
+    if (error2) throw createError({ statusMessage: error2.message });
+    const { data: data3, error: error3, count: count3 } = await client.from("cafe_pics").select("id, cafe_id, url").eq('cafe_id', data.id)
+
+    if (error3) throw createError({ statusMessage: error3.message });
+
+
+    return { 'data': data, 'count': count, 'features': data2, 'is_admin': is_admin, 'cafe_pics': data3 };
 })

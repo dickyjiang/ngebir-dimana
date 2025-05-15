@@ -21,6 +21,18 @@ export default defineEventHandler(async (event) => {
 	const cafeLocationLink = formData.find((f) => f.name === "cafeLocationLink")?.data?.toString() ?? '';
 	const cafeWorkingHours = formData.find((f) => f.name === "cafeWorkingHours")?.data?.toString() ?? '';
 
+	// const features = formData.filter((f) => f.name === "features");
+	const features = formData.find((f) => f.name === "features")
+
+	let parsedFeatures = [];
+	if (features && features.data) {
+		try {
+			const featuresString = features.data.toString();
+			parsedFeatures = JSON.parse(featuresString);
+		} catch (e) {
+			console.error("Error parsing features:", e);
+		}
+	}
 
 	const image = formData.find((f) => f.name === "image");
 	const cafeLogo = formData.find((f) => f.name === "cafeLogo");
@@ -52,7 +64,6 @@ export default defineEventHandler(async (event) => {
 		console.error("Error parsing working hours:", e);
 		formattedWorkingHours = {};
 	}
-	console.log('formattedWorkingHours', formattedWorkingHours);
 
 	// Helper function to format time from 24h to am/pm
 	const cafeCitySlug = cafeCity
@@ -85,7 +96,6 @@ export default defineEventHandler(async (event) => {
 		let query = client.from("cafes").select("id,name,slug_name", { count: "exact" });
 		query = query.eq('slug_name', finalSlug)
 
-		console.log('query', query);
 		const { data, error, count } = await query
 
 		if (error) throw createError({ statusMessage: error.message });
@@ -152,6 +162,7 @@ export default defineEventHandler(async (event) => {
 		.insert({
 			name: cafeName,
 			description: cafeDescription,
+			street: cafeStreet,
 			site: cafeSite,
 			phone: cafePhoneNumber,
 			city: cafeCity,
@@ -168,6 +179,20 @@ export default defineEventHandler(async (event) => {
 
 	if (error) throw createError({ statusCode: 500, message: error.message });
 
+	if (parsedFeatures.length > 0) {
+		const featuresToInsert = parsedFeatures.map(feature => ({
+			cafe_id: data.id,
+			feature_id: feature.id
+		}));
+
+		const { error: featuresError } = await client
+			.from("cafe_features")
+			.insert(featuresToInsert);
+
+		if (featuresError) {
+			console.error("Error saving cafe features:", featuresError);
+		}
+	}
 	// Add additional images to cafe_pics
 	if (imageUrls.length > 0) {
 		const imagesToInsert = imageUrls.map(url => ({
