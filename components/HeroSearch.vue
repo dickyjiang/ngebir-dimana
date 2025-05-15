@@ -147,8 +147,7 @@
           {{ totalCafes }} Cafe's Directory
         </h2>
         <div
-          class="mt-2 sm:mt-4 w-full md:w-3/4 flex flex-col gap-2 sm:gap-4 items-center justify-center px-4"
-        >
+          class="mt-2 sm:mt-4 w-full flex flex-col gap-2 sm:gap-4 items-center justify-center px-4">
           <div class="flex items-center gap-2 w-full md:w-1/2">
             <input
               v-model="searchQuery"
@@ -274,7 +273,7 @@
             </button>
             <button
               v-if="activeFilters.features.length > 0"
-              class="text-yellow-500 text-xs sm:text-base cursor-pointer touch-manipulation"
+              class="text-yellow-500 text-xs sm:text-base cursor-pointer touch-manipulation ml-4 mt-2"
               @click="resetFeatureFilter"
             >
               Reset Filter
