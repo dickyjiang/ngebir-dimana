@@ -22,7 +22,7 @@
     <p class="mb-4 text-gray-500">Kami dapat memperbarui kebijakan privasi ini dari waktu ke waktu. Perubahan akan diumumkan di halaman ini.</p>
 
     <h2 class="text-xl font-semibold mt-6 mb-2">Hubungi Kami</h2>
-    <p class="mb-8 text-gray-500">Jika Anda memiliki pertanyaan mengenai kebijakan privasi ini, silakan hubungi kami melalui email di: <a href="mailto:dicky@dickyjiang.com" class="text-gray-700 font-semibold hover:underline">dicky@dickyjiang.com</a>.</p>
+    <p class="mb-8 text-gray-500">Jika Anda memiliki pertanyaan mengenai kebijakan privasi ini, silakan hubungi kami melalui email di: <a href="mailto:info-ngopi@di-mana.com" class="text-gray-700 font-semibold hover:underline">info-ngopi@di-mana.com</a>.</p>
 
     <hr class="my-10 border-t" />
 
@@ -46,7 +46,7 @@
     <p class="mb-4 text-gray-500">We may update this privacy policy from time to time. Any changes will be posted on this page.</p>
 
     <h2 class="text-xl font-semibold mt-6 mb-2">Contact Us</h2>
-    <p class="text-gray-500">If you have any questions about this privacy policy, please contact us at: <a href="mailto:dicky@dickyjiang.com" class="text-gray-700 font-semibold hover:underline">dicky@dickyjiang.com</a>.</p>
+    <p class="text-gray-500">If you have any questions about this privacy policy, please contact us at: <a href="mailto:info-ngopi@di-mana.com" class="text-gray-700 font-semibold hover:underline">info-ngopi@di-mana.com</a>.</p>
   </div>
   </div>
 </template>
