@@ -1,5 +1,12 @@
 <!-- components/CafeForm.vue -->
 <template>
+  <!-- Add the toast notification component -->
+  <ToastNotification
+    :show="showToast"
+    :message="toastMessage"
+    :type="toastType"
+    @close="showToast = false"
+  />
   <div class="bg-gray-100 min-h-screen">
     <div class="max-w-6xl mx-auto px-[5%]">
       <section class="pt-6 mb-8">
@@ -8,7 +15,6 @@
           Silahkan menambah atau mengedit informasi cafe Anda. Pastikan semua
           informasi yang Anda masukkan adalah benar dan sesuai dengan cafe Anda.
           Jika Anda memiliki pertanyaan atau masalah, silahkan hubungi
-          <a href="mailto:admin@ngopi.di-mana.com">admin</a>
         </p>
       </section>
 
@@ -281,6 +287,7 @@
                   <div class="mb-8">
                     <label for="logo">Logo Cafe:</label>
                     <div
+                      v-if="logoPreview.length == 0"
                       class="mt-2 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg"
                     >
                       <label for="logo" class="w-full cursor-pointer">
@@ -324,13 +331,18 @@
                     <span v-if="hasError('logo')" class="text-red-500 text-sm">
                       {{ formErrors.logo.join(', ') }}
                     </span>
-                    <!-- Logo preview section -->
-                    <div v-if="logoPreview" class="mt-4">
-                      <div class="relative inline-block">
+                    <div
+                      v-if="logoPreview.length > 0"
+                      class="grid grid-cols-2 sm:grid-cols-3 gap-4"
+                    >
+                      <div
+                        v-for="(preview, index) in logoPreview"
+                        :key="index"
+                        class="relative"
+                      >
                         <img
-                          :src="logoPreview"
-                          class="w-32 h-32 object-cover rounded-lg"
-                          alt="Logo preview"
+                          :src="preview"
+                          class="w-full h-32 object-cover rounded-lg"
                         />
                         <button
                           @click="removeLogo"
@@ -341,11 +353,13 @@
                         </button>
                       </div>
                     </div>
+                    <!-- Logo preview section -->
                   </div>
 
                   <div class="flex flex-col space-y-2 mb-8">
                     <label for="cafeImage">Main Photo Cafe:</label>
                     <div
+                      v-if="imagePreviews.length == 0"
                       class="mt-2 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg"
                     >
                       <label for="cafeImage" class="w-full cursor-pointer">
@@ -396,22 +410,27 @@
                       </p>
                     </div>
 
-                    <!-- Image preview section -->
                     <div
-                      v-if="imagePreviews"
+                      v-if="imagePreviews.length > 0"
                       class="grid grid-cols-2 sm:grid-cols-3 gap-4"
                     >
-                      <img
-                        :src="imagePreviews"
-                        class="w-full h-32 object-cover rounded-lg"
-                      />
-                      <button
-                        @click="removeImage(index)"
-                        class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center"
-                        type="button"
+                      <div
+                        v-for="(preview, index) in imagePreviews"
+                        :key="index"
+                        class="relative"
                       >
-                        ×
-                      </button>
+                        <img
+                          :src="preview"
+                          class="w-full h-32 object-cover rounded-lg"
+                        />
+                        <button
+                          @click="removeImage(index)"
+                          class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center"
+                          type="button"
+                        >
+                          ×
+                        </button>
+                      </div>
                     </div>
                   </div>
 
@@ -667,13 +686,12 @@
             </form>
             <div class="flex justify-center sm:justify-end px-8 mt-8">
               <!-- hasAnyErrors:{{ hasAnyErrors() }} isSubmitting:{{ isSubmitting }} -->
-
               <button
                 class="text-black font-semibold border border-black px-4 py-2 rounded-full relative"
                 type="submit"
                 @click="submitForm"
-                :disabled="isSubmitting || hasAnyErrors()"
-                :class="{ 'opacity-50 cursor-not-allowed': hasAnyErrors() }"
+                :disabled="isSubmitting"
+                :class="{ 'opacity-50 cursor-not-allowed': isSubmitting }"
               >
                 <span :class="{ 'opacity-0': isSubmitting }">
                   {{ submitButtonText }}
@@ -748,6 +766,10 @@
   });
 
   const isSubmitting = ref(false);
+  // Add toast state
+  const showToast = ref(false);
+  const toastMessage = ref('');
+  const toastType = ref('info'); // 'info', 'success', or 'error'
 
   // const parentCities = ref<ParentCity[]>([]);
   // const selectedParentCity = ref('');
@@ -755,7 +777,8 @@
   // const availableChildCities = ref<ChildCity[]>([]);
   // const locationLink = ref('');
   const showPopup = ref(false);
-  const logoPreview = ref<string | null>(null);
+
+  const logoPreview = ref<string[]>([]);
   // const logoFile = ref<File | null>(null);
   // const imageFiles = ref<File[]>([]); // Store the actual File objects
   // const imageErrors = ref<string[]>([]); // Store validation errors
@@ -796,6 +819,10 @@
     return formErrors.value[field].length > 0;
   };
   const hasAnyErrors = (): boolean => {
+    // Check if general errors exist
+    if (formErrors.value.general && formErrors.value.general.length > 0) {
+      return true;
+    }
     // Check if any field has errors
     return Object.values(formErrors.value).some((errors) => errors.length > 0);
   };
@@ -824,6 +851,14 @@
     formErrors,
     menuImageErrors,
     imageErrors,
+    hasExistingImages,
+    existingImageUrls,
+    cafeIdInteger,
+    hasExistingMenuImages,
+    existingMenuImageUrls,
+    imagesToDelete,
+    hasExistingLogo,
+    existingLogoUrls,
   } = useCafeForm(isEditMode, cafeId);
   watch(
     () => props.isEditMode,
@@ -845,17 +880,93 @@
   });
 
   // Redefine submitForm to use the one from the composable
-  const submitForm = () => {
-    handleSubmit();
+  // This code in CafeForm.vue will now work properly
+  const submitForm = async () => {
+    showToast.value = false;
+
+    try {
+      // Clear any previous general errors
+      if (formErrors.value.general) {
+        formErrors.value.general = [];
+      }
+
+      // First check for validation errors
+      if (!validateForm()) {
+        // Show validation error toast
+        toastMessage.value = 'Please fix the form errors before submitting.';
+        toastType.value = 'error';
+        showToast.value = true;
+        return;
+      }
+      await handleSubmit();
+      // Show success toast
+      toastMessage.value = isEditMode.value
+        ? 'Cafe updated successfully!'
+        : 'Cafe created successfully!';
+      toastType.value = 'success';
+      showToast.value = true;
+    } catch (error) {
+      console.error('Form submission error:', error);
+
+      // Set a more specific error message for network errors
+      if (
+        error?.message?.includes('Network') ||
+        error?.message?.includes('network')
+      ) {
+        toastMessage.value =
+          'Network error: Please check your internet connection and try again.';
+      } else {
+        // For other types of errors
+        toastMessage.value =
+          error?.message || 'An unexpected error occurred. Please try again.';
+      }
+
+      toastType.value = 'error';
+      showToast.value = true;
+
+      // Still store the error in formErrors for internal tracking
+      formErrors.value.general = [toastMessage.value];
+
+      // Reset submission state
+      isSubmitting.value = false;
+    }
   };
   const loadImagePreviews = () => {
     // Handle logo preview for existing URL
-    if (logoFile.value && typeof logoFile.value === 'string') {
-      logoPreview.value = logoFile.value;
+    // if (logoFile.value && typeof logoFile.value === 'string') {
+    //   logoPreview.value = logoFile.value;
+    // }
+
+    if (logoFile.value && logoFile.value.length > 0) {
+      logoPreview.value = logoFile.value
+        .filter((item) => item)
+        .map((item) =>
+          typeof item === 'string' ? item : URL.createObjectURL(item)
+        );
     }
 
-    if (imageFiles.value && typeof imageFiles.value === 'string') {
-      imagePreviews.value = imageFiles.value;
+    if (existingLogoUrls.value && existingLogoUrls.value.length > 0) {
+      logoPreview.value = existingLogoUrls.value
+        .filter((item) => item)
+        .map((item) =>
+          typeof item === 'string' ? item : URL.createObjectURL(item)
+        );
+    }
+
+    if (imageFiles.value && imageFiles.value.length > 0) {
+      imagePreviews.value = imageFiles.value
+        .filter((item) => item)
+        .map((item) =>
+          typeof item === 'string' ? item : URL.createObjectURL(item)
+        );
+    }
+
+    if (existingImageUrls.value && existingImageUrls.value.length > 0) {
+      imagePreviews.value = existingImageUrls.value
+        .filter((item) => item)
+        .map((item) =>
+          typeof item === 'string' ? item : URL.createObjectURL(item)
+        );
     }
 
     // Handle menu/additional images preview
@@ -865,6 +976,11 @@
         .map((item) =>
           typeof item === 'string' ? item : URL.createObjectURL(item)
         );
+    }
+    if (existingMenuImageUrls.value && existingMenuImageUrls.value.length > 0) {
+      menuImagePreviews.value = existingMenuImageUrls.value
+        .filter((item) => item)
+        .map((item) => item);
     }
   };
   // Force reload data if needed
@@ -909,24 +1025,29 @@
     }
 
     // Update the logo file and create preview
-    logoFile.value = file;
-    logoPreview.value = URL.createObjectURL(file);
+    logoFile.value = [file];
+
+    const preview = URL.createObjectURL(file);
+    logoPreview.value = [preview];
+    event.target.value = '';
+
+    // logoPreview.value = URL.createObjectURL(file);
 
     // Clear any previous errors
     formErrors.value.logo = [];
   };
 
   const removeLogo = () => {
-    logoPreview.value = null;
-    logoFile.value = null;
+    logoPreview.value = [];
+    logoFile.value = [];
     // Reset the file input
     const input = document.getElementById('logo') as HTMLInputElement;
     if (input) input.value = '';
   };
 
-  const handleImageUpload = (event) => {
+  const handleImageUpload = async (event) => {
     const file = event.target.files[0];
-    if (!files) return;
+    if (!file) return;
 
     imageErrors.value = []; // Clear previous errors
 
@@ -943,15 +1064,30 @@
     }
 
     // Add to files array and create preview
-    imageFiles.value = file;
-    imagePreviews.value = URL.createObjectURL(file);
+    imageFiles.value = [file];
+    const preview = URL.createObjectURL(file);
+    imagePreviews.value = [preview];
+    event.target.value = '';
+
     // }
+    // ----------------------------------
   };
 
   const removeImage = (index: number) => {
-    imagePreviews.value = null;
-    imageFiles.value = null;
-    imageUploadProgress.value = null;
+    imagePreviews.value.splice(index, 1);
+
+    // If it's a File object
+    if (index < imageFiles.value.length) {
+      if (typeof imageFiles.value[index] === 'object') {
+        imageFiles.value.splice(index, 1);
+        if (index < imageUploadProgress.value.length) {
+          imageUploadProgress.value.splice(index, 1);
+        }
+      } else {
+        // If it's a URL string
+        imageFiles.value.splice(index, 1);
+      }
+    }
   };
 
   const handleMenuImageUpload = (event) => {
@@ -982,9 +1118,21 @@
   };
 
   const removeMenuImage = (index: number) => {
+    const imagePreview = menuImagePreviews.value[index];
+
+    // If we're in edit mode and this is an existing image (not a new upload)
+    if (
+      isEditMode.value &&
+      existingMenuImageUrls.value.includes(imagePreview)
+    ) {
+      const existingImageData = existingImageUrls.value?.find(
+        (img) => img.url === imagePreview
+      );
+      imagesToDelete.value.push(imagePreview);
+    }
+
     menuImagePreviews.value.splice(index, 1);
 
-    // If it's a File object
     if (index < menuImageFiles.value.length) {
       if (typeof menuImageFiles.value[index] === 'object') {
         menuImageFiles.value.splice(index, 1);
@@ -992,7 +1140,6 @@
           menuImageUploadProgress.value.splice(index, 1);
         }
       } else {
-        // If it's a URL string
         menuImageFiles.value.splice(index, 1);
       }
     }
