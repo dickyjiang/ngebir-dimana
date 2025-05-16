@@ -5,175 +5,223 @@
       v-if="user"
     >
       <div class="grid grid-cols-1 md:grid-cols-2">
-        <div
-          class="pb-8 sm:pb-0 sm:border-r border-gray-300 pr-0 sm:pr-8 mb-10 sm:mb-0 border-b-2 sm:border-b-0"
-        >
-          <div>
-            <div class="pb-1 border-b border-gray-600 mb-3">
-              <h1 class="text-2xl text-gray-800">Profil Kamu</h1>
+        <div class="pb-8 sm:pb-0 sm:border-r border-gray-300 pr-0 sm:pr-8 mb-10 sm:mb-0 border-b-2 sm:border-b-0">
+          <div class="pb-8 border-b border-gray-600 mb-8">
+            <div>
+              <div class="pb-1 border-b border-gray-600 mb-3">
+                <h1 class="text-2xl text-gray-800">Profil Kamu</h1>
+              </div>
+              <div class="flex flex-col sm:flex-row gap-4 mb-8">
+                <div class="flex">
+                  <div
+                    class="mt-4 relative w-24 h-24 rounded-full overflow-hidden bg-gray-200 mb-4"
+                  >
+                    <img
+                      v-if="avatarUrl"
+                      :src="avatarUrl"
+                      alt="Profile Picture"
+                      class="w-full h-full object-cover"
+                    />
+                    <div
+                      v-else
+                      class="w-full h-full flex items-center justify-center text-5xl text-gray-600 bg-gray-100"
+                    >
+                      {{ user.email ? user.email.charAt(0).toUpperCase() : "?" }}
+                    </div>
+                    <div
+                      class="absolute bottom-0 left-0 right-0 bg-black/60 text-white py-2 text-center cursor-pointer opacity-0 hover:opacity-100 transition-opacity"
+                      @click="selectFile"
+                    >
+                      <span>Change</span>
+                    </div>
+                  </div>
+                  <input
+                    type="file"
+                    ref="fileInput"
+                    accept="image/*"
+                    class="hidden"
+                    @change="uploadAvatar"
+                  />
+                  <p v-if="uploading" class="text-sm text-gray-600 mt-2">
+                    Uploading...
+                  </p>
+                </div>
+                <div class="flex flex-col gap-4 flex-1">
+                  <div class="flex flex-col gap-2">
+                    <label for="name" class="font-medium text-gray-600"
+                      >Nama Lengkap</label
+                    >
+                    <input
+                      type="text"
+                      id="name"
+                      v-model="userData.name"
+                      placeholder="Nama Lengkap"
+                      class="p-3 border border-gray-300 rounded-md text-base focus:outline-none focus:ring-2 focus:ring-gray-500"
+                    />
+                  </div>
+                  <div class="flex flex-col gap-2">
+                    <label for="email" class="font-medium text-gray-600"
+                      >Email</label
+                    >
+                    <input
+                      type="email"
+                      id="email"
+                      :value="user.email"
+                      disabled
+                      class="p-3 border border-gray-300 rounded-md text-base bg-gray-100 cursor-not-allowed"
+                    />
+                  </div>
+                </div>
+              </div>
             </div>
-            <div class="flex flex-col sm:flex-row gap-4 mb-8">
-              <div class="flex">
-                <div
-                  class="mt-4 relative w-24 h-24 rounded-full overflow-hidden bg-gray-200 mb-4"
+            <div class="flex flex-col gap-2">
+              <label for="bio" class="font-medium text-gray-600">Bio anda</label>
+              <textarea
+                id="bio"
+                v-model="userData.bio"
+                placeholder="Sedikit mengenai anda"
+                rows="4"
+                class="p-3 border border-gray-300 rounded-md text-base focus:outline-none focus:ring-2 focus:ring-gray-500"
+              ></textarea>
+            </div>
+            <button
+              class="mt-4 bg-gray-800 text-white py-3 px-4 rounded-md text-base font-medium hover:bg-gray-600 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
+              @click="updateProfile"
+              :disabled="saving"
+            >
+              {{ saving ? "Saving..." : "Save Changes" }}
+            </button>
+          </div>
+          <div class="">
+            <div>
+              <h2 class="mb-3 text-2xl text-gray-800">Tambah Usaha</h2>
+              <p class="font-medium text-gray-600">
+                Pilih Jenis usaha yang mau ditambahkan.
+              </p>
+              <p class="text-gray-500">
+                Kamu boleh menambah lebih dari satu jenis usaha.
+              </p>
+            </div>
+            <div class="grid grid-cols-2 gap-4 pt-8">
+              <div
+                class="flex flex-col items-center justify-center gap-8 bg-gray-100 px-4 py-3 rounded-md border border-gray-600"
+              >
+                <img class="w-20" src="/src/assets/img/newCafe.svg" alt="" />
+                <NuxtLink
+                  to="/cafe/owner/form"
+                  class="border w-full border-gray-600 text-gray-600 py-2 px-3 rounded-md text-sm text-center font-medium hover:bg-gray-800 hover:text-yellow-500 transition-colors"
                 >
-                  <img
-                    v-if="avatarUrl"
-                    :src="avatarUrl"
-                    alt="Profile Picture"
-                    class="w-full h-full object-cover"
-                  />
-                  <div
-                    v-else
-                    class="w-full h-full flex items-center justify-center text-5xl text-gray-600 bg-gray-100"
-                  >
-                    {{ user.email ? user.email.charAt(0).toUpperCase() : "?" }}
-                  </div>
-                  <div
-                    class="absolute bottom-0 left-0 right-0 bg-black/60 text-white py-2 text-center cursor-pointer opacity-0 hover:opacity-100 transition-opacity"
-                    @click="selectFile"
-                  >
-                    <span>Change</span>
-                  </div>
-                </div>
-                <input
-                  type="file"
-                  ref="fileInput"
-                  accept="image/*"
-                  class="hidden"
-                  @change="uploadAvatar"
-                />
-                <p v-if="uploading" class="text-sm text-gray-600 mt-2">
-                  Uploading...
-                </p>
+                  Cafe</NuxtLink
+                >
               </div>
-              <div class="flex flex-col gap-4 flex-1">
-                <div class="flex flex-col gap-2">
-                  <label for="name" class="font-medium text-gray-600"
-                    >Nama Lengkap</label>
-                  <input
-                    type="text"
-                    id="name"
-                    v-model="userData.name"
-                    placeholder="Nama Lengkap"
-                    class="p-3 border border-gray-300 rounded-md text-base focus:outline-none focus:ring-2 focus:ring-gray-500"/>
-                </div>
-                <div class="flex flex-col gap-2">
-                  <label for="email" class="font-medium text-gray-600"
-                    >Email</label>
-                  <input
-                    type="email"
-                    id="email"
-                    :value="user.email"
-                    disabled
-                    class="p-3 border border-gray-300 rounded-md text-base bg-gray-100 cursor-not-allowed"
-                  />
-                </div>
+              <div
+                class="flex flex-col items-center justify-center gap-8 bg-gray-100 px-4 py-3 rounded-md border border-gray-600"
+              >
+                <img
+                  class="w-20 opacity-70"
+                  src="/src/assets/img/coffee-beans.svg"
+                  alt=""
+                />
+  
+                <NuxtLink
+                  to="/cafe/owner/form"
+                  class="border w-full border-gray-600 text-gray-600 py-2 px-3 rounded-md text-sm text-center font-medium hover:bg-gray-800 hover:text-yellow-500 transition-colors"
+                >
+                  Beans & Roastery</NuxtLink
+                >
+              </div>
+              <div
+                class="flex flex-col items-center justify-center gap-8 bg-gray-100 px-4 py-3 rounded-md border border-gray-600"
+              >
+                <img
+                  class="w-20 opacity-70"
+                  src="/src/assets/img/portafilter.svg"
+                  alt=""
+                />
+  
+                <NuxtLink
+                  to="/cafe/owner/form"
+                  class="border w-full border-gray-600 text-gray-600 py-2 px-3 rounded-md text-sm text-center font-medium hover:bg-gray-800 hover:text-yellow-500 transition-colors"
+                >
+                  Tools & Supplies</NuxtLink
+                >
               </div>
             </div>
+
           </div>
-          <div class="flex flex-col gap-2">
-            <label for="bio" class="font-medium text-gray-600">Bio anda</label>
-            <textarea
-              id="bio"
-              v-model="userData.bio"
-              placeholder="Sedikit mengenai anda"
-              rows="4"
-              class="p-3 border border-gray-300 rounded-md text-base focus:outline-none focus:ring-2 focus:ring-gray-500"
-            ></textarea>
-          </div>
-          <button
-            class="mt-4 bg-gray-800 text-white py-3 px-4 rounded-md text-base font-medium hover:bg-gray-600 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
-            @click="updateProfile"
-            :disabled="saving"
-          >
-            {{ saving ? "Saving..." : "Save Changes" }}
-          </button>
         </div>
         <div class="pl-0 sm:pl-8">
-          <div class="pb-1 border-b border-gray-600 mb-3">
+          <div class="pb-1 border-b border-gray-600 mb-4">
             <h1 class="text-2xl text-gray-800">Bisnis kamu</h1>
           </div>
-          <p class="font-medium text-gray-600">
-            Pilih Jenis usaha yang mau ditambahkan.
-          </p>
-          <p class="text-gray-500">
-            Kamu boleh menambah lebih dari satu jenis usaha.
-          </p>
-          <div class="grid grid-cols-2 gap-4 pt-8">
+          <div class="flex flex-col gap-2">
             <div
-              class="flex flex-col items-center justify-center gap-8 bg-gray-100 px-4 py-3 rounded-md border border-gray-600"
+              v-for="cafe in cafesList"
+              :key="cafe.slug_name"
+              class="w-full border border-gray-300 rounded-md p-4 mb-4"
             >
-              <img class="w-20" src="/src/assets/img/newCafe.svg" alt="" />
-              <NuxtLink
-                to="/cafe/owner/form"
-                class="border w-full border-gray-600 text-gray-600  py-2 px-3 rounded-md text-sm text-center font-medium hover:bg-gray-800 hover:text-yellow-500 transition-colors"
-              >
-                Cafe</NuxtLink
-              >
+              <NuxtLink :to="`/cafe/owner/form/${cafe.slug_name}`">
+                <NuxtImg
+                  :src="`${cafe.photo}`"
+                  alt="cafe_pic"
+                  class="w-full h-64 object-cover"
+                />
+                <div class="mt-3 flex flex-col gap-3">
+                  <div
+                    class="w-full flex gap-2 justify-between items-start"
+                  >
+                    <div>
+                      <h2 class="text-xl font-semibold flex-1">
+                        {{ cafe.name }}
+                      </h2>
+                      <p class="text-gray-500">
+                        Alamatna kuduna {{ cafe.address }}
+                      </p>
+                      <p>{{ cafe.city }}</p>
+                    </div>
+                    <div class="flex flex-col gap-2">
+                      <div
+                        class="px-3 py-1 rounded-full bg-yellow-400 text-gray-800 text-center text-sm font-medium"
+                      >
+                        Cafe
+                      </div>
+                       <!-- <button
+                    class="border border-gray-600 text-gray-600 py-1 px-4 rounded-md text-sm text-center font-medium hover:bg-gray-800 hover:text-yellow-500 transition-colors disabled:cursor-not-allowed"
+                  >
+                    Published
+                  </button> -->
+                    </div>
+                  </div>
+                  <div class="flex justify-between items-center">
+                    <!-- <p class="text-gray-500 line-clamp-2">{{ cafe.description }}</p> -->
+                  </div>
+                </div>
+                <div class="mt-2 flex justify-between gap-4">
+                  <button
+                    class=" text-white bg-green-600 py-2 px-4 rounded-md text-sm text-center font-medium hover:bg-red-800 transition-colors disabled:cursor-not-allowed"
+                  >
+                    Published
+                  </button>
+                  <div class="flex gap-2">
+                    <button
+                      class="border w-full border-gray-600 text-gray-600 py-2 px-6 rounded-md text-sm text-center font-medium hover:bg-gray-800 hover:text-yellow-500 transition-colors disabled:cursor-not-allowed"
+                    >
+                      View
+                    </button>
+                    <button
+                      class="border w-full border-gray-600 text-gray-600 py-2 px-6 rounded-md text-sm text-center font-medium hover:bg-gray-800 hover:text-yellow-500 transition-colors disabled:cursor-not-allowed"
+                    >
+                      Edit
+                    </button>
+                  </div>
+                </div>
+              </NuxtLink>
             </div>
-            <div
-              class="flex flex-col items-center justify-center gap-8 bg-gray-100 px-4 py-3 rounded-md border border-gray-600"
-            >
-              <img
-                class="w-20 opacity-70"
-                src="/src/assets/img/coffee-beans.svg"
-                alt=""
-              />
-
-              <NuxtLink
-                to="/cafe/owner/form"
-                class="border w-full border-gray-600 text-gray-600  py-2 px-3 rounded-md text-sm text-center font-medium hover:bg-gray-800 hover:text-yellow-500 transition-colors"
-              >
-                Beans & Roastery</NuxtLink
-              >
-            </div>
-            <div
-              class="flex flex-col items-center justify-center gap-8 bg-gray-100 px-4 py-3 rounded-md border border-gray-600"
-            >
-              <img
-                class="w-20 opacity-70"
-                src="/src/assets/img/portafilter.svg"
-                alt=""
-              />
-
-              <NuxtLink
-                to="/cafe/owner/form"
-                class="border w-full border-gray-600 text-gray-600  py-2 px-3 rounded-md text-sm text-center font-medium hover:bg-gray-800 hover:text-yellow-500 transition-colors"
-              >
-              Tools & Supplies</NuxtLink
-              >
+            <div class="p-2 text-center text-sm border border-green-400 text-green-700 bg-green-400/20 rounded-md">
+              <p>Terimakasih telah mendaftarkan Bisnis anda, informasi lebih lanjut akan dikirim ke email, setelah pendaftaran anda selesai diproses.</p>
             </div>
           </div>
-          <div
-            v-for="cafe in cafesList"
-            :key="cafe.slug_name"
-            class="w-full border border-gray-300 rounded-md p-4 mb-4"
-          >
-            <NuxtLink :to="`/cafe/owner/form/${cafe.slug_name}`">
-              <NuxtImg
-                :src="`${cafe.photo}`"
-                alt="cafe_pic"
-                class="w-full h-64 object-cover"
-              />
-              <div class="mt-4 flex flex-col gap-2">
-                <div class="w-full flex justify-between items-center">
-                  <h2 class="text-xl font-semibold">{{ cafe.name }}</h2>
-                  <p>{{ cafe.city }}</p>
-                </div>
-                <div class="flex justify-between items-center">
-                  <p>{{ cafe.description }}</p>
-                </div>
-              </div>
-              <div class="mt-2 flex justify-end w-full">
-                <button
-                  class="bg-gray-800 text-white py-3 px-8 rounded-md text-base font-medium hover:bg-gray-600 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
-                >
-                  edit
-                </button>
-              </div>
-            </NuxtLink>
-          </div>
+          
         </div>
       </div>
     </div>
