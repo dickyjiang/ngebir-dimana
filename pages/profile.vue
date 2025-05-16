@@ -107,7 +107,7 @@
               <img class="w-20" src="/src/assets/img/newCafe.svg" alt="" />
               <NuxtLink
                 to="/cafe/owner/form"
-                class="border w-full border-gray-600 text-gray-600 text-nowrap py-2 px-3 rounded-md text-sm text-center font-medium hover:bg-gray-800 hover:text-yellow-500 transition-colors"
+                class="border w-full border-gray-600 text-gray-600  py-2 px-3 rounded-md text-sm text-center font-medium hover:bg-gray-800 hover:text-yellow-500 transition-colors"
               >
                 Cafe</NuxtLink
               >
@@ -123,7 +123,7 @@
 
               <NuxtLink
                 to="/cafe/owner/form"
-                class="border w-full border-gray-600 text-gray-600 text-nowrap py-2 px-3 rounded-md text-sm text-center font-medium hover:bg-gray-800 hover:text-yellow-500 transition-colors"
+                class="border w-full border-gray-600 text-gray-600  py-2 px-3 rounded-md text-sm text-center font-medium hover:bg-gray-800 hover:text-yellow-500 transition-colors"
               >
                 Beans & Roastery</NuxtLink
               >
@@ -139,9 +139,9 @@
 
               <NuxtLink
                 to="/cafe/owner/form"
-                class="border w-full border-gray-600 text-gray-600 text-nowrap py-2 px-3 rounded-md text-sm text-center font-medium hover:bg-gray-800 hover:text-yellow-500 transition-colors"
+                class="border w-full border-gray-600 text-gray-600  py-2 px-3 rounded-md text-sm text-center font-medium hover:bg-gray-800 hover:text-yellow-500 transition-colors"
               >
-                Cafe Tools & Supplies</NuxtLink
+              Tools & Supplies</NuxtLink
               >
             </div>
           </div>
