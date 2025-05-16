@@ -25,3 +25,18 @@ Content-Type: application/json
     "to": 23,
     "requestedItems": 24
 }
+
+
+### Test with different ranges
+PUT http://localhost:3000/api/cafe/owner/slug-example HTTP/1.1
+Content-Type: application/json
+
+{
+    "name": "Updated Cafe Name",
+    "description": "Updated cafe description",
+    "address": "New address",
+    "city": "bsd",
+    "phone": "081234567890",
+    "rating": 4,
+    "priceRange": "$$"
+}

@@ -29,6 +29,7 @@ export interface FormErrors {
   rating: string[];
   logo: string[];
   location_link: string[];
+  general: string[];
 }
 export const formErrors = ref<FormErrors>({
   cafeName: [],
@@ -47,12 +48,14 @@ export const formErrors = ref<FormErrors>({
   location_link: [],
   rating: [],
   logo: [],
+  general: [],
 });
 
 export function useCafeForm(isEditMode: Ref<boolean>, cafeId: Ref<string | null>) {
   // All your form state and methods from your existing form
 
   const cafeName = ref('');
+  const cafeIdInteger = ref(0);
   const businessTypes = ref<string[]>([]);
 
   const cafeStreet = ref('');
@@ -70,7 +73,8 @@ export function useCafeForm(isEditMode: Ref<boolean>, cafeId: Ref<string | null>
 
   const selectedFeatures = ref<Feature[]>([]);
 
-  const logoFile = ref<File | null>(null);
+  // const logoFile = ref<File | null>(null);
+  const logoFile = ref<File[]>([]); // Store the actual File objects
   const imageFiles = ref<File[]>([]); // Store the actual File objects
   const menuImageFiles = ref<File[]>([]); // Store the actual File objects
 
@@ -79,6 +83,14 @@ export function useCafeForm(isEditMode: Ref<boolean>, cafeId: Ref<string | null>
   const imageErrors = ref<string[]>([]); // Store validation errors
 
   const maxFileSize = 5 * 1024 * 1024; // 5MB in bytes
+  const hasExistingImages = ref(false);
+  const existingImageUrls = ref<string[]>([]);
+  const hasExistingMenuImages = ref(false);
+  const existingMenuImageUrls = ref<string[]>([]);
+  const imagesToDelete = ref<number[]>([]);
+
+  const hasExistingLogo = ref(false);
+  const existingLogoUrls = ref<string[]>([]);
 
   const days = ref([
     {
@@ -251,6 +263,7 @@ export function useCafeForm(isEditMode: Ref<boolean>, cafeId: Ref<string | null>
 
         // Populate form fields
         cafeName.value = data.data.name || '';
+        cafeIdInteger.value = data.data.id || 0;
         businessTypes.value = data.businessTypes || [];
         cafeStreet.value = data.data.street || '';
         cafeSite.value = data.data.site || '';
@@ -259,10 +272,26 @@ export function useCafeForm(isEditMode: Ref<boolean>, cafeId: Ref<string | null>
         selectedParentCity.value = data.city_parent[0].city_parent || '';
         selectedChildCity.value = data.data.city_slug || '';
         locationLink.value = data.data.location_link || '';
-        imageFiles.value = data.data.photo || '';
-        logoFile.value = data.data.logo || null;
-        menuImageFiles.value = data.cafe_pics.map((pic: any) => pic.url) || [];
+        if (data.data.photo) {
+          hasExistingImages.value = true;
+          existingImageUrls.value = [data.data.photo];
+          imageFiles.value = []; // Clear imageFiles as we're not replacing them yet
+        }
+        if (data.data.logo) {
+          hasExistingLogo.value = true;
+          existingLogoUrls.value = [data.data.logo];
+          logoFile.value = []
+        }
+        if (data.cafe_pics && data.cafe_pics.length > 0) {
+          hasExistingMenuImages.value = true;
+          existingMenuImageUrls.value = data.cafe_pics.map((pic: any) => pic.url);
+          menuImageFiles.value = []; // Clear menuImageFiles as we're not replacing them yet
+        } else {
+          hasExistingMenuImages.value = false;
+          existingMenuImageUrls.value = [];
+        }
         days.value = convertDaysToFormFormat(data.data.working_hours) || [];
+        selectedFeatures.value = data.features || [];
         // ...populate other fields
       } catch (error) {
         console.error('Error loading cafe data:', error);
@@ -297,6 +326,9 @@ export function useCafeForm(isEditMode: Ref<boolean>, cafeId: Ref<string | null>
   // Validation function stub (implement your actual validation logic)
   const validateForm = () => {
     // Implement your validation logic here
+    Object.keys(formErrors.value).forEach((key) => {
+      formErrors.value[key] = [];
+    });
     let isValid = true;
 
     // Reset all previous errors
@@ -309,7 +341,6 @@ export function useCafeForm(isEditMode: Ref<boolean>, cafeId: Ref<string | null>
       formErrors.value.cafeName.push('Nama cafe tidak boleh kosong');
       isValid = false;
     }
-
 
     if (!selectedParentCity.value) {
       formErrors.value.state.push('Provinsi/Kota Besar tidak boleh kosong');
@@ -324,13 +355,15 @@ export function useCafeForm(isEditMode: Ref<boolean>, cafeId: Ref<string | null>
       isValid = false;
     }
 
-    if (!imageFiles.value || imageFiles.value.length === 0) {
+    // Check if we have new files or existing images in edit mode
+    if ((!imageFiles.value || imageFiles.value.length === 0) &&
+      (!isEditMode.value || !hasExistingImages.value)) {
       imageErrors.value.push(
         'Gambar cafe tidak boleh kosong. Silakan pilih file gambar.'
       );
       isValid = false;
-    } else {
-      // Check each file for type and size
+    } else if (imageFiles.value && imageFiles.value.length > 0) {
+      // Only validate new files when they exist
       let hasImageError = false;
       imageFiles.value.forEach((file) => {
         if (!file.type.startsWith('image/')) {
@@ -353,6 +386,7 @@ export function useCafeForm(isEditMode: Ref<boolean>, cafeId: Ref<string | null>
 
   // Form validation, submission logic, etc.
   const submitForm = async () => {
+
     if (!validateForm()) return;
 
     isSubmitting.value = true;
@@ -360,12 +394,8 @@ export function useCafeForm(isEditMode: Ref<boolean>, cafeId: Ref<string | null>
 
     // Add all form data
     formData.append('cafeName', cafeName.value);
-
-    // formData.append('parentCity', selectedParentCity.value);
-    // formData.append('childCity', selectedChildCity.value);
     // ... other form fields ...
-
-
+    formData.append('cafeId', cafeIdInteger.value.toString());
     formData.append('cafeName', cafeName.value);
     formData.append('cafeStreet', cafeStreet.value);
     formData.append('cafeDescription', cafeDescription.value);
@@ -374,14 +404,33 @@ export function useCafeForm(isEditMode: Ref<boolean>, cafeId: Ref<string | null>
     formData.append('cafeCity', selectedChildCity.value);
     formData.append('cafeState', selectedParentCity.value);
     formData.append('cafeLocationLink', locationLink.value);
-    // features: selectedFeatures.value.map(feature => feature.id),
 
-    if (logoFile.value) {
-      formData.append('cafeLogo', logoFile.value);
+    // if (logoFile.value) {
+    //   formData.append('cafeLogo', logoFile.value);
+    // }
+
+    if (logoFile.value.length > 0) {
+      formData.append('cafeLogo', logoFile.value[0]);
+    }
+
+    if (isEditMode.value && hasExistingLogo.value && logoFile.value.length === 0) {
+      formData.append('keepExistingLogo', 'true');
+      formData.append('existingLogoUrls', JSON.stringify(existingImageUrls.value));
+    }
+
+    // Add a flag to indicate if we're keeping existing images
+    if (isEditMode.value && hasExistingImages.value && imageFiles.value.length === 0) {
+      formData.append('keepExistingImages', 'true');
+      formData.append('existingImageUrls', JSON.stringify(existingImageUrls.value));
     }
 
     if (imageFiles.value.length > 0) {
       formData.append('image', imageFiles.value[0]);
+    }
+
+    if (isEditMode.value && hasExistingMenuImages.value && menuImageFiles.value.length === 0) {
+      formData.append('keepExistingMenuImages', 'true');
+      formData.append('existingMenuImageUrls', JSON.stringify(existingMenuImageUrls.value));
     }
 
     if (menuImageFiles.value.length > 0) {
@@ -392,6 +441,10 @@ export function useCafeForm(isEditMode: Ref<boolean>, cafeId: Ref<string | null>
 
     formData.append('features', JSON.stringify(selectedFeatures.value));
     formData.append('cafeWorkingHours', JSON.stringify(days.value));
+    // In the submitForm function, add after the other formData.append calls
+    if (imagesToDelete.value.length > 0) {
+      formData.append('imagesToDelete', JSON.stringify(imagesToDelete.value));
+    }
 
     try {
       const url = isEditMode.value
@@ -406,13 +459,31 @@ export function useCafeForm(isEditMode: Ref<boolean>, cafeId: Ref<string | null>
       });
 
       if (!response.ok) {
-        throw new Error('Network response was not ok');
+        // Get response text if available
+        let errorMessage = 'Network response was not ok';
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.message || errorMessage;
+        } catch (e) {
+          // If can't parse JSON, try to get text
+          try {
+            errorMessage = await response.text() || errorMessage;
+          } catch (e2) {
+            // Fallback to status text if all else fails
+            errorMessage = response.statusText || errorMessage;
+          }
+        }
+        throw new Error(errorMessage);
       }
 
       // Redirect to list page after success
       navigateTo('/profile');
+      return true; // Return success status
     } catch (error) {
       console.error('Error submitting form:', error);
+      // Important: Rethrow the error so it can be caught by the component
+      isSubmitting.value = false;
+      throw error;
     } finally {
       isSubmitting.value = false;
     }
@@ -444,7 +515,15 @@ export function useCafeForm(isEditMode: Ref<boolean>, cafeId: Ref<string | null>
     menuImageFiles,
     formErrors,
     menuImageErrors,
-    imageErrors
+    imageErrors,
+    hasExistingImages,
+    existingImageUrls,
+    cafeIdInteger,
+    hasExistingMenuImages,
+    existingMenuImageUrls,
+    imagesToDelete,
+    hasExistingLogo,
+    existingLogoUrls
 
   };
 }

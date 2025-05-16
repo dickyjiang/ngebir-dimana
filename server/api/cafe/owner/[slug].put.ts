@@ -39,10 +39,30 @@ export default defineEventHandler(async (event) => {
 	const cafeLocationLink = formData.find((f) => f.name === "cafeLocationLink")?.data?.toString() ?? cafeData.location_link;
 	const cafeWorkingHours = formData.find((f) => f.name === "cafeWorkingHours")?.data?.toString();
 
+	// Check if there are existing images that should be preserved
+	const hasExistingImages = formData.find((f) => f.name === "hasExistingImages")?.data?.toString() === "true";
+	const existingImageUrls = formData.find((f) => f.name === "existingImageUrls")?.data?.toString();
+	const hasExistingMenuImages = formData.find((f) => f.name === "hasExistingMenuImages")?.data?.toString() === "true";
+	const existingMenuImageUrls = formData.find((f) => f.name === "existingMenuImageUrls")?.data?.toString();
+	const hasExistingLogo = formData.find((f) => f.name === "hasExistingLogo")?.data?.toString() === "true";
+	const existingLogoUrls = formData.find((f) => f.name === "existingLogoUrls")?.data?.toString();
+
 	const image = formData.find((f) => f.name === "image");
 	const cafeLogo = formData.find((f) => f.name === "cafeLogo");
 	const multipleImages = formData.filter((f) => f.name === "images");
 	const imagesToDelete = formData.find((f) => f.name === "imagesToDelete")?.data?.toString();
+	const features = formData.find((f) => f.name === "features")
+
+	let parsedFeatures = [];
+	if (features && features.data) {
+		try {
+			const featuresString = features.data.toString();
+			parsedFeatures = JSON.parse(featuresString);
+		} catch (e) {
+			console.error("Error parsing features:", e);
+		}
+	}
+
 
 	let formattedWorkingHours = cafeData.working_hours;
 	if (cafeWorkingHours) {
@@ -72,16 +92,40 @@ export default defineEventHandler(async (event) => {
 
 	const slug = cafeData.slug_name;
 
+	// Handle logo - only upload if a new file was provided
 	let logoUrl = cafeData.logo;
 	if (cafeLogo && cafeLogo.data) {
-		const logoKey = `${slug}/${uuidv4()}.${cafeLogo?.filename?.split('.')[1]}`;
+		const logoKey = `${slug}/${uuidv4()}.${cafeLogo?.filename?.split('.')[1] || 'jpg'}`;
 		logoUrl = await uploadToR2(cafeLogo.data, logoKey, cafeLogo.type || "image/jpeg");
+	} else if (hasExistingLogo && existingLogoUrls) {
+		try {
+			// If the user has existing images but didn't upload a new one
+			const parsedUrls = JSON.parse(existingLogoUrls);
+			if (Array.isArray(parsedUrls) && parsedUrls.length > 0) {
+				// Use the first image URL as the primary image if it exists
+				logoUrl = parsedUrls[0];
+			}
+		} catch (e) {
+			console.error("Error parsing existing image URLs:", e);
+		}
 	}
 
+	// Handle primary image - only upload if a new file was provided
 	let primaryImageUrl = cafeData.photo;
 	if (image && image.data) {
-		const imageKey = `${slug}/${uuidv4()}.${image?.filename?.split('.')[1]}`;
+		const imageKey = `${slug}/${uuidv4()}.${image?.filename?.split('.')[1] || 'jpg'}`;
 		primaryImageUrl = await uploadToR2(image.data, imageKey, image.type || "image/jpeg");
+	} else if (hasExistingImages && existingImageUrls) {
+		try {
+			// If the user has existing images but didn't upload a new one
+			const parsedUrls = JSON.parse(existingImageUrls);
+			if (Array.isArray(parsedUrls) && parsedUrls.length > 0) {
+				// Use the first image URL as the primary image if it exists
+				primaryImageUrl = parsedUrls[0];
+			}
+		} catch (e) {
+			console.error("Error parsing existing image URLs:", e);
+		}
 	}
 
 	// Handle new additional images
@@ -102,6 +146,19 @@ export default defineEventHandler(async (event) => {
 		newImageUrls.push(...results.filter(url => url !== null));
 	}
 
+	// Handle existing menu/additional images
+	let preserveExistingMenuImages = [];
+	if (hasExistingMenuImages && existingMenuImageUrls) {
+		try {
+			const parsedMenuUrls = JSON.parse(existingMenuImageUrls);
+			if (Array.isArray(parsedMenuUrls)) {
+				preserveExistingMenuImages = parsedMenuUrls;
+			}
+		} catch (e) {
+			console.error("Error parsing existing menu image URLs:", e);
+		}
+	}
+
 	// Delete images if needed
 	if (imagesToDelete) {
 		try {
@@ -110,7 +167,7 @@ export default defineEventHandler(async (event) => {
 				const { error: deleteError } = await client
 					.from("cafe_pics")
 					.delete()
-					.in("id", imageIds);
+					.in("url", imageIds);
 
 				if (deleteError) {
 					console.error("Error deleting images:", deleteError);
@@ -130,17 +187,68 @@ export default defineEventHandler(async (event) => {
 			site: cafeSite,
 			phone: cafePhoneNumber,
 			city: cafeCity,
+			state: cafeState,
+			street: cafeStreet,
 			working_hours: formattedWorkingHours,
 			location_link: cafeLocationLink,
 			logo: logoUrl,
 			photo: primaryImageUrl,
-			updated_at: new Date().toISOString(),
+			datetime: new Date().toISOString(),
 		})
 		.eq("id", cafeId)
 		.select()
 		.single();
 
 	if (error) throw createError({ statusCode: 500, message: error.message });
+
+	// Handle cafe_pics management
+
+	if (parsedFeatures.length > 0) {
+		const featuresToInsert = parsedFeatures.map(feature => ({
+			cafe_id: cafeId,
+			feature_id: feature.id
+		}));
+		// First, delete features that are not in the new list
+		const featureIdsToKeep = parsedFeatures.map(feature => feature.id);
+
+		const { error: deleteError } = await client
+			.from("cafe_features")
+			.delete()
+			.eq("cafe_id", cafeId)
+			.not("feature_id", "in", `(${featureIdsToKeep.join(',')})`);
+
+		if (deleteError) {
+			console.error("Error removing old cafe features:", deleteError);
+		}
+
+		const { error: featuresError } = await client
+			.from("cafe_features")
+			.upsert(featuresToInsert);
+
+		if (featuresError) {
+			console.error("Error saving cafe features:", featuresError);
+		}
+	} else {
+
+		const { error: deleteAllError } = await client
+			.from("cafe_features")
+			.delete()
+			.eq("cafe_id", cafeId);
+
+		if (deleteAllError) {
+			console.error("Error removing all cafe features:", deleteAllError);
+		}
+	}
+
+	// First, get existing pics to compare
+	const { data: existingPics, error: existingPicsError } = await client
+		.from("cafe_pics")
+		.select("id, url")
+		.eq("cafe_id", cafeId);
+
+	if (existingPicsError) {
+		console.error("Error fetching existing pics:", existingPicsError);
+	}
 
 	// Add new additional images to cafe_pics
 	if (newImageUrls.length > 0) {
@@ -155,6 +263,30 @@ export default defineEventHandler(async (event) => {
 
 		if (additionalImagesError) {
 			console.error("Error saving additional images:", additionalImagesError);
+		}
+	}
+
+	// Handle preserving existing menu images
+	if (preserveExistingMenuImages.length > 0) {
+		// Check which URLs are already in the database
+		const existingUrls = existingPics?.map(pic => pic.url) || [];
+
+		// Filter out URLs that are already in the database
+		const urlsToAdd = preserveExistingMenuImages.filter(url => !existingUrls.includes(url));
+
+		if (urlsToAdd.length > 0) {
+			const imagesToInsert = urlsToAdd.map(url => ({
+				cafe_id: cafeId,
+				url: url
+			}));
+
+			const { error: preserveImagesError } = await client
+				.from("cafe_pics")
+				.insert(imagesToInsert);
+
+			if (preserveImagesError) {
+				console.error("Error preserving existing menu images:", preserveImagesError);
+			}
 		}
 	}
 
