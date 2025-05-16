@@ -10,24 +10,21 @@
   <div class="bg-gray-100 min-h-screen">
     <div class="max-w-6xl mx-auto px-[5%]">
       <section class="pt-6 mb-8">
-        <h1 class="text-2xl font-semibold mb-4">{{ formTitle }}</h1>
+        <h1 class="text-2xl font-semibold mb-2">{{ formTitle }}</h1>
         <p class="text-gray-700 mb-4">
           Silahkan menambah atau mengedit informasi cafe Anda. Pastikan semua
           informasi yang Anda masukkan adalah benar dan sesuai dengan cafe Anda.
-          Jika Anda memiliki pertanyaan atau masalah, silahkan hubungi
         </p>
       </section>
 
       <!-- Your existing form content from add.vue -->
       <section class="mb-8">
-        <div class="bg-white shadow-md rounded px-4 pt-2 pb-8 mb-8">
-          <div class="mt-10">
+        <div class="bg-white shadow-md rounded-lg px-4 pt-2 pb-8 mb-8">
+          <div class="mt-8">
             <form>
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-8 sm:gap-0">
-                <div
-                  class="border-b sm:border-b-0 border-r-0 sm:border-r border-gray-300 px-4"
-                >
-                  <div class="mb-8">
+                <div class="border-b sm:border-b-0 border-r-0 sm:border-r border-gray-300 px-4">
+                  <!-- <div class="mb-8">
                     <label class="block mb-2"
                       >Jenis usaha:
                       <span class="text-sm text-gray-400"
@@ -63,10 +60,10 @@
                         <span>Supplier Alat-alat</span>
                       </label>
                     </div>
-                    <!-- <span v-if="hasError('businessTypes')" class="text-red-500 text-sm">
+                    <span v-if="hasError('businessTypes')" class="text-red-500 text-sm">
                       {{ formErrors.businessTypes?.join(', ') }}
-                    </span> -->
-                  </div>
+                    </span>
+                  </div> -->
                   <div class="mb-8">
                     <label for="cafeName">Nama Cafe:</label>
                     <input
