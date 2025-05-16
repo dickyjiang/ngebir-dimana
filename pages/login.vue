@@ -10,7 +10,7 @@
     <div class="absolute inset-0 bg-black opacity-60 z-[1]"></div>
     <div class="login-card z-[2]">
       <h1 class="title">Selamat datang</h1>
-      <p class="subtitle">Masuk ke akun anda</p>
+      <p class="subtitle">Login atau Daftar baru menggunakan Akun Google anda</p>
 
       <div class="auth-buttons">
         <button
@@ -22,11 +22,9 @@
             src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
             alt="Google logo"
           />
-          {{ loading ? 'Signing in...' : 'Sign in with Google' }}
+          {{ loading ? 'Signing in...' : 'Login / Daftar dengan Google' }}
         </button>
       </div>
-      <!-- @budi link to signup -->
-      <p class="subtitle mt-8">Belum punya akun? <span>Sign up</span></p>
     </div>
   </div>
 </template>
