@@ -148,7 +148,7 @@ export function useCafeForm(isEditMode: Ref<boolean>, cafeId: Ref<string | null>
   // ...other form fields
 
   // Helper function to convert time format from 12.30am to 00:30 format
-  const convertTimeFormat = (timeStr) => {
+  const convertTimeFormat = (timeStr: string) => {
     try {
       // Handle special case for 24h format
       if (timeStr === '24') return '23:59';
@@ -161,7 +161,7 @@ export function useCafeForm(isEditMode: Ref<boolean>, cafeId: Ref<string | null>
       if (!match) return '00:00';
 
       let [_, hours, minutes, period] = match;
-      hours = parseInt(hours);
+      let hoursNum = parseInt(hours);
 
       // Handle missing minutes
       minutes = minutes ? minutes : '00';
@@ -170,14 +170,14 @@ export function useCafeForm(isEditMode: Ref<boolean>, cafeId: Ref<string | null>
       period = period ? period.toLowerCase() : '';
 
       // Convert 12-hour to 24-hour format
-      if (period === 'pm' && hours < 12) {
-        hours += 12;
-      } else if (period === 'am' && hours === 12) {
-        hours = 0;
+      if (period === 'pm' && hoursNum < 12) {
+        hoursNum += 12;
+      } else if (period === 'am' && hoursNum === 12) {
+        hoursNum = 0;
       }
 
       // Format with leading zeros
-      return `${hours.toString().padStart(2, '0')}:${minutes.padEnd(2, '0')}`;
+      return `${hoursNum.toString().padStart(2, '0')}:${minutes.padEnd(2, '0')}`;
     } catch (e) {
       console.error('Error parsing time:', timeStr, e);
       return '00:00';
@@ -187,7 +187,7 @@ export function useCafeForm(isEditMode: Ref<boolean>, cafeId: Ref<string | null>
   // Corrected implementation of convertDaysToFormFormat
   // Direct fix for convertDaysToFormFormat
   // Fixed implementation of convertDaysToFormFormat to handle string input
-  const convertDaysToFormFormat = (daysData) => {
+  const convertDaysToFormFormat = (daysData: Record<string, string> | string | null | undefined) => {
     // Handle null or undefined daysData
     if (!daysData) {
       return days.value; // Return default days if no data provided
@@ -212,7 +212,7 @@ export function useCafeForm(isEditMode: Ref<boolean>, cafeId: Ref<string | null>
 
     // Create a completely new array with processed values
     return dayOrder.map(dayName => {
-      const dayValue = parsedData[dayName];
+      const dayValue = (parsedData as Record<string, string>)[dayName];
 
       // Set defaults
       let isOpen = false;
@@ -327,7 +327,7 @@ export function useCafeForm(isEditMode: Ref<boolean>, cafeId: Ref<string | null>
   const validateForm = () => {
     // Implement your validation logic here
     Object.keys(formErrors.value).forEach((key) => {
-      formErrors.value[key] = [];
+      formErrors.value[key as keyof FormErrors] = [];
     });
     let isValid = true;
 
