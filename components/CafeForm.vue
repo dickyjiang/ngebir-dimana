@@ -142,7 +142,7 @@
                   <div class="mb-8">
                     <label for="phone">Phone:</label>
                     <input
-                      class="input-base"
+                      class="input-base text-sm leading-7"
                       :class="{ 'input-error': hasError('phone') }"
                       type="tel"
                       id="phone"
@@ -160,7 +160,7 @@
                     <div class="mb-8">
                       <label for="state">Provinsi / Kota Besar:</label>
                       <select
-                        class="input-base"
+                        class="input-base text-sm leading-7"
                         :class="{ 'input-error': hasError('state') }"
                         id="state"
                         name="state"
@@ -192,7 +192,7 @@
                       <div class="mb-8">
                         <label for="city">Kota / Kabupaten:</label>
                         <select
-                          class="input-base"
+                          class="input-base text-sm leading-7"
                           :class="{ 'input-error': hasError('city') }"
                           id="city"
                           name="city"
@@ -243,8 +243,8 @@
                     >
                       {{ formErrors.location_link.join(', ') }}
                     </span>
-                    <p class="text-gray-500 text-sm mt-2 text-center">
-                      Masukan tautan URL (URL link) dari Google Business anda
+                    <p class="text-gray-500 text-sm mt-2">
+                      <strong>Note:</strong> Masukan tautan URL (URL link) dari Google Business anda
                       disini (diawalin dengan:
                       <span class="font-semibold text-gray-700"
                         >https://maps.app.goo.gl/</span
@@ -1138,8 +1138,9 @@
 
   select.input-base {
     @apply appearance-none bg-no-repeat bg-right pr-8;
+    background-position: calc(100% - 0.5rem) center;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
-    background-size: 1.5em;
+    background-size: 1em;
   }
 
   /* Add this to your CSS */
