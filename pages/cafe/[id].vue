@@ -247,6 +247,8 @@
           :src="selectedImage"
           class="max-h-[90vh] max-w-full object-contain"
           @click.stop
+          @touchstart="handleTouchStart"
+          @touchend="handleTouchEnd"
           alt="Full screen image"
         />
 
@@ -299,11 +301,43 @@ const showModal = ref(false);
 const selectedImage = ref("");
 const selectedImageIndex = ref(0); // Track current image index
 
+// Add these variables with other refs
+const touchStartX = ref(0)
+const touchEndX = ref(0)
+
+// Add these new functions
+function handleTouchStart(e) {
+  touchStartX.value = e.touches[0].clientX
+}
+
+function handleTouchEnd(e) {
+  touchEndX.value = e.changedTouches[0].clientX
+  handleSwipe()
+}
+
+function handleSwipe() {
+  const swipeDistance = touchEndX.value - touchStartX.value
+  const minSwipeDistance = 50 // minimum distance for swipe
+
+  if (Math.abs(swipeDistance) >= minSwipeDistance) {
+    if (swipeDistance > 0) {
+      // Swiped right - show previous image
+      previousImage()
+    } else {
+      // Swiped left - show next image
+      nextImage()
+    }
+  }
+}
+
 function openImageModal(imageUrl, index) {
-  selectedImage.value = imageUrl;
-  selectedImageIndex.value = index;
-  showModal.value = true;
-  document.body.style.overflow = "hidden"; // Prevent background scrolling
+  selectedImage.value = imageUrl
+  selectedImageIndex.value = index
+  showModal.value = true
+  document.body.style.overflow = "hidden"
+  // Reset touch values
+  touchStartX.value = 0
+  touchEndX.value = 0
 }
 
 function closeModal() {
