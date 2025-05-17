@@ -160,62 +160,48 @@
               :key="cafe.slug_name"
               class="w-full border border-gray-300 rounded-md p-4 mb-4"
             >
-              <NuxtLink :to="`/cafe/owner/form/${cafe.slug_name}`">
-                <NuxtImg
-                  :src="`${cafe.photo}`"
-                  alt="cafe_pic"
-                  class="w-full h-64 object-cover"
-                />
-                <div class="mt-3 flex flex-col gap-3">
-                  <div
-                    class="w-full flex gap-2 justify-between items-start"
-                  >
-                    <div>
-                      <h2 class="text-xl font-semibold flex-1">
-                        {{ cafe.name }}
-                      </h2>
-                      <p class="text-gray-500">
-                        Alamatna kuduna {{ cafe.address }}
-                      </p>
-                      <p>{{ cafe.city }}</p>
-                    </div>
-                    <div class="flex flex-col gap-2">
-                      <div
-                        class="px-3 py-1 rounded-full bg-yellow-400 text-gray-800 text-center text-sm font-medium"
-                      >
-                        Cafe
-                      </div>
-                       <!-- <button
-                    class="border border-gray-600 text-gray-600 py-1 px-4 rounded-md text-sm text-center font-medium hover:bg-gray-800 hover:text-yellow-500 transition-colors disabled:cursor-not-allowed"
-                  >
-                    Published
-                  </button> -->
-                    </div>
-                  </div>
-                  <div class="flex justify-between items-center">
-                    <!-- <p class="text-gray-500 line-clamp-2">{{ cafe.description }}</p> -->
+            <NuxtImg
+              :src="`${cafe.photo}`"
+              alt="cafe_pic"
+              class="w-full h-64 object-cover"
+            />
+            <div class="mt-3 flex flex-col gap-3">
+              <div class="w-full flex gap-2 justify-between items-start">
+                <div>
+                  <h2 class="text-xl font-semibold flex-1">
+                    {{ cafe.name }}
+                  </h2>
+                  <p class="text-gray-500">
+                    Alamatna kuduna {{ cafe.address }}
+                  </p>
+                  <p>{{ cafe.city }}</p>
+                </div>
+                <div class="flex flex-col gap-2">
+                  <div class="px-3 py-1 rounded-full bg-yellow-400 text-gray-800 text-center text-sm font-medium">
+                    Cafe
                   </div>
                 </div>
-                <div class="mt-2 flex justify-between gap-4">
-                  <button
-                    class=" text-white bg-green-600 py-2 px-4 rounded-md text-sm text-center font-medium hover:bg-red-800 transition-colors disabled:cursor-not-allowed"
-                  >
-                    Published
-                  </button>
-                  <div class="flex gap-2">
-                    <button
-                      class="border w-full border-gray-600 text-gray-600 py-2 px-6 rounded-md text-sm text-center font-medium hover:bg-gray-800 hover:text-yellow-500 transition-colors disabled:cursor-not-allowed"
-                    >
-                      View
-                    </button>
-                    <button
-                      class="border w-full border-gray-600 text-gray-600 py-2 px-6 rounded-md text-sm text-center font-medium hover:bg-gray-800 hover:text-yellow-500 transition-colors disabled:cursor-not-allowed"
-                    >
-                      Edit
-                    </button>
-                  </div>
-                </div>
-              </NuxtLink>
+              </div>
+            </div>
+            <div class="mt-2 flex justify-between gap-4">
+              <div class=" text-green-700 border border-green-700 py-2 px-4 rounded-full text-sm text-center font-medium">
+                Published
+              </div>
+              <div class="flex gap-2">
+                <button
+                  class="border w-full border-gray-600 text-gray-600 py-2 px-6 rounded-md text-sm text-center font-medium hover:bg-gray-800 hover:text-yellow-500 transition-colors disabled:cursor-not-allowed"
+                >
+                  View
+                </button>
+                <NuxtLink :to="`/cafe/owner/form/${cafe.slug_name}`"><button
+                  class="border w-full border-gray-600 text-gray-600 py-2 px-6 rounded-md text-sm text-center font-medium hover:bg-gray-800 hover:text-yellow-500 transition-colors disabled:cursor-not-allowed"
+                >
+                  Edit
+                </button></NuxtLink>
+                
+              </div>
+            </div>
+
             </div>
             <div class="p-2 text-center text-sm border border-green-400 text-green-700 bg-green-400/20 rounded-md">
               <p>Terimakasih telah mendaftarkan Bisnis anda, informasi lebih lanjut akan dikirim ke email, setelah pendaftaran anda selesai diproses.</p>
