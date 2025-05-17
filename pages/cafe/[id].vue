@@ -16,41 +16,50 @@
             class="w-full h-64 object-cover mb-4 rounded-lg"
             placeholder="/img/noimg.webp"
           />
-          <div class="px-4">
+          <div>
             <div
               class="flex items-end gap-2 justify-between border-b border-gray-500 pb-2"
             >
-              <div class="w-10 h-10 rounded-full overflow-hidden">
-                <NuxtImg
-                  :src="cafe.data.logo"
-                  alt="Cafe Logo"
-                  class="w-full h-full object-cover mb-4"
-                  placeholder="/img/logo-default.png"
-                />
-              </div>
-
-              <div class="flex items-center justify-between gap-2 py-1">
-                <div class="flex items-center gap-1">
-                  <img
-                    src="/src/assets/img/city.svg"
-                    alt="location"
-                    class="h-4"
+              <div class="flex items-center gap-4">
+                <div class="w-10 h-10 rounded-full overflow-hidden">
+                  <NuxtImg
+                    :src="cafe.data.logo"
+                    alt="Cafe Logo"
+                    class="w-full h-full object-cover mb-4"
+                    placeholder="/img/logo-default.png"
                   />
-                  <p class="text-gray-500">{{ cafe.data.city }}</p>
                 </div>
-                <div class="flex items-center gap-2">
-                  <div class="flex items-center gap-2">
-                    <img
-                      src="/src/assets/img/rating.svg"
-                      alt="rating"
-                      class="h-4"
-                    />
-                    <p class="text-gray-500">{{ cafe.data.rating }}</p>
+                <div>
+                  <div class="flex items-center gap-4">
+                    <div class="flex items-center gap-1">
+                      <img
+                        src="/src/assets/img/city.svg"
+                        alt="location"
+                        class="h-4"
+                      />
+                      <p class="text-gray-500">{{ cafe.data.city }}</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <div class="flex items-center gap-2">
+                        <img
+                          src="/src/assets/img/rating.svg"
+                          alt="rating"
+                          class="h-4"
+                        />
+                        <p class="text-gray-500">{{ cafe.data.rating }}</p>
+                      </div>
+                      <p class="text-gray-500 font-semibold">
+                        {{ cafe.data.range }}
+                      </p>
+                    </div>
                   </div>
-                  <p class="text-gray-500 font-semibold">
-                    {{ cafe.data.range }}
-                  </p>
+                  <p class="text-sm text-gray-500">{{ cafe.data.street }}</p>
                 </div>
+              </div>
+              <div class="flex items-center justify-between gap-2 py-1">
+                <div>share</div>
+                <div>Thumbs</div>
+                <div>Add Review</div>
               </div>
             </div>
             <div
@@ -61,7 +70,7 @@
                   (cafe.data.lat && cafe.data.long) || cafe.data.location_link
                 "
                 @click="openInGoogleMaps"
-                class="mt-4 w-full bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg flex items-center justify-center gap-2 max-w-1/2"
+                class="mt-4 w-1/2 bg-gray-800 hover:bg-gray-600 text-white py-2 px-4 rounded-lg flex items-center justify-center gap-2 max-w-1/2"
               >
                 <i class="fas fa-map-marker-alt"></i>
                 Open in Google Maps
@@ -69,7 +78,7 @@
               <button
                 v-if="cafe.data.site || cafe.data.instagram_url"
                 @click="openWebsite"
-                class="mt-4 w-full bg-gray-800 hover:bg-gray-700 text-white py-2 px-4 rounded-lg flex items-center justify-center gap-2"
+                class="mt-4 w-1/2 bg-gray-800 hover:bg-gray-700 text-white py-2 px-4 rounded-lg flex items-center justify-center gap-2"
               >
                 <i class="fas fa-globe"></i>
                 Visit
@@ -85,7 +94,7 @@
                     v-for="feature in cafe.features"
                     :key="feature.id"
                     :href="`/cafes?features=${feature.feature_slug}`"
-                    class="px-3 py-2 flex text-white text-xs items-center gap-2 border rounded-full border-gray-300 bg-blue-500 hover:bg-blue-600 transition-colors"
+                    class="px-3 py-2 flex text-white text-xs items-center gap-2 border rounded-full border-gray-300 bg-gray-800 hover:bg-gray-600 transition-colors"
                   >
                     {{ feature.name }}
                   </a>
@@ -243,155 +252,155 @@
 </template>
 
 <script setup>
-  import { ref, onMounted } from 'vue';
-  import { useRoute, useNuxtApp } from '#app';
-  import { useSeo } from '~/composables/useSeo';
+import { ref, onMounted } from "vue";
+import { useRoute, useNuxtApp } from "#app";
+import { useSeo } from "~/composables/useSeo";
 
-  const route = useRoute();
-  const cafe = ref(null);
-  const loading = ref(true);
-  const about = ref({});
-  const showModal = ref(false);
-  const selectedImage = ref('');
+const route = useRoute();
+const cafe = ref(null);
+const loading = ref(true);
+const about = ref({});
+const showModal = ref(false);
+const selectedImage = ref("");
 
-  function openImageModal(imageUrl) {
-    selectedImage.value = imageUrl;
-    showModal.value = true;
-    document.body.style.overflow = 'hidden'; // Prevent background scrolling
+function openImageModal(imageUrl) {
+  selectedImage.value = imageUrl;
+  showModal.value = true;
+  document.body.style.overflow = "hidden"; // Prevent background scrolling
+}
+
+function closeModal() {
+  showModal.value = false;
+  selectedImage.value = "";
+  document.body.style.overflow = ""; // Restore scrolling
+}
+
+useSeo({
+  title: "Website Paling Lengkap buat Cari Tempat Ngopi!",
+  description: "Satu Klik, Ribuan Cafe! Temukan yang Pas untuk Kamu.",
+  image: "/img/OG-img.png",
+  url: `https://ngopi.di-mana.com/cafes/${route.params.id}`,
+  type: "article",
+});
+
+function openInGoogleMaps() {
+  // encan
+  // First priority: use location_link if available
+  if (cafe.value?.data.location_link) {
+    window.open(cafe.value.data.location_link, "_blank");
+    return;
   }
 
-  function closeModal() {
-    showModal.value = false;
-    selectedImage.value = '';
-    document.body.style.overflow = ''; // Restore scrolling
-  }
+  // // Second priority: use place_id
+  // if (cafe.value?.place_id) {
+  //   const url = `https://www.google.com/maps/place/?q=place_id:${cafe.value.place_id}`;
+  //   window.open(url, '_blank');
+  //   return;
+  // }
 
-  useSeo({
-    title: 'Website Paling Lengkap buat Cari Tempat Ngopi!',
-    description: 'Satu Klik, Ribuan Cafe! Temukan yang Pas untuk Kamu.',
-    image: '/img/OG-img.png',
-    url: `https://ngopi.di-mana.com/cafes/${route.params.id}`,
-    type: 'article',
+  // // Third priority: use google_id
+  // if (cafe.value?.google_id) {
+  //   const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+  //     cafe.value.name
+  //   )}&query_place_id=${cafe.value.google_id}`;
+  //   window.open(url, '_blank');
+  //   return;
+  // }
+
+  // Fallback: use coordinates if other options aren't available
+  if (cafe.value.data?.lat && cafe.value?.data.long) {
+    const lat = cafe.value.data.lat.toString().replace(",", ".").trim();
+    const lng = cafe.value.data.long.toString().replace(",", ".").trim();
+    const url = `https://www.google.com/maps/search/${encodeURIComponent(
+      cafe.value.data.name
+    )}/@${lat},${lng},17z`;
+    window.open(url, "_blank");
+  } else {
+    console.error("No location data available");
+  }
+}
+
+function openWebsite() {
+  if (cafe.value?.data.site) {
+    window.open(cafe.value.data.site, "_blank");
+  }
+}
+
+onMounted(async () => {
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && showModal.value) {
+      closeModal();
+    }
   });
-
-  function openInGoogleMaps() {
-    // encan
-    // First priority: use location_link if available
-    if (cafe.value?.data.location_link) {
-      window.open(cafe.value.data.location_link, '_blank');
-      return;
-    }
-
-    // // Second priority: use place_id
-    // if (cafe.value?.place_id) {
-    //   const url = `https://www.google.com/maps/place/?q=place_id:${cafe.value.place_id}`;
-    //   window.open(url, '_blank');
-    //   return;
-    // }
-
-    // // Third priority: use google_id
-    // if (cafe.value?.google_id) {
-    //   const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-    //     cafe.value.name
-    //   )}&query_place_id=${cafe.value.google_id}`;
-    //   window.open(url, '_blank');
-    //   return;
-    // }
-
-    // Fallback: use coordinates if other options aren't available
-    if (cafe.value.data?.lat && cafe.value?.data.long) {
-      const lat = cafe.value.data.lat.toString().replace(',', '.').trim();
-      const lng = cafe.value.data.long.toString().replace(',', '.').trim();
-      const url = `https://www.google.com/maps/search/${encodeURIComponent(
-        cafe.value.data.name
-      )}/@${lat},${lng},17z`;
-      window.open(url, '_blank');
-    } else {
-      console.error('No location data available');
-    }
-  }
-
-  function openWebsite() {
-    if (cafe.value?.data.site) {
-      window.open(cafe.value.data.site, '_blank');
-    }
-  }
-
-  onMounted(async () => {
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && showModal.value) {
-        closeModal();
-      }
+  try {
+    const cafeData = await $fetch(`/api/cafe/${route.params.id}`, {
+      headers: useRequestHeaders(["cookie"]),
+      onResponseError({ response }) {
+        console.error(
+          `Server error: ${response.status} ${response.statusText}`
+        );
+        loading.value = false;
+      },
     });
-    try {
-      const cafeData = await $fetch(`/api/cafe/${route.params.id}`, {
-        headers: useRequestHeaders(['cookie']),
-        onResponseError({ response }) {
-          console.error(
-            `Server error: ${response.status} ${response.statusText}`
-          );
-          loading.value = false;
-        },
-      });
 
-      cafe.value = cafeData;
-    } catch (err) {
-      console.error('Fetch error:', err);
-    } finally {
-      loading.value = false;
-    }
-  });
+    cafe.value = cafeData;
+  } catch (err) {
+    console.error("Fetch error:", err);
+  } finally {
+    loading.value = false;
+  }
+});
 </script>
 
 <style scoped>
-  .skeleton {
-    background-color: #e0e0e0;
-    border-radius: 4px;
-    animation: pulse 1.5s infinite ease-in-out;
-  }
+.skeleton {
+  background-color: #e0e0e0;
+  border-radius: 4px;
+  animation: pulse 1.5s infinite ease-in-out;
+}
 
-  @keyframes pulse {
-    0% {
-      opacity: 1;
-    }
-    50% {
-      opacity: 0.4;
-    }
-    100% {
-      opacity: 1;
-    }
+@keyframes pulse {
+  0% {
+    opacity: 1;
   }
+  50% {
+    opacity: 0.4;
+  }
+  100% {
+    opacity: 1;
+  }
+}
 
-  .skeleton-text {
-    height: 1em;
-    margin-bottom: 0.5em;
-    width: 80%;
-  }
+.skeleton-text {
+  height: 1em;
+  margin-bottom: 0.5em;
+  width: 80%;
+}
 
-  .skeleton-image {
-    height: 200px;
-    width: 100%;
-    margin-bottom: 1em;
-  }
+.skeleton-image {
+  height: 200px;
+  width: 100%;
+  margin-bottom: 1em;
+}
 
-  .fixed {
-    animation: fadeIn 0.3s ease-in-out;
-  }
+.fixed {
+  animation: fadeIn 0.3s ease-in-out;
+}
 
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 1;
-    }
+@keyframes fadeIn {
+  from {
+    opacity: 0;
   }
+  to {
+    opacity: 1;
+  }
+}
 
-  img {
-    transition: transform 0.2s;
-  }
+img {
+  transition: transform 0.2s;
+}
 
-  img:hover {
-    transform: scale(1.05);
-  }
+img:hover {
+  transform: scale(1.05);
+}
 </style>
