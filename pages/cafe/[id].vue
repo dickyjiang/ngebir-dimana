@@ -18,7 +18,7 @@
           />
           <div>
             <div
-              class="flex flex-col sm:flex-row sm:items-end gap-4 sm:gap-2 justify-between border-b border-gray-500 pb-2"
+              class="flex flex-col sm:flex-row sm:items-start gap-4 sm:gap-2 justify-between border-b border-gray-500 pb-2"
             >
               <div class="flex items-center gap-4">
                 <div class="w-10 h-10 rounded-full overflow-hidden">
@@ -56,15 +56,30 @@
                   <p class="text-sm text-gray-500">{{ cafe.data.street }}</p>
                 </div>
               </div>
-              <div class="flex items-center justify-center gap-2 bg-white shadow-xl border border-gray-300 rounded-xl px-4 py-2 w-1/2">
-                <button class="flex items-center gap-2 rounded-full border border-gray-300  px-4 py-1">
-                  <div>share</div>
+              <div class="flex items-center justify-center gap-2  max-w-1/2">
+                <button class="flex items-center px-2">
+                      <img
+                        src="/src/assets/img/send.svg"
+                        alt="share"
+                        class="h-5 "
+                      />
+                      <!-- <p class="text-xs">Share</p> -->
                 </button>
-                <button class="flex items-center gap-2 rounded-full border border-gray-300  px-4 py-1">
-                  <div>Thumb</div>
+                <button class="flex fl items-center px-2">
+                      <img
+                        src="/src/assets/img/add-review.svg"
+                        alt="share"
+                        class="h-6"
+                      />
+                      <!-- <p class="text-xs">Review</p> -->
                 </button>
-                <button class="flex items-center gap-2 rounded-full border border-gray-300  px-4 py-1">
-                  <div>Reviews</div>
+                <button class="flex items-center px-2">
+                      <img
+                        src="/src/assets/img/love.svg"
+                        alt="share"
+                        class="h-6"
+                      />
+                      <!-- <p class="text-xs">Like</p> -->
                 </button>
               </div>
             </div>
