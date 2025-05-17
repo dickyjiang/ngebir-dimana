@@ -57,6 +57,7 @@
                 </div>
               </div>
               <div class="flex items-center justify-center gap-2  max-w-1/2">
+                <!-- @budi add function share - buat user nge share link cafe ini -->
                 <button class="flex items-center px-2">
                       <img
                         src="/src/assets/img/send.svg"
@@ -65,18 +66,20 @@
                       />
                       <!-- <p class="text-xs">Share</p> -->
                 </button>
+                <!-- @budi add function add review ( engke iyeu mah teu urgent) -->
                 <button class="flex fl items-center px-2">
                       <img
                         src="/src/assets/img/add-review.svg"
-                        alt="share"
+                        alt="review"
                         class="h-6"
                       />
                       <!-- <p class="text-xs">Review</p> -->
                 </button>
+                <!-- @budi add function like nantinya kita bisa show how many likes nya  -->
                 <button class="flex items-center px-2">
                       <img
                         src="/src/assets/img/love.svg"
-                        alt="share"
+                        alt="like"
                         class="h-6"
                       />
                       <!-- <p class="text-xs">Like</p> -->

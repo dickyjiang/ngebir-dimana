@@ -114,6 +114,7 @@
                   Cafe</NuxtLink
                 >
               </div>
+              <!-- @budi create page form buat roastery -->
               <div
                 class="flex flex-col items-center justify-center gap-8 bg-gray-100 px-4 py-3 rounded-md border border-gray-600"
               >
@@ -130,6 +131,7 @@
                   Beans & Roastery</NuxtLink
                 >
               </div>
+              <!-- @budi create page form buat add supplies -->
               <div
                 class="flex flex-col items-center justify-center gap-8 bg-gray-100 px-4 py-3 rounded-md border border-gray-600"
               >
@@ -171,11 +173,13 @@
                   <h2 class="text-xl font-semibold flex-1">
                     {{ cafe.name }}
                   </h2>
+                  <!-- @budi pang kaluarkeun alamatna -->
                   <p class="text-gray-500">
                     Alamatna kuduna {{ cafe.address }}
                   </p>
                   <p>{{ cafe.city }}</p>
                 </div>
+                <!-- @budi ini tag doang show jenis usaha na Cafe - roastery -supplies-->
                 <div class="flex flex-col gap-2">
                   <div class="px-3 py-1 rounded-full bg-yellow-400 text-gray-800 text-center text-sm font-medium">
                     Cafe
@@ -184,10 +188,12 @@
               </div>
             </div>
             <div class="mt-2 flex justify-between gap-4">
+              <!-- @budi show status published -->
               <div class=" text-green-700 border border-green-700 py-2 px-4 rounded-full text-sm text-center font-medium">
                 Published
               </div>
               <div class="flex gap-2">
+                <!-- @budi tah ini diclik view ke cafe id na ( kalau udah publish) -->
                 <button
                   class="border w-full border-gray-600 text-gray-600 py-2 px-6 rounded-md text-sm text-center font-medium hover:bg-gray-800 hover:text-yellow-500 transition-colors disabled:cursor-not-allowed"
                 >
@@ -203,6 +209,7 @@
             </div>
 
             </div>
+            <!-- @budi show message after registration -->
             <div class="p-2 text-center text-sm border border-green-400 text-green-700 bg-green-400/20 rounded-md">
               <p>Terimakasih telah mendaftarkan Bisnis anda, informasi lebih lanjut akan dikirim ke email, setelah pendaftaran anda selesai diproses.</p>
             </div>
