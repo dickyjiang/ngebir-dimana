@@ -143,7 +143,7 @@
               <img
                 class="rounded-md object-cover cursor-pointer w-full h-full"
                 :src="cafePic.url"
-                @click="openImageModal(cafePic.url)"
+                @click="openImageModal(cafePic.url, index)"  
                 :alt="`Cafe photo ${index + 1}`"
                 style="aspect-ratio: 1/1"
               />
@@ -201,6 +201,7 @@
       @click="closeModal"
     >
       <div class="relative max-w-4xl max-h-screen p-4" @click.stop>
+        <!-- Close button -->
         <button
           @click="closeModal"
           class="absolute top-4 right-4 text-white hover:text-gray-300 z-50"
@@ -219,12 +220,40 @@
             />
           </svg>
         </button>
+
+        <!-- Navigation buttons -->
+        <button
+          v-if="selectedImageIndex > 0"
+          @click.stop="previousImage"
+          class="absolute left-4 top-1/2 transform -translate-y-1/2 text-white hover:text-gray-300 z-50"
+        >
+          <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+          </svg>
+        </button>
+        
+        <button
+          v-if="selectedImageIndex < cafe.cafe_pics.length - 1"
+          @click.stop="nextImage"
+          class="absolute right-4 top-1/2 transform -translate-y-1/2 text-white hover:text-gray-300 z-50"
+        >
+          <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
+
+        <!-- Image -->
         <img
           :src="selectedImage"
           class="max-h-[90vh] max-w-full object-contain"
           @click.stop
           alt="Full screen image"
         />
+
+        <!-- Image counter -->
+        <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-white">
+          {{ selectedImageIndex + 1 }} / {{ cafe.cafe_pics.length }}
+        </div>
       </div>
     </div>
   </Teleport>
@@ -268,9 +297,11 @@ const loading = ref(true);
 const about = ref({});
 const showModal = ref(false);
 const selectedImage = ref("");
+const selectedImageIndex = ref(0); // Track current image index
 
-function openImageModal(imageUrl) {
+function openImageModal(imageUrl, index) {
   selectedImage.value = imageUrl;
+  selectedImageIndex.value = index;
   showModal.value = true;
   document.body.style.overflow = "hidden"; // Prevent background scrolling
 }
@@ -279,6 +310,20 @@ function closeModal() {
   showModal.value = false;
   selectedImage.value = "";
   document.body.style.overflow = ""; // Restore scrolling
+}
+
+function nextImage() {
+  if (selectedImageIndex.value < cafe.value.cafe_pics.length - 1) {
+    selectedImageIndex.value++;
+    selectedImage.value = cafe.value.cafe_pics[selectedImageIndex.value].url;
+  }
+}
+
+function previousImage() {
+  if (selectedImageIndex.value > 0) {
+    selectedImageIndex.value--;
+    selectedImage.value = cafe.value.cafe_pics[selectedImageIndex.value].url;
+  }
 }
 
 useSeo({
