@@ -6,10 +6,10 @@
       <div class="skeleton skeleton-text"></div>
       <div class="skeleton skeleton-text"></div>
     </div>
-    <div v-else-if="cafe">
+    <div v-else-if="cafe" class="flex flex-col gap-4">
       <h1 class="text-4xl font-bold mb-4">{{ cafe.data.name }}</h1>
-      <div class="flex flex-col md:flex-row items-start justify-between gap-4">
-        <div class="w-full md:w-1/2">
+      <div class="flex flex-col md:flex-row items-start justify-between gap-4 ">
+        <div class="w-full md:w-1/2 px-4">
           <NuxtImg
             :src="cafe.data.photo"
             alt="Cafe Image"
@@ -18,7 +18,7 @@
           />
           <div>
             <div
-              class="flex items-end gap-2 justify-between border-b border-gray-500 pb-2"
+              class="flex flex-col sm:flex-row sm:items-end gap-4 sm:gap-2 justify-between border-b border-gray-500 pb-2"
             >
               <div class="flex items-center gap-4">
                 <div class="w-10 h-10 rounded-full overflow-hidden">
@@ -56,10 +56,16 @@
                   <p class="text-sm text-gray-500">{{ cafe.data.street }}</p>
                 </div>
               </div>
-              <div class="flex items-center justify-between gap-2 py-1">
-                <div>share</div>
-                <div>Thumbs</div>
-                <div>Add Review</div>
+              <div class="flex items-center justify-center gap-2 bg-white shadow-xl border border-gray-300 rounded-xl px-4 py-2 w-1/2">
+                <button class="flex items-center gap-2 rounded-full border border-gray-300  px-4 py-1">
+                  <div>share</div>
+                </button>
+                <button class="flex items-center gap-2 rounded-full border border-gray-300  px-4 py-1">
+                  <div>Thumb</div>
+                </button>
+                <button class="flex items-center gap-2 rounded-full border border-gray-300  px-4 py-1">
+                  <div>Reviews</div>
+                </button>
               </div>
             </div>
             <div
@@ -70,7 +76,7 @@
                   (cafe.data.lat && cafe.data.long) || cafe.data.location_link
                 "
                 @click="openInGoogleMaps"
-                class="mt-4 w-1/2 bg-gray-800 hover:bg-gray-600 text-white py-2 px-4 rounded-lg flex items-center justify-center gap-2 max-w-1/2"
+                class="mt-4 md:w-1/2 bg-gray-800 hover:bg-gray-600 text-white py-2 px-4 rounded-lg flex items-center justify-center gap-2 max-w-1/2"
               >
                 <i class="fas fa-map-marker-alt"></i>
                 Open in Google Maps
@@ -78,7 +84,7 @@
               <button
                 v-if="cafe.data.site || cafe.data.instagram_url"
                 @click="openWebsite"
-                class="mt-4 w-1/2 bg-gray-800 hover:bg-gray-700 text-white py-2 px-4 rounded-lg flex items-center justify-center gap-2"
+                class="mt-4 md:w-1/2 bg-gray-800 hover:bg-gray-700 text-white py-2 px-4 rounded-lg flex items-center justify-center gap-2"
               >
                 <i class="fas fa-globe"></i>
                 Visit
@@ -101,7 +107,7 @@
                 </div>
               </div>
             </div>
-            <div class="flex flex-col" v-if="cafe.data.working_hours">
+            <div class="flex flex-col mt-4" v-if="cafe.data.working_hours">
               <h2 class="text-lg font-semibold">Working Hours</h2>
               <table
                 class="min-w-full border-collapse border border-gray-300 text-sm mt-2"
@@ -129,9 +135,9 @@
         </div>
         <!-- @budisentosa thumbnail na -->
 
-        <div class="w-full md:w-1/2 flex flex-col gap-8">
+        <div class="w-full md:w-1/2 flex flex-col px-4">
           <div
-            class="grid grid-cols-4 sm:grid-cols-4 gap-2 flex-1 items-start overflow-y-scroll"
+            class="grid grid-cols-4 sm:grid-cols-4 gap-2 flex-1 items-start overflow-y-hidden mb-4"
           >
             <div v-for="(cafePic, index) in cafe.cafe_pics" :key="index">
               <img
@@ -143,7 +149,7 @@
               />
             </div>
           </div>
-          <div class="border border-gray-300 rounded-lg">
+          <div class="border border-gray-300 rounded-lg overflow-hidden">
             <ClientOnly>
               <LMap
                 style="height: 350px"
@@ -396,11 +402,11 @@ onMounted(async () => {
   }
 }
 
-img {
+/* img {
   transition: transform 0.2s;
 }
 
 img:hover {
   transform: scale(1.05);
-}
+} */
 </style>
