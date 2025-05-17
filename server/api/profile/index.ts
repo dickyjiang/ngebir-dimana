@@ -22,7 +22,7 @@ export default defineEventHandler(async (event) => {
 
         const { data: cafeData, error: cafeError } = await supabase
             .from('cafes')
-            .select('id, name, city, photo,  slug_name, description')
+            .select('id, name, city, photo,  slug_name, description, street, city(city_name), is_published, business_type')
             .eq('uuid', user.id)
             .order('datetime', { ascending: false })
         if (cafeError) throw cafeError

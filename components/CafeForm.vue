@@ -23,7 +23,9 @@
           <div class="mt-8">
             <form>
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-8 sm:gap-0">
-                <div class="border-b sm:border-b-0 border-r-0 sm:border-r border-gray-300 px-4">
+                <div
+                  class="border-b sm:border-b-0 border-r-0 sm:border-r border-gray-300 px-4"
+                >
                   <!-- <div class="mb-8">
                     <label class="block mb-2"
                       >Jenis usaha:
@@ -247,8 +249,8 @@
                       {{ formErrors.location_link.join(', ') }}
                     </span>
                     <p class="text-gray-500 text-sm mt-2">
-                      <strong>Note:</strong> Masukan tautan URL (URL link) dari Google Business anda
-                      disini (diawalin dengan:
+                      <strong>Note:</strong> Masukan tautan URL (URL link) dari
+                      Google Business anda disini (diawalin dengan:
                       <span class="font-semibold text-gray-700"
                         >https://maps.app.goo.gl/</span
                       >) Click button di bawah untuk panduan cara menemukan

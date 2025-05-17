@@ -8,7 +8,7 @@
     </div>
     <div v-else-if="cafe" class="flex flex-col gap-4">
       <h1 class="text-4xl font-bold mb-4">{{ cafe.data.name }}</h1>
-      <div class="flex flex-col md:flex-row items-start justify-between gap-4 ">
+      <div class="flex flex-col md:flex-row items-start justify-between gap-4">
         <div class="w-full md:w-1/2 px-4">
           <NuxtImg
             :src="cafe.data.photo"
@@ -56,33 +56,24 @@
                   <p class="text-sm text-gray-500">{{ cafe.data.street }}</p>
                 </div>
               </div>
-              <div class="flex items-center justify-center gap-2  max-w-1/2">
-                <!-- @budi add function share - buat user nge share link cafe ini -->
-                <button class="flex items-center px-2">
-                      <img
-                        src="/src/assets/img/send.svg"
-                        alt="share"
-                        class="h-5 "
-                      />
-                      <!-- <p class="text-xs">Share</p> -->
+              <div class="flex items-center justify-center gap-2 max-w-1/2">
+                <button class="flex items-center px-2" @click="sharePage">
+                  <img src="/src/assets/img/send.svg" alt="share" class="h-5" />
+                  <!-- <p class="text-xs">Share</p> -->
                 </button>
                 <!-- @budi add function add review ( engke iyeu mah teu urgent) -->
                 <button class="flex fl items-center px-2">
-                      <img
-                        src="/src/assets/img/add-review.svg"
-                        alt="review"
-                        class="h-6"
-                      />
-                      <!-- <p class="text-xs">Review</p> -->
+                  <img
+                    src="/src/assets/img/add-review.svg"
+                    alt="review"
+                    class="h-6"
+                  />
+                  <!-- <p class="text-xs">Review</p> -->
                 </button>
                 <!-- @budi add function like nantinya kita bisa show how many likes nya  -->
                 <button class="flex items-center px-2">
-                      <img
-                        src="/src/assets/img/love.svg"
-                        alt="like"
-                        class="h-6"
-                      />
-                      <!-- <p class="text-xs">Like</p> -->
+                  <img src="/src/assets/img/love.svg" alt="like" class="h-6" />
+                  <!-- <p class="text-xs">Like</p> -->
                 </button>
               </div>
             </div>
@@ -151,8 +142,6 @@
             </div>
           </div>
         </div>
-        <!-- @budisentosa thumbnail na -->
-
         <div class="w-full md:w-1/2 flex flex-col px-4">
           <div
             class="grid grid-cols-4 sm:grid-cols-4 gap-2 flex-1 items-start overflow-y-hidden mb-4"
@@ -161,7 +150,7 @@
               <img
                 class="rounded-md object-cover cursor-pointer w-full h-full"
                 :src="cafePic.url"
-                @click="openImageModal(cafePic.url, index)"  
+                @click="openImageModal(cafePic.url, index)"
                 :alt="`Cafe photo ${index + 1}`"
                 style="aspect-ratio: 1/1"
               />
@@ -245,18 +234,38 @@
           @click.stop="previousImage"
           class="absolute left-4 top-1/2 transform -translate-y-1/2 text-white hover:text-gray-300 z-50"
         >
-          <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+          <svg
+            class="w-8 h-8"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M15 19l-7-7 7-7"
+            />
           </svg>
         </button>
-        
+
         <button
           v-if="selectedImageIndex < cafe.cafe_pics.length - 1"
           @click.stop="nextImage"
           class="absolute right-4 top-1/2 transform -translate-y-1/2 text-white hover:text-gray-300 z-50"
         >
-          <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+          <svg
+            class="w-8 h-8"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 5l7 7-7 7"
+            />
           </svg>
         </button>
 
@@ -271,7 +280,9 @@
         />
 
         <!-- Image counter -->
-        <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-white">
+        <div
+          class="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-white"
+        >
           {{ selectedImageIndex + 1 }} / {{ cafe.cafe_pics.length }}
         </div>
       </div>
@@ -307,199 +318,211 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
-import { useRoute, useNuxtApp } from "#app";
-import { useSeo } from "~/composables/useSeo";
+  import { ref, onMounted } from 'vue';
+  import { useRoute, useNuxtApp } from '#app';
+  import { useSeo } from '~/composables/useSeo';
 
-const route = useRoute();
-const cafe = ref(null);
-const loading = ref(true);
-const about = ref({});
-const showModal = ref(false);
-const selectedImage = ref("");
-const selectedImageIndex = ref(0); // Track current image index
+  const route = useRoute();
+  const cafe = ref(null);
+  const loading = ref(true);
+  const about = ref({});
+  const showModal = ref(false);
+  const selectedImage = ref('');
+  const selectedImageIndex = ref(0); // Track current image index
 
-// Add these variables with other refs
-const touchStartX = ref(0)
-const touchEndX = ref(0)
+  // Add these variables with other refs
+  const touchStartX = ref(0);
+  const touchEndX = ref(0);
 
-// Add these new functions
-function handleTouchStart(e) {
-  touchStartX.value = e.touches[0].clientX
-}
+  // Add these new functions
+  function handleTouchStart(e) {
+    touchStartX.value = e.touches[0].clientX;
+  }
 
-function handleTouchEnd(e) {
-  touchEndX.value = e.changedTouches[0].clientX
-  handleSwipe()
-}
+  function handleTouchEnd(e) {
+    touchEndX.value = e.changedTouches[0].clientX;
+    handleSwipe();
+  }
 
-function handleSwipe() {
-  const swipeDistance = touchEndX.value - touchStartX.value
-  const minSwipeDistance = 50 // minimum distance for swipe
+  function handleSwipe() {
+    const swipeDistance = touchEndX.value - touchStartX.value;
+    const minSwipeDistance = 50; // minimum distance for swipe
 
-  if (Math.abs(swipeDistance) >= minSwipeDistance) {
-    if (swipeDistance > 0) {
-      // Swiped right - show previous image
-      previousImage()
-    } else {
-      // Swiped left - show next image
-      nextImage()
+    if (Math.abs(swipeDistance) >= minSwipeDistance) {
+      if (swipeDistance > 0) {
+        // Swiped right - show previous image
+        previousImage();
+      } else {
+        // Swiped left - show next image
+        nextImage();
+      }
     }
   }
-}
 
-function openImageModal(imageUrl, index) {
-  selectedImage.value = imageUrl
-  selectedImageIndex.value = index
-  showModal.value = true
-  document.body.style.overflow = "hidden"
-  // Reset touch values
-  touchStartX.value = 0
-  touchEndX.value = 0
-}
-
-function closeModal() {
-  showModal.value = false;
-  selectedImage.value = "";
-  document.body.style.overflow = ""; // Restore scrolling
-}
-
-function nextImage() {
-  if (selectedImageIndex.value < cafe.value.cafe_pics.length - 1) {
-    selectedImageIndex.value++;
-    selectedImage.value = cafe.value.cafe_pics[selectedImageIndex.value].url;
-  }
-}
-
-function previousImage() {
-  if (selectedImageIndex.value > 0) {
-    selectedImageIndex.value--;
-    selectedImage.value = cafe.value.cafe_pics[selectedImageIndex.value].url;
-  }
-}
-
-useSeo({
-  title: "Website Paling Lengkap buat Cari Tempat Ngopi!",
-  description: "Satu Klik, Ribuan Cafe! Temukan yang Pas untuk Kamu.",
-  image: "/img/OG-img.png",
-  url: `https://ngopi.di-mana.com/cafes/${route.params.id}`,
-  type: "article",
-});
-
-function openInGoogleMaps() {
-  // encan
-  // First priority: use location_link if available
-  if (cafe.value?.data.location_link) {
-    window.open(cafe.value.data.location_link, "_blank");
-    return;
+  function openImageModal(imageUrl, index) {
+    selectedImage.value = imageUrl;
+    selectedImageIndex.value = index;
+    showModal.value = true;
+    document.body.style.overflow = 'hidden';
+    // Reset touch values
+    touchStartX.value = 0;
+    touchEndX.value = 0;
   }
 
-  // // Second priority: use place_id
-  // if (cafe.value?.place_id) {
-  //   const url = `https://www.google.com/maps/place/?q=place_id:${cafe.value.place_id}`;
-  //   window.open(url, '_blank');
-  //   return;
-  // }
-
-  // // Third priority: use google_id
-  // if (cafe.value?.google_id) {
-  //   const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-  //     cafe.value.name
-  //   )}&query_place_id=${cafe.value.google_id}`;
-  //   window.open(url, '_blank');
-  //   return;
-  // }
-
-  // Fallback: use coordinates if other options aren't available
-  if (cafe.value.data?.lat && cafe.value?.data.long) {
-    const lat = cafe.value.data.lat.toString().replace(",", ".").trim();
-    const lng = cafe.value.data.long.toString().replace(",", ".").trim();
-    const url = `https://www.google.com/maps/search/${encodeURIComponent(
-      cafe.value.data.name
-    )}/@${lat},${lng},17z`;
-    window.open(url, "_blank");
-  } else {
-    console.error("No location data available");
+  function closeModal() {
+    showModal.value = false;
+    selectedImage.value = '';
+    document.body.style.overflow = ''; // Restore scrolling
   }
-}
 
-function openWebsite() {
-  if (cafe.value?.data.site) {
-    window.open(cafe.value.data.site, "_blank");
+  function nextImage() {
+    if (selectedImageIndex.value < cafe.value.cafe_pics.length - 1) {
+      selectedImageIndex.value++;
+      selectedImage.value = cafe.value.cafe_pics[selectedImageIndex.value].url;
+    }
   }
-}
 
-onMounted(async () => {
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && showModal.value) {
-      closeModal();
+  function previousImage() {
+    if (selectedImageIndex.value > 0) {
+      selectedImageIndex.value--;
+      selectedImage.value = cafe.value.cafe_pics[selectedImageIndex.value].url;
+    }
+  }
+
+  useSeo({
+    title: 'Website Paling Lengkap buat Cari Tempat Ngopi!',
+    description: 'Satu Klik, Ribuan Cafe! Temukan yang Pas untuk Kamu.',
+    image: '/img/OG-img.png',
+    url: `https://ngopi.di-mana.com/cafes/${route.params.id}`,
+    type: 'article',
+  });
+
+  function openInGoogleMaps() {
+    // encan
+    // First priority: use location_link if available
+    if (cafe.value?.data.location_link) {
+      window.open(cafe.value.data.location_link, '_blank');
+      return;
+    }
+
+    // // Second priority: use place_id
+    // if (cafe.value?.place_id) {
+    //   const url = `https://www.google.com/maps/place/?q=place_id:${cafe.value.place_id}`;
+    //   window.open(url, '_blank');
+    //   return;
+    // }
+
+    // // Third priority: use google_id
+    // if (cafe.value?.google_id) {
+    //   const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+    //     cafe.value.name
+    //   )}&query_place_id=${cafe.value.google_id}`;
+    //   window.open(url, '_blank');
+    //   return;
+    // }
+
+    // Fallback: use coordinates if other options aren't available
+    if (cafe.value.data?.lat && cafe.value?.data.long) {
+      const lat = cafe.value.data.lat.toString().replace(',', '.').trim();
+      const lng = cafe.value.data.long.toString().replace(',', '.').trim();
+      const url = `https://www.google.com/maps/search/${encodeURIComponent(
+        cafe.value.data.name
+      )}/@${lat},${lng},17z`;
+      window.open(url, '_blank');
+    } else {
+      console.error('No location data available');
+    }
+  }
+
+  function openWebsite() {
+    if (cafe.value?.data.site) {
+      window.open(cafe.value.data.site, '_blank');
+    }
+  }
+
+  onMounted(async () => {
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && showModal.value) {
+        closeModal();
+      }
+    });
+    try {
+      const cafeData = await $fetch(`/api/cafe/${route.params.id}`, {
+        headers: useRequestHeaders(['cookie']),
+        onResponseError({ response }) {
+          console.error(
+            `Server error: ${response.status} ${response.statusText}`
+          );
+          loading.value = false;
+        },
+      });
+
+      cafe.value = cafeData;
+    } catch (err) {
+      console.error('Fetch error:', err);
+    } finally {
+      loading.value = false;
     }
   });
-  try {
-    const cafeData = await $fetch(`/api/cafe/${route.params.id}`, {
-      headers: useRequestHeaders(["cookie"]),
-      onResponseError({ response }) {
-        console.error(
-          `Server error: ${response.status} ${response.statusText}`
-        );
-        loading.value = false;
-      },
-    });
-
-    cafe.value = cafeData;
-  } catch (err) {
-    console.error("Fetch error:", err);
-  } finally {
-    loading.value = false;
+  async function sharePage() {
+    try {
+      await navigator.share({
+        title: document.title,
+        url: window.location.href,
+        text: 'Check out this page!', // Optional description
+      });
+      console.log('Shared successfully');
+    } catch (error) {
+      console.error('Error sharing:', error);
+    }
   }
-});
 </script>
 
 <style scoped>
-.skeleton {
-  background-color: #e0e0e0;
-  border-radius: 4px;
-  animation: pulse 1.5s infinite ease-in-out;
-}
-
-@keyframes pulse {
-  0% {
-    opacity: 1;
+  .skeleton {
+    background-color: #e0e0e0;
+    border-radius: 4px;
+    animation: pulse 1.5s infinite ease-in-out;
   }
-  50% {
-    opacity: 0.4;
+
+  @keyframes pulse {
+    0% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.4;
+    }
+    100% {
+      opacity: 1;
+    }
   }
-  100% {
-    opacity: 1;
+
+  .skeleton-text {
+    height: 1em;
+    margin-bottom: 0.5em;
+    width: 80%;
   }
-}
 
-.skeleton-text {
-  height: 1em;
-  margin-bottom: 0.5em;
-  width: 80%;
-}
-
-.skeleton-image {
-  height: 200px;
-  width: 100%;
-  margin-bottom: 1em;
-}
-
-.fixed {
-  animation: fadeIn 0.3s ease-in-out;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
+  .skeleton-image {
+    height: 200px;
+    width: 100%;
+    margin-bottom: 1em;
   }
-  to {
-    opacity: 1;
-  }
-}
 
-/* img {
+  .fixed {
+    animation: fadeIn 0.3s ease-in-out;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  /* img {
   transition: transform 0.2s;
 }
 
