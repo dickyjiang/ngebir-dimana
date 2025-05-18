@@ -6,20 +6,17 @@
       <div class="skeleton skeleton-text"></div>
       <div class="skeleton skeleton-text"></div>
     </div>
-    <div v-else-if="cafe" class="flex flex-col gap-4">
-      <h1 class="text-4xl font-bold mb-4">{{ cafe.data.name }}</h1>
-      <div class="flex flex-col md:flex-row items-start justify-between gap-4">
-        <div class="w-full md:w-1/2 px-4">
-          <NuxtImg
-            :src="cafe.data.photo"
-            alt="Cafe Image"
-            class="w-full h-64 object-cover mb-4 rounded-lg"
-            placeholder="/img/noimg.webp"
-          />
+    <div v-else-if="cafe">
+      <h1 class="text-2xl sm:text-4xl font-bold mb-4">{{ cafe.data.name }}</h1>
+      <div class="grid grid-cols-1 md:grid-cols-2 grid-flow-row items-stretch gap-8">
           <div>
-            <div
-              class="flex flex-col sm:flex-row sm:items-start gap-4 sm:gap-2 justify-between border-b border-gray-500 pb-2"
-            >
+            <NuxtImg
+              :src="cafe.data.photo"
+              alt="Cafe Image"
+              class="object-cover mb-4 rounded-lg"
+              placeholder="/img/noimg.webp"
+            />
+            <div class="flex flex-row sm:items-start gap-4 sm:gap-2 justify-between border-y border-gray-500 py-2">
               <div class="flex items-center gap-4">
                 <div class="w-10 h-10 rounded-full overflow-hidden">
                   <NuxtImg
@@ -29,6 +26,7 @@
                     placeholder="/img/logo-default.png"
                   />
                 </div>
+
                 <div>
                   <div class="flex items-center gap-4">
                     <div class="flex items-center gap-1">
@@ -77,75 +75,8 @@
                 </button>
               </div>
             </div>
-            <div
-              class="flex flex-col sm:flex-row gap-2 items-center justify-center"
-            >
-              <button
-                v-if="
-                  (cafe.data.lat && cafe.data.long) || cafe.data.location_link
-                "
-                @click="openInGoogleMaps"
-                class="mt-4 md:w-1/2 bg-gray-800 hover:bg-gray-600 text-white py-2 px-4 rounded-lg flex items-center justify-center gap-2 max-w-1/2"
-              >
-                <i class="fas fa-map-marker-alt"></i>
-                Open in Google Maps
-              </button>
-              <button
-                v-if="cafe.data.site || cafe.data.instagram_url"
-                @click="openWebsite"
-                class="mt-4 md:w-1/2 bg-gray-800 hover:bg-gray-700 text-white py-2 px-4 rounded-lg flex items-center justify-center gap-2"
-              >
-                <i class="fas fa-globe"></i>
-                Visit
-              </button>
-            </div>
-            <p class="text-md text-gray-500 my-2">
-              {{ cafe.data.description }}
-            </p>
-            <div>
-              <div class="py-4">
-                <div class="flex flex-wrap gap-2">
-                  <a
-                    v-for="feature in cafe.features"
-                    :key="feature.id"
-                    :href="`/cafes?features=${feature.feature_slug}`"
-                    class="px-3 py-2 flex text-white text-xs items-center gap-2 border rounded-full border-gray-300 bg-gray-800 hover:bg-gray-600 transition-colors"
-                  >
-                    {{ feature.name }}
-                  </a>
-                </div>
-              </div>
-            </div>
-            <div class="flex flex-col mt-4" v-if="cafe.data.working_hours">
-              <h2 class="text-lg font-semibold">Working Hours</h2>
-              <table
-                class="min-w-full border-collapse border border-gray-300 text-sm mt-2"
-              >
-                <thead>
-                  <tr>
-                    <th class="border border-gray-300 px-4 py-2">Day</th>
-                    <th class="border border-gray-300 px-4 py-2">Hours</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr
-                    v-for="(hours, day) in JSON.parse(cafe.data.working_hours)"
-                    :key="day"
-                  >
-                    <td class="border border-gray-300 px-4 py-2">{{ day }}</td>
-                    <td class="border border-gray-300 px-4 py-2">
-                      {{ hours }}
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
           </div>
-        </div>
-        <div class="w-full md:w-1/2 flex flex-col px-4">
-          <div
-            class="grid grid-cols-4 sm:grid-cols-4 gap-2 flex-1 items-start overflow-y-hidden mb-4"
-          >
+          <div class=" grid grid-cols-4 gap-2 items-start overflow-y-hidden mb-4">
             <div v-for="(cafePic, index) in cafe.cafe_pics" :key="index">
               <img
                 class="rounded-md object-cover cursor-pointer w-full h-full"
@@ -156,25 +87,90 @@
               />
             </div>
           </div>
-          <div class="border border-gray-300 rounded-lg overflow-hidden">
-            <ClientOnly>
-              <LMap
-                style="height: 350px"
-                :zoom="15"
-                :center="
-                  cafe.data.lat && cafe.data.long
-                    ? [Number(cafe.data.lat), Number(cafe.data.long)]
-                    : [0, 0]
-                "
-                :use-global-leaflet="false"
+        <div class="">
+          <p class="text-md text-gray-500 mb-4">
+            {{ cafe.data.description }}
+          </p>
+          <div
+            class="flex flex-col sm:flex-row gap-2 items-center justify-center mb-4 pb-4 border-b border-gray-500"
+          >
+            <button
+              v-if="
+                (cafe.data.lat && cafe.data.long) || cafe.data.location_link
+              "
+              @click="openInGoogleMaps"
+              class="mt-4 md:w-1/2 bg-gray-800 hover:bg-gray-600 text-white py-2 px-4 rounded-lg flex items-center justify-center gap-2 max-w-1/2"
+            >
+              <i class="fas fa-map-marker-alt"></i>
+              Open in Google Maps
+            </button>
+            <button
+              v-if="cafe.data.site || cafe.data.instagram_url"
+              @click="openWebsite"
+              class="mt-4 md:w-1/2 bg-gray-800 hover:bg-gray-700 text-white py-2 px-4 rounded-lg flex items-center justify-center gap-2"
+            >
+              <i class="fas fa-globe"></i>
+              Visit
+            </button>
+          </div>
+          <div>
+            <div class="py-4">
+              <div class="flex flex-wrap gap-2">
+                <a
+                  v-for="feature in cafe.features"
+                  :key="feature.id"
+                  :href="`/cafes?features=${feature.feature_slug}`"
+                  class="px-3 py-2 flex text-white text-xs items-center gap-2 border rounded-full border-gray-300 bg-gray-800 hover:bg-gray-600 transition-colors"
+                >
+                  {{ feature.name }}
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="flex flex-col mt-4" v-if="cafe.data.working_hours">
+          <h2 class="text-lg font-semibold">Working Hours</h2>
+          <table
+            class="min-w-full border-collapse border border-gray-300 text-sm mt-2"
+          >
+            <thead>
+              <tr>
+                <th class="border border-gray-300 px-4 py-2">Day</th>
+                <th class="border border-gray-300 px-4 py-2">Hours</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                v-for="(hours, day) in JSON.parse(cafe.data.working_hours)"
+                :key="day"
               >
-                <LTileLayer
-                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                  attribution='&amp;copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
-                  layer-type="base"
-                  name="OpenStreetMap"
-                />
-                <!-- <LMarker
+                <td class="border border-gray-300 px-4 py-2">{{ day }}</td>
+                <td class="border border-gray-300 px-4 py-2">
+                  {{ hours }}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="rounded-lg overflow-hidden ">
+          <ClientOnly>
+            <LMap
+              style="height: 350px"
+              :zoom="15"
+              :center="
+                cafe.data.lat && cafe.data.long
+                  ? [Number(cafe.data.lat), Number(cafe.data.long)]
+                  : [0, 0]
+              "
+              :use-global-leaflet="false"
+            >
+              <LTileLayer
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                attribution='&amp;copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
+                layer-type="base"
+                name="OpenStreetMap"
+              />
+              <!-- <LMarker
                   v-if="cafe.data.lat && cafe.data.long"
                   :lat-lng="[
                     Number(cafe.data.lat + 0.1),
@@ -183,17 +179,16 @@
                 >
                   <LPopup> teuing tah </LPopup>
                 </LMarker> -->
-                <LMarker
-                  v-if="cafe.data.lat && cafe.data.long"
-                  :lat-lng="[Number(cafe.data.lat), Number(cafe.data.long)]"
-                >
-                  <LPopup>
-                    {{ cafe.data.name }}
-                  </LPopup>
-                </LMarker>
-              </LMap>
-            </ClientOnly>
-          </div>
+              <LMarker
+                v-if="cafe.data.lat && cafe.data.long"
+                :lat-lng="[Number(cafe.data.lat), Number(cafe.data.long)]"
+              >
+                <LPopup>
+                  {{ cafe.data.name }}
+                </LPopup>
+              </LMarker>
+            </LMap>
+          </ClientOnly>
         </div>
       </div>
     </div>
@@ -318,211 +313,211 @@
 </template>
 
 <script setup>
-  import { ref, onMounted } from 'vue';
-  import { useRoute, useNuxtApp } from '#app';
-  import { useSeo } from '~/composables/useSeo';
+import { ref, onMounted } from "vue";
+import { useRoute, useNuxtApp } from "#app";
+import { useSeo } from "~/composables/useSeo";
 
-  const route = useRoute();
-  const cafe = ref(null);
-  const loading = ref(true);
-  const about = ref({});
-  const showModal = ref(false);
-  const selectedImage = ref('');
-  const selectedImageIndex = ref(0); // Track current image index
+const route = useRoute();
+const cafe = ref(null);
+const loading = ref(true);
+const about = ref({});
+const showModal = ref(false);
+const selectedImage = ref("");
+const selectedImageIndex = ref(0); // Track current image index
 
-  // Add these variables with other refs
-  const touchStartX = ref(0);
-  const touchEndX = ref(0);
+// Add these variables with other refs
+const touchStartX = ref(0);
+const touchEndX = ref(0);
 
-  // Add these new functions
-  function handleTouchStart(e) {
-    touchStartX.value = e.touches[0].clientX;
-  }
+// Add these new functions
+function handleTouchStart(e) {
+  touchStartX.value = e.touches[0].clientX;
+}
 
-  function handleTouchEnd(e) {
-    touchEndX.value = e.changedTouches[0].clientX;
-    handleSwipe();
-  }
+function handleTouchEnd(e) {
+  touchEndX.value = e.changedTouches[0].clientX;
+  handleSwipe();
+}
 
-  function handleSwipe() {
-    const swipeDistance = touchEndX.value - touchStartX.value;
-    const minSwipeDistance = 50; // minimum distance for swipe
+function handleSwipe() {
+  const swipeDistance = touchEndX.value - touchStartX.value;
+  const minSwipeDistance = 50; // minimum distance for swipe
 
-    if (Math.abs(swipeDistance) >= minSwipeDistance) {
-      if (swipeDistance > 0) {
-        // Swiped right - show previous image
-        previousImage();
-      } else {
-        // Swiped left - show next image
-        nextImage();
-      }
-    }
-  }
-
-  function openImageModal(imageUrl, index) {
-    selectedImage.value = imageUrl;
-    selectedImageIndex.value = index;
-    showModal.value = true;
-    document.body.style.overflow = 'hidden';
-    // Reset touch values
-    touchStartX.value = 0;
-    touchEndX.value = 0;
-  }
-
-  function closeModal() {
-    showModal.value = false;
-    selectedImage.value = '';
-    document.body.style.overflow = ''; // Restore scrolling
-  }
-
-  function nextImage() {
-    if (selectedImageIndex.value < cafe.value.cafe_pics.length - 1) {
-      selectedImageIndex.value++;
-      selectedImage.value = cafe.value.cafe_pics[selectedImageIndex.value].url;
-    }
-  }
-
-  function previousImage() {
-    if (selectedImageIndex.value > 0) {
-      selectedImageIndex.value--;
-      selectedImage.value = cafe.value.cafe_pics[selectedImageIndex.value].url;
-    }
-  }
-
-  useSeo({
-    title: 'Website Paling Lengkap buat Cari Tempat Ngopi!',
-    description: 'Satu Klik, Ribuan Cafe! Temukan yang Pas untuk Kamu.',
-    image: '/img/OG-img.png',
-    url: `https://ngopi.di-mana.com/cafes/${route.params.id}`,
-    type: 'article',
-  });
-
-  function openInGoogleMaps() {
-    // encan
-    // First priority: use location_link if available
-    if (cafe.value?.data.location_link) {
-      window.open(cafe.value.data.location_link, '_blank');
-      return;
-    }
-
-    // // Second priority: use place_id
-    // if (cafe.value?.place_id) {
-    //   const url = `https://www.google.com/maps/place/?q=place_id:${cafe.value.place_id}`;
-    //   window.open(url, '_blank');
-    //   return;
-    // }
-
-    // // Third priority: use google_id
-    // if (cafe.value?.google_id) {
-    //   const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-    //     cafe.value.name
-    //   )}&query_place_id=${cafe.value.google_id}`;
-    //   window.open(url, '_blank');
-    //   return;
-    // }
-
-    // Fallback: use coordinates if other options aren't available
-    if (cafe.value.data?.lat && cafe.value?.data.long) {
-      const lat = cafe.value.data.lat.toString().replace(',', '.').trim();
-      const lng = cafe.value.data.long.toString().replace(',', '.').trim();
-      const url = `https://www.google.com/maps/search/${encodeURIComponent(
-        cafe.value.data.name
-      )}/@${lat},${lng},17z`;
-      window.open(url, '_blank');
+  if (Math.abs(swipeDistance) >= minSwipeDistance) {
+    if (swipeDistance > 0) {
+      // Swiped right - show previous image
+      previousImage();
     } else {
-      console.error('No location data available');
+      // Swiped left - show next image
+      nextImage();
     }
   }
+}
 
-  function openWebsite() {
-    if (cafe.value?.data.site) {
-      window.open(cafe.value.data.site, '_blank');
-    }
+function openImageModal(imageUrl, index) {
+  selectedImage.value = imageUrl;
+  selectedImageIndex.value = index;
+  showModal.value = true;
+  document.body.style.overflow = "hidden";
+  // Reset touch values
+  touchStartX.value = 0;
+  touchEndX.value = 0;
+}
+
+function closeModal() {
+  showModal.value = false;
+  selectedImage.value = "";
+  document.body.style.overflow = ""; // Restore scrolling
+}
+
+function nextImage() {
+  if (selectedImageIndex.value < cafe.value.cafe_pics.length - 1) {
+    selectedImageIndex.value++;
+    selectedImage.value = cafe.value.cafe_pics[selectedImageIndex.value].url;
+  }
+}
+
+function previousImage() {
+  if (selectedImageIndex.value > 0) {
+    selectedImageIndex.value--;
+    selectedImage.value = cafe.value.cafe_pics[selectedImageIndex.value].url;
+  }
+}
+
+useSeo({
+  title: "Website Paling Lengkap buat Cari Tempat Ngopi!",
+  description: "Satu Klik, Ribuan Cafe! Temukan yang Pas untuk Kamu.",
+  image: "/img/OG-img.png",
+  url: `https://ngopi.di-mana.com/cafes/${route.params.id}`,
+  type: "article",
+});
+
+function openInGoogleMaps() {
+  // encan
+  // First priority: use location_link if available
+  if (cafe.value?.data.location_link) {
+    window.open(cafe.value.data.location_link, "_blank");
+    return;
   }
 
-  onMounted(async () => {
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && showModal.value) {
-        closeModal();
-      }
-    });
-    try {
-      const cafeData = await $fetch(`/api/cafe/${route.params.id}`, {
-        headers: useRequestHeaders(['cookie']),
-        onResponseError({ response }) {
-          console.error(
-            `Server error: ${response.status} ${response.statusText}`
-          );
-          loading.value = false;
-        },
-      });
+  // // Second priority: use place_id
+  // if (cafe.value?.place_id) {
+  //   const url = `https://www.google.com/maps/place/?q=place_id:${cafe.value.place_id}`;
+  //   window.open(url, '_blank');
+  //   return;
+  // }
 
-      cafe.value = cafeData;
-    } catch (err) {
-      console.error('Fetch error:', err);
-    } finally {
-      loading.value = false;
+  // // Third priority: use google_id
+  // if (cafe.value?.google_id) {
+  //   const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+  //     cafe.value.name
+  //   )}&query_place_id=${cafe.value.google_id}`;
+  //   window.open(url, '_blank');
+  //   return;
+  // }
+
+  // Fallback: use coordinates if other options aren't available
+  if (cafe.value.data?.lat && cafe.value?.data.long) {
+    const lat = cafe.value.data.lat.toString().replace(",", ".").trim();
+    const lng = cafe.value.data.long.toString().replace(",", ".").trim();
+    const url = `https://www.google.com/maps/search/${encodeURIComponent(
+      cafe.value.data.name
+    )}/@${lat},${lng},17z`;
+    window.open(url, "_blank");
+  } else {
+    console.error("No location data available");
+  }
+}
+
+function openWebsite() {
+  if (cafe.value?.data.site) {
+    window.open(cafe.value.data.site, "_blank");
+  }
+}
+
+onMounted(async () => {
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && showModal.value) {
+      closeModal();
     }
   });
-  async function sharePage() {
-    try {
-      await navigator.share({
-        title: document.title,
-        url: window.location.href,
-        text: 'Check out this page!', // Optional description
-      });
-      console.log('Shared successfully');
-    } catch (error) {
-      console.error('Error sharing:', error);
-    }
+  try {
+    const cafeData = await $fetch(`/api/cafe/${route.params.id}`, {
+      headers: useRequestHeaders(["cookie"]),
+      onResponseError({ response }) {
+        console.error(
+          `Server error: ${response.status} ${response.statusText}`
+        );
+        loading.value = false;
+      },
+    });
+
+    cafe.value = cafeData;
+  } catch (err) {
+    console.error("Fetch error:", err);
+  } finally {
+    loading.value = false;
   }
+});
+async function sharePage() {
+  try {
+    await navigator.share({
+      title: document.title,
+      url: window.location.href,
+      text: "Check out this page!", // Optional description
+    });
+    console.log("Shared successfully");
+  } catch (error) {
+    console.error("Error sharing:", error);
+  }
+}
 </script>
 
 <style scoped>
-  .skeleton {
-    background-color: #e0e0e0;
-    border-radius: 4px;
-    animation: pulse 1.5s infinite ease-in-out;
-  }
+.skeleton {
+  background-color: #e0e0e0;
+  border-radius: 4px;
+  animation: pulse 1.5s infinite ease-in-out;
+}
 
-  @keyframes pulse {
-    0% {
-      opacity: 1;
-    }
-    50% {
-      opacity: 0.4;
-    }
-    100% {
-      opacity: 1;
-    }
+@keyframes pulse {
+  0% {
+    opacity: 1;
   }
-
-  .skeleton-text {
-    height: 1em;
-    margin-bottom: 0.5em;
-    width: 80%;
+  50% {
+    opacity: 0.4;
   }
-
-  .skeleton-image {
-    height: 200px;
-    width: 100%;
-    margin-bottom: 1em;
+  100% {
+    opacity: 1;
   }
+}
 
-  .fixed {
-    animation: fadeIn 0.3s ease-in-out;
+.skeleton-text {
+  height: 1em;
+  margin-bottom: 0.5em;
+  width: 80%;
+}
+
+.skeleton-image {
+  height: 200px;
+  width: 100%;
+  margin-bottom: 1em;
+}
+
+.fixed {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
   }
-
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 1;
-    }
+  to {
+    opacity: 1;
   }
+}
 
-  /* img {
+/* img {
   transition: transform 0.2s;
 }
 
