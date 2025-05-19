@@ -63,7 +63,10 @@ export default defineEventHandler(async (event) => {
         query.in('range', body.ranges)
     }
 
-    query = query.ilike("name", `%${body.searchQuery}%`);
+    if (body.searchQuery && body.searchQuery.query) {
+        // Use the search query to filter by name
+        query = query.ilike("name", `%${body.searchQuery.query}%`);
+    }
     // query = query.lt('st_distance(location, st_point(107.59655891385863, -6.879245721118651)::geography)', 5000)
     // query = query.filter(
     //     'ST_Distance(location::geometry, ST_MakePoint(107.59655891385863, -6.879245721118651)::geometry)',
