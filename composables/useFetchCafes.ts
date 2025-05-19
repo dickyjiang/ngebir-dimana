@@ -66,14 +66,6 @@ export function useFetchCafes() {
             //     range: `${from}-${to}`
             // });
 
-            if (hasil.data?.length < itemsPerPage) {
-                console.warn('Pagination Mismatch:', {
-                    expected: itemsPerPage,
-                    received: hasil.data?.length,
-                    difference: itemsPerPage - hasil.data?.length
-                });
-            }
-
             totalCafes.value = hasil.count || 0;
             data.value = hasil.data || [];
 

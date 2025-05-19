@@ -24,7 +24,7 @@
           class="mb-8"
         >
           <h3 class="font-medium mb-3">{{ parentCity.city_name }}</h3>
-          <div class="flex flex-wrap gap-2 text-sm ">
+          <div class="flex flex-wrap gap-2 text-sm">
             <!-- Child cities belonging to this parent -->
             <button
               v-for="childCity in getChildCities(parentCity.city_slug)"
@@ -34,7 +34,9 @@
                 'bg-gray-800 text-white': activeFilters.city.includes(
                   childCity.city_slug
                 ),
-                'bg-gray-100': !activeFilters.city.includes(childCity.city_slug),
+                'bg-gray-100': !activeFilters.city.includes(
+                  childCity.city_slug
+                ),
               }"
               class="px-3 py-1 text-xs rounded-full"
             >
@@ -67,14 +69,6 @@
     onNearbyToggle: Function,
     isNearbyActive: Boolean,
     locationLoading: Boolean,
-  });
-
-  onMounted(() => {
-    // console.log('Filter options received:', {
-    //   cities: props.cities?.length || 0,
-    //   ratings: props.ratings?.length || 0,
-    //   ranges: props.ranges?.length || 0,
-    // });
   });
 
   const uniqueRanges = computed(() => {

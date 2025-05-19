@@ -64,6 +64,7 @@ export type Database = {
           booking_appointment_link: string | null
           borough: string | null
           business_status: string | null
+          business_type: string
           category: string | null
           cid: string | null
           city: string | null
@@ -123,6 +124,7 @@ export type Database = {
           time_zone: string | null
           type: string | null
           typical_time_spent: string | null
+          uuid: string | null
           verified: boolean | null
           working_hours: string | null
           working_hours_old_format: string | null
@@ -133,6 +135,7 @@ export type Database = {
           booking_appointment_link?: string | null
           borough?: string | null
           business_status?: string | null
+          business_type?: string
           category?: string | null
           cid?: string | null
           city?: string | null
@@ -192,6 +195,7 @@ export type Database = {
           time_zone?: string | null
           type?: string | null
           typical_time_spent?: string | null
+          uuid?: string | null
           verified?: boolean | null
           working_hours?: string | null
           working_hours_old_format?: string | null
@@ -202,6 +206,7 @@ export type Database = {
           booking_appointment_link?: string | null
           borough?: string | null
           business_status?: string | null
+          business_type?: string
           category?: string | null
           cid?: string | null
           city?: string | null
@@ -261,11 +266,20 @@ export type Database = {
           time_zone?: string | null
           type?: string | null
           typical_time_spent?: string | null
+          uuid?: string | null
           verified?: boolean | null
           working_hours?: string | null
           working_hours_old_format?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "city_fk"
+            columns: ["city_slug"]
+            isOneToOne: false
+            referencedRelation: "city"
+            referencedColumns: ["city_slug"]
+          },
+        ]
       }
       city: {
         Row: {
@@ -306,24 +320,30 @@ export type Database = {
       profiles: {
         Row: {
           avatar_url: string | null
+          bio_profile: string | null
           full_name: string | null
           id: string
+          phone_number: string | null
           updated_at: string | null
           username: string | null
           website: string | null
         }
         Insert: {
           avatar_url?: string | null
+          bio_profile?: string | null
           full_name?: string | null
           id: string
+          phone_number?: string | null
           updated_at?: string | null
           username?: string | null
           website?: string | null
         }
         Update: {
           avatar_url?: string | null
+          bio_profile?: string | null
           full_name?: string | null
           id?: string
+          phone_number?: string | null
           updated_at?: string | null
           username?: string | null
           website?: string | null

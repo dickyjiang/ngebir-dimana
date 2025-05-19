@@ -1,3 +1,4 @@
+
 import { serverSupabaseClient, serverSupabaseUser } from '#supabase/server'
 
 export default defineEventHandler(async (event) => {
@@ -14,7 +15,7 @@ export default defineEventHandler(async (event) => {
     try {
         const { data, error } = await supabase
             .from('profiles')
-            .select('full_name, avatar_url, updated_at, phone_number, bio_profile')
+            .select('full_name, avatar_url, phone_number, bio_profile')
             .eq('id', user.id)
             .single()
 
@@ -24,6 +25,7 @@ export default defineEventHandler(async (event) => {
             .from('cafes')
             .select('id, name, city, photo,  slug_name, description, street, city(city_name), is_published, business_type')
             .eq('uuid', user.id)
+            .eq('is_published', true)
             .order('datetime', { ascending: false })
         if (cafeError) throw cafeError
 
