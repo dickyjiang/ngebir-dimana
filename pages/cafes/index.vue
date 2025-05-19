@@ -175,7 +175,7 @@
         }
       }
 
-      await fetchNewCafes();
+      // await fetchNewCafes();
       // Then fetch cafes with the initial filters
       await fetchCafes(currentPage.value, activeFilters.value);
     } catch (error) {
