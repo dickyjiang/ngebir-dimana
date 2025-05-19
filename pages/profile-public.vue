@@ -22,7 +22,7 @@
                       class="w-full h-full object-cover"
                     />
                   </div>
-                  <div class="flex flex-col gap-4 flex-1 pt-2 bg-green-100">
+                  <div class="flex flex-col gap-4 flex-1 pt-2">
                     <div class="flex flex-col gap-2">
                       <h1 class="text-2xl text-gray-800">
                         {{ userData.name }}
@@ -30,7 +30,7 @@
                       <p>
                         {{ userData.phone_number }}
                       </p>
-                      <div class="border w-full h-full">
+                      <div class="w-full h-full">
                         <p>
                           jang bio
                           {{ userData.bio }}
@@ -92,7 +92,6 @@
                 </div>
               </div>
               <div class="mt-2 flex justify-between gap-4">
-                <!-- @dicky ttg publish & unpublish -->
                 <div
                   v-if="cafe.is_published"
                   class="text-green-700 border border-green-700 py-2 px-4 rounded-full text-sm text-center font-medium bg-green-100"
@@ -137,7 +136,6 @@
                 </p>
               </div>
             </div>
-            <!-- @budi show message after registration -->
           </div>
         </div>
       </div>
