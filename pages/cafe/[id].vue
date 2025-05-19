@@ -55,24 +55,26 @@
                 </div>
               </div>
               <div class="flex items-center justify-center gap-2 max-w-1/2">
-                <button class="flex items-center px-2" @click="sharePage">
+                <button class="flex flex-col gap-1 items-center px-2" @click="">
                   <img src="/src/assets/img/send.svg" alt="share" class="h-5" />
-                  <!-- <p class="text-xs">Share</p> -->
+                  <p class="text-xs">Kontak Owner</p>
+                </button>
+                <button class="flex flex-col gap-1 items-center px-2" @click="sharePage">
+                  <img src="/src/assets/img/send.svg" alt="share" class="h-5" />
+                  <p class="text-xs">Share</p>
                 </button>
                 <!-- @budi add function add review ( engke iyeu mah teu urgent) -->
-                <button class="flex fl items-center px-2">
+                <!-- <button class="flex fl items-center px-2">
                   <img
                     src="/src/assets/img/add-review.svg"
                     alt="review"
                     class="h-6"
                   />
-                  <!-- <p class="text-xs">Review</p> -->
-                </button>
+                </button> -->
                 <!-- @budi add function like nantinya kita bisa show how many likes nya  -->
-                <button class="flex items-center px-2">
+                <!-- <button class="flex items-center px-2">
                   <img src="/src/assets/img/love.svg" alt="like" class="h-6" />
-                  <!-- <p class="text-xs">Like</p> -->
-                </button>
+                </button> -->
               </div>
             </div>
           </div>
@@ -152,7 +154,7 @@
             </tbody>
           </table>
         </div>
-        <div class="rounded-lg overflow-hidden ">
+        <!-- <div class="rounded-lg overflow-hidden ">
           <ClientOnly>
             <LMap
               style="height: 350px"
@@ -170,15 +172,6 @@
                 layer-type="base"
                 name="OpenStreetMap"
               />
-              <!-- <LMarker
-                  v-if="cafe.data.lat && cafe.data.long"
-                  :lat-lng="[
-                    Number(cafe.data.lat + 0.1),
-                    Number(cafe.data.long),
-                  ]"
-                >
-                  <LPopup> teuing tah </LPopup>
-                </LMarker> -->
               <LMarker
                 v-if="cafe.data.lat && cafe.data.long"
                 :lat-lng="[Number(cafe.data.lat), Number(cafe.data.long)]"
@@ -189,7 +182,7 @@
               </LMarker>
             </LMap>
           </ClientOnly>
-        </div>
+        </div> -->
       </div>
     </div>
     <div v-else class="text-center text-gray-500">Cafe not found.</div>
@@ -284,7 +277,7 @@
     </div>
   </Teleport>
   <!-- @budi section ini showing cafe yg realted dengan last search result - atau kalau bukan hasil search show close location dari cafe terpilih) -->
-  <section id="related-cafes" class="my-4">
+  <!-- <section id="related-cafes" class="my-4">
     <div
       class="my-4 w-full py-2 mx-auto flex flex-row gap-4 items-center justify-center bg-gray-200"
     >
@@ -309,7 +302,7 @@
         Cafe Terbaru 4
       </div>
     </div>
-  </section>
+  </section> -->
 </template>
 
 <script setup>
@@ -464,7 +457,7 @@ async function sharePage() {
     await navigator.share({
       title: document.title,
       url: window.location.href,
-      text: "Check out this page!", // Optional description
+      text: "Lagi cari tempat ngopi? Cek Cafe ini!", // Optional description
     });
     console.log("Shared successfully");
   } catch (error) {

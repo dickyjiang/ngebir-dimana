@@ -122,25 +122,6 @@
           </div>
 
           <div v-if="data.session" class="flex flex-col sm:flex-row items-center gap-2">
-            <NuxtLink
-              to="/cafe/owner/form"
-              class="flex text-sm font-semibold  border px-3 py-2 rounded-lg border-none transition-colors hover:bg-black hover:text-yellow-500"
-            >
-              add cafe
-            </NuxtLink>
-            <NuxtLink
-              to="/cafe/owner/form"
-              class="flex text-sm font-semibold  border px-3 py-2 rounded-lg border-none transition-colors hover:bg-black hover:text-yellow-500"
-            >
-              add Roastery
-            </NuxtLink>
-            <NuxtLink
-              to="/cafe/owner/form"
-              class="flex text-sm font-semibold  border px-3 py-2 rounded-lg border-none transition-colors hover:bg-black hover:text-yellow-500"
-            >
-              add Cafe Supplies
-            </NuxtLink>
-
             <NuxtLink to="/profile">
               <button
                 class="text-sm font-semibold flex border px-3 py-2 rounded-lg border-none transition-colors hover:bg-black hover:text-yellow-500"

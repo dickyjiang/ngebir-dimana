@@ -75,9 +75,35 @@
                       class="p-3 border border-gray-300 rounded-md text-base bg-gray-100 cursor-not-allowed"
                     />
                   </div>
+                  <!-- @budi nambaha phone number & whatsapp no -->
+                  <div class="flex flex-col gap-2">
+                    <label for="phone" class="font-medium text-gray-600"
+                      >Phone</label
+                    >
+                    <input
+                      type="text"
+                      id="phone"
+                      v-model="userData.phone_number"
+                      placeholder="No. Telepon"
+                      class="p-3 border border-gray-300 rounded-md text-base focus:outline-none focus:ring-2 focus:ring-gray-500"
+                    />
+                  </div>
+                  <div class="flex flex-col gap-2">
+                    <label for="whatsapp" class="font-medium text-gray-600"
+                      >WhatsApp</label
+                    >
+                    <input
+                      type="text"
+                      id="whatsapp"
+                      v-model="userData.whatsapp"
+                      placeholder="No. WhatsApp"
+                      class="p-3 border border-gray-300 rounded-md text-base focus:outline-none focus:ring-2 focus:ring-gray-500"
+                    />
+                  </div>
                 </div>
               </div>
             </div>
+            <!-- @budi Bio belum ter save setelah di isi -->
             <div class="flex flex-col gap-2">
               <label for="bio" class="font-medium text-gray-600"
                 >Bio anda</label
@@ -110,7 +136,7 @@
             </div>
             <div class="grid grid-cols-2 gap-4 pt-8">
               <div
-                class="flex flex-col items-center justify-center gap-8 bg-gray-100 px-4 py-3 rounded-md border border-gray-600"
+                class="flex flex-col items-center justify-end gap-8 bg-gray-100 px-4 py-3 rounded-md border border-gray-600"
               >
                 <img class="w-20" src="/src/assets/img/newCafe.svg" alt="" />
                 <NuxtLink
@@ -122,36 +148,35 @@
               </div>
               <!-- @budi create page form buat roastery -->
               <div
-                class="flex flex-col items-center justify-center gap-8 bg-gray-100 px-4 py-3 rounded-md border border-gray-600"
+                class="flex flex-col items-center justify-between gap-4 bg-gray-100 px-4 py-3 rounded-md border border-gray-600"
               >
                 <img
                   class="w-20 opacity-70"
                   src="/src/assets/img/coffee-beans.svg"
                   alt=""
                 />
-
-                <NuxtLink
+              <p class="text-red-500">Coming Soon</p>
+                <div
                   to="/cafe/owner/form"
-                  class="border w-full border-gray-600 text-gray-600 py-2 px-3 rounded-md text-sm text-center font-medium hover:bg-gray-800 hover:text-yellow-500 transition-colors"
+                  class="border w-full border-gray-600 text-gray-600 py-2 px-3 rounded-md text-sm text-center font-medium "
                 >
-                  Beans & Roastery</NuxtLink
+                  Beans & Roastery</div
                 >
               </div>
               <!-- @budi create page form buat add supplies -->
               <div
-                class="flex flex-col items-center justify-center gap-8 bg-gray-100 px-4 py-3 rounded-md border border-gray-600"
+                class="flex flex-col items-center justify-center gap-4 bg-gray-100 px-4 py-3 rounded-md border border-gray-600"
               >
                 <img
                   class="w-20 opacity-70"
                   src="/src/assets/img/portafilter.svg"
                   alt=""
                 />
-
-                <NuxtLink
-                  to="/cafe/owner/form"
-                  class="border w-full border-gray-600 text-gray-600 py-2 px-3 rounded-md text-sm text-center font-medium hover:bg-gray-800 hover:text-yellow-500 transition-colors"
+                 <p class="text-red-500">Coming Soon</p>
+                <div
+                  class="border w-full border-gray-600 text-gray-600 py-2 px-3 rounded-md text-sm text-center font-medium"
                 >
-                  Tools & Supplies</NuxtLink
+                  Tools & Supplies</div
                 >
               </div>
             </div>
