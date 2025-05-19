@@ -116,7 +116,7 @@
             v-if="!data.session"
             class="flex flex-col items-center sm:flex-row gap-1 w-full">
             <p class="text-sm text-gray-600 text-nowrap">
-              Mau nambah cafe kamu?
+              Mau daftarin atau Edit cafe kamu?
             </p>
             <NuxtLink
               to="/login"
