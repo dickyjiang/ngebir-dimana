@@ -3,11 +3,7 @@
   "tabWidth": 2,
   "semi": false,
   "singleQuote": true,
-<<<<<<< HEAD
-  "singleAttributePerLine": true
-=======
   "bracketSameLine": true,
   "singleAttributePerLine": false,
   "printWidth": 100
->>>>>>> fc174f0d7ff6cf33a153772796418c9949e29902
 }

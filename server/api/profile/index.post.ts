@@ -4,6 +4,12 @@ export default defineEventHandler(async (event) => {
     const supabase = await serverSupabaseClient(event)
     const user = await serverSupabaseUser(event)
 
+    const formData = await readMultipartFormData(event);
+
+    const name = formData.find((f) => f.name === "name")?.data?.toString() ?? '';
+    const phone_number = formData.find((f) => f.name === "phone_number")?.data?.toString() ?? '';
+    const bio_profile = formData.find((f) => f.name === "bio_profile")?.data?.toString() ?? '';
+    const avatar_url = formData.find((f) => f.name === "avatar");
     if (!user) {
         throw createError({
             statusCode: 401,
@@ -11,9 +17,15 @@ export default defineEventHandler(async (event) => {
         })
     }
 
+    let logoUrl = null;
+    if (avatar_url && avatar_url.data) {
+        const logoKey = `profile/${user.id}.${avatar_url?.filename?.split('.')[1]}`;
+        logoUrl = await uploadToR2(avatar_url.data, logoKey, avatar_url.type || "image/jpeg");
+    }
+
+    console.log('logoUrl', logoUrl);
     try {
         // Get request body
-        const { name } = await readBody(event)
 
         // Update profile in database
         const { data, error } = await supabase
@@ -21,7 +33,10 @@ export default defineEventHandler(async (event) => {
             .upsert({
                 id: user.id,
                 full_name: name,
-                updated_at: new Date()
+                phone_number: phone_number,
+                bio_profile: bio_profile,
+                updated_at: new Date(),
+                avatar_url: logoUrl
             })
 
         if (error) throw error

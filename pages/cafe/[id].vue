@@ -9,131 +9,120 @@
     <div v-else-if="cafe">
       <h1 class="text-2xl sm:text-4xl font-bold mb-4">{{ cafe.data.name }}</h1>
       <div class="grid grid-cols-1 md:grid-cols-2 grid-flow-row items-stretch gap-8">
-          <div>
-            <NuxtImg
-              :src="cafe.data.photo"
-              alt="Cafe Image"
-              class="object-cover mb-4 rounded-lg"
-              placeholder="/img/noimg.webp"
-            />
-            <div class="flex flex-row sm:items-start gap-4 sm:gap-2 justify-between border-y border-gray-500 py-2">
-              <div class="flex items-center gap-4">
-                <div class="w-10 h-10 rounded-full overflow-hidden">
-                  <NuxtImg
-                    :src="cafe.data.logo"
-                    alt="Cafe Logo"
-                    class="w-full h-full object-cover mb-4"
-                    placeholder="/img/logo-default.png"
-                  />
-                </div>
-
-                <div>
-                  <div class="flex items-center gap-4">
-                    <div class="flex items-center gap-1">
-                      <img
-                        src="/src/assets/img/city.svg"
-                        alt="location"
-                        class="h-4"
-                      />
-                      <p class="text-gray-500">{{ cafe.data.city }}</p>
-                    </div>
-                    <div class="flex items-center gap-2">
-                      <div class="flex items-center gap-2">
-                        <img
-                          src="/src/assets/img/rating.svg"
-                          alt="rating"
-                          class="h-4"
-                        />
-                        <p class="text-gray-500">{{ cafe.data.rating }}</p>
-                      </div>
-                      <p class="text-gray-500 font-semibold">
-                        {{ cafe.data.range }}
-                      </p>
-                    </div>
-                  </div>
-                  <p class="text-sm text-gray-500">{{ cafe.data.street }}</p>
-                </div>
+        <div>
+          <NuxtImg
+            :src="cafe.data.photo"
+            alt="Cafe Image"
+            class="object-cover mb-4 rounded-lg"
+            placeholder="/img/noimg.webp" />
+          <div
+            class="flex flex-row sm:items-start gap-4 sm:gap-2 justify-between border-y border-gray-500 py-2">
+            <div class="flex items-center gap-4">
+              <div class="w-10 h-10 rounded-full overflow-hidden">
+                <NuxtImg
+                  :src="cafe.data.logo"
+                  alt="Cafe Logo"
+                  class="w-full h-full object-cover mb-4"
+                  placeholder="/img/logo-default.png" />
               </div>
-              <div class="flex items-center justify-center gap-2 max-w-1/2">
-                <!-- @budi kontak owner - open modal dulu sebelum dibawa ke page register/login  -->
-                <button class="flex flex-col gap-1 items-center px-2" @click="">
-                  <img src="/src/assets/img/message.svg" alt="share" class="h-5 hover:transform hover:scale-110 transition-transform" />
+
+              <div>
+                <div class="flex items-center gap-4">
+                  <div class="flex items-center gap-1">
+                    <img src="/src/assets/img/city.svg" alt="location" class="h-4" />
+                    <p class="text-gray-500">{{ cafe.data.city }}</p>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <div class="flex items-center gap-2">
+                      <img src="/src/assets/img/rating.svg" alt="rating" class="h-4" />
+                      <p class="text-gray-500">{{ cafe.data.rating }}</p>
+                    </div>
+                    <p class="text-gray-500 font-semibold">
+                      {{ cafe.data.range }}
+                    </p>
+                  </div>
+                </div>
+                <p class="text-sm text-gray-500">{{ cafe.data.street }}</p>
+              </div>
+            </div>
+            <div class="flex items-center justify-center gap-2 max-w-1/2">
+              <NuxtLink :to="`/profile-public/${cafe.data.uuid}`">
+                <button class="flex flex-col gap-1 items-center px-2">
+                  <img
+                    src="/src/assets/img/message.svg"
+                    alt="share"
+                    class="h-5 hover:transform hover:scale-110 transition-transform" />
                   <p class="text-xs">Kontak Owner</p>
                 </button>
-                <button class="flex flex-col gap-1 items-center px-2 " @click="sharePage">
-                  <img src="/src/assets/img/send.svg" alt="share" class="h-5 hover:transform hover:scale-110 transition-transform" />
-                  <p class="text-xs">Share</p>
-                </button>
-                <!-- @budi add function add review ( engke iyeu mah teu urgent) -->
-                <!-- <button class="flex fl items-center px-2">
+              </NuxtLink>
+              <button class="flex flex-col gap-1 items-center px-2" @click="sharePage">
+                <img
+                  src="/src/assets/img/send.svg"
+                  alt="share"
+                  class="h-5 hover:transform hover:scale-110 transition-transform" />
+                <p class="text-xs">Share</p>
+              </button>
+              <!-- @budi add function add review ( engke iyeu mah teu urgent) -->
+              <!-- <button class="flex fl items-center px-2">
                   <img
                     src="/src/assets/img/add-review.svg"
                     alt="review"
                     class="h-6"
                   />
                 </button> -->
-                <!-- @budi add function like nantinya kita bisa show how many likes nya  -->
-                <!-- <button class="flex items-center px-2">
+              <!-- @budi add function like nantinya kita bisa show how many likes nya  -->
+              <!-- <button class="flex items-center px-2">
                   <img src="/src/assets/img/love.svg" alt="like" class="h-6" />
                 </button> -->
-              </div>
             </div>
           </div>
-          <div class=" grid grid-cols-4 gap-2 items-start overflow-y-hidden mb-2">
-            <div v-for="(cafePic, index) in cafe.cafe_pics" :key="index">
-              <img
-                class="rounded-md object-cover cursor-pointer w-full h-full"
-                :src="cafePic.url"
-                @click="openImageModal(cafePic.url, index)"
-                :alt="`Cafe photo ${index + 1}`"
-                style="aspect-ratio: 1/1"
-              />
-            </div>
+        </div>
+        <div class="grid grid-cols-4 gap-2 items-start overflow-y-hidden mb-2">
+          <div v-for="(cafePic, index) in cafe.cafe_pics" :key="index">
+            <img
+              class="rounded-md object-cover cursor-pointer w-full h-full"
+              :src="cafePic.url"
+              @click="openImageModal(cafePic.url, index)"
+              :alt="`Cafe photo ${index + 1}`"
+              style="aspect-ratio: 1/1" />
           </div>
+        </div>
         <div>
           <p class="text-md text-gray-500 mb-2">
             {{ cafe.data.description }}
           </p>
           <div
-            class="flex flex-col sm:flex-row gap-2 items-center justify-center mb-4 pb-4 border-b border-gray-500"
-          >
+            class="flex flex-col sm:flex-row gap-2 items-center justify-center mb-4 pb-4 border-b border-gray-500">
             <button
-              v-if="
-                (cafe.data.lat && cafe.data.long) || cafe.data.location_link
-              "
+              v-if="(cafe.data.lat && cafe.data.long) || cafe.data.location_link"
               @click="openInGoogleMaps"
-              class="mt-4 md:w-1/2 bg-gray-800 hover:bg-gray-600 text-white py-2 px-4 rounded-lg flex items-center justify-center gap-2 max-w-1/2"
-            >
+              class="mt-4 md:w-1/2 bg-gray-800 hover:bg-gray-600 text-white py-2 px-4 rounded-lg flex items-center justify-center gap-2 max-w-1/2">
               <i class="fas fa-map-marker-alt"></i>
               Open in Google Maps
             </button>
             <button
               v-if="cafe.data.site || cafe.data.instagram_url"
               @click="openWebsite"
-              class="mt-4 md:w-1/2 bg-gray-800 hover:bg-gray-700 text-white py-2 px-4 rounded-lg flex items-center justify-center gap-2"
-            >
+              class="mt-4 md:w-1/2 bg-gray-800 hover:bg-gray-700 text-white py-2 px-4 rounded-lg flex items-center justify-center gap-2">
               <i class="fas fa-globe"></i>
               Visit
             </button>
           </div>
-            <div class="py-4">
-              <div class="flex flex-wrap gap-2">
-                <a
-                  v-for="feature in cafe.features"
-                  :key="feature.id"
-                  :href="`/cafes?features=${feature.feature_slug}`"
-                  class="px-3 py-2 flex text-white text-xs items-center gap-2 border rounded-full border-gray-300 bg-gray-800 hover:bg-gray-600 transition-colors"
-                >
-                  {{ feature.name }}
-                </a>
-              </div>
+          <div class="py-4">
+            <div class="flex flex-wrap gap-2">
+              <a
+                v-for="feature in cafe.features"
+                :key="feature.id"
+                :href="`/cafes?features=${feature.feature_slug}`"
+                class="px-3 py-2 flex text-white text-xs items-center gap-2 border rounded-full border-gray-300 bg-gray-800 hover:bg-gray-600 transition-colors">
+                {{ feature.name }}
+              </a>
             </div>
+          </div>
         </div>
         <div class="flex flex-col mt-4" v-if="cafe.data.working_hours">
           <h2 class="text-lg font-semibold">Working Hours</h2>
-          <table
-            class="min-w-full border-collapse border border-gray-300 text-sm mt-2"
-          >
+          <table class="min-w-full border-collapse border border-gray-300 text-sm mt-2">
             <thead>
               <tr>
                 <th class="border border-gray-300 px-4 py-2">Day</th>
@@ -141,10 +130,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr
-                v-for="(hours, day) in JSON.parse(cafe.data.working_hours)"
-                :key="day"
-              >
+              <tr v-for="(hours, day) in JSON.parse(cafe.data.working_hours)" :key="day">
                 <td class="border border-gray-300 px-4 py-2">{{ day }}</td>
                 <td class="border border-gray-300 px-4 py-2">
                   {{ hours }}
@@ -192,26 +178,18 @@
       v-if="showModal"
       class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center"
       style="z-index: 9999"
-      @click="closeModal"
-    >
+      @click="closeModal">
       <div class="relative max-w-4xl max-h-screen p-4" @click.stop>
         <!-- Close button -->
         <button
           @click="closeModal"
-          class="absolute top-4 right-4 text-white hover:text-gray-300 z-50"
-        >
-          <svg
-            class="w-6 h-6"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
+          class="absolute top-4 right-4 text-white hover:text-gray-300 z-50">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
               stroke-width="2"
-              d="M6 18L18 6M6 6l12 12"
-            />
+              d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
 
@@ -219,40 +197,26 @@
         <button
           v-if="selectedImageIndex > 0"
           @click.stop="previousImage"
-          class="absolute left-4 top-1/2 transform -translate-y-1/2 text-white hover:text-gray-300 z-50"
-        >
-          <svg
-            class="w-8 h-8"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
+          class="absolute left-4 top-1/2 transform -translate-y-1/2 text-white hover:text-gray-300 z-50">
+          <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
               stroke-width="2"
-              d="M15 19l-7-7 7-7"
-            />
+              d="M15 19l-7-7 7-7" />
           </svg>
         </button>
 
         <button
           v-if="selectedImageIndex < cafe.cafe_pics.length - 1"
           @click.stop="nextImage"
-          class="absolute right-4 top-1/2 transform -translate-y-1/2 text-white hover:text-gray-300 z-50"
-        >
-          <svg
-            class="w-8 h-8"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
+          class="absolute right-4 top-1/2 transform -translate-y-1/2 text-white hover:text-gray-300 z-50">
+          <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
               stroke-width="2"
-              d="M9 5l7 7-7 7"
-            />
+              d="M9 5l7 7-7 7" />
           </svg>
         </button>
 
@@ -263,13 +227,10 @@
           @click.stop
           @touchstart="handleTouchStart"
           @touchend="handleTouchEnd"
-          alt="Full screen image"
-        />
+          alt="Full screen image" />
 
         <!-- Image counter -->
-        <div
-          class="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-white"
-        >
+        <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-white">
           {{ selectedImageIndex + 1 }} / {{ cafe.cafe_pics.length }}
         </div>
       </div>
@@ -305,91 +266,91 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
-import { useRoute, useNuxtApp } from "#app";
-import { useSeo } from "~/composables/useSeo";
+import { ref, onMounted } from 'vue'
+import { useRoute, useNuxtApp } from '#app'
+import { useSeo } from '~/composables/useSeo'
 
-const route = useRoute();
-const cafe = ref(null);
-const loading = ref(true);
-const about = ref({});
-const showModal = ref(false);
-const selectedImage = ref("");
-const selectedImageIndex = ref(0); // Track current image index
+const route = useRoute()
+const cafe = ref(null)
+const loading = ref(true)
+const about = ref({})
+const showModal = ref(false)
+const selectedImage = ref('')
+const selectedImageIndex = ref(0) // Track current image index
 
 // Add these variables with other refs
-const touchStartX = ref(0);
-const touchEndX = ref(0);
+const touchStartX = ref(0)
+const touchEndX = ref(0)
 
 // Add these new functions
 function handleTouchStart(e) {
-  touchStartX.value = e.touches[0].clientX;
+  touchStartX.value = e.touches[0].clientX
 }
 
 function handleTouchEnd(e) {
-  touchEndX.value = e.changedTouches[0].clientX;
-  handleSwipe();
+  touchEndX.value = e.changedTouches[0].clientX
+  handleSwipe()
 }
 
 function handleSwipe() {
-  const swipeDistance = touchEndX.value - touchStartX.value;
-  const minSwipeDistance = 50; // minimum distance for swipe
+  const swipeDistance = touchEndX.value - touchStartX.value
+  const minSwipeDistance = 50 // minimum distance for swipe
 
   if (Math.abs(swipeDistance) >= minSwipeDistance) {
     if (swipeDistance > 0) {
       // Swiped right - show previous image
-      previousImage();
+      previousImage()
     } else {
       // Swiped left - show next image
-      nextImage();
+      nextImage()
     }
   }
 }
 
 function openImageModal(imageUrl, index) {
-  selectedImage.value = imageUrl;
-  selectedImageIndex.value = index;
-  showModal.value = true;
-  document.body.style.overflow = "hidden";
+  selectedImage.value = imageUrl
+  selectedImageIndex.value = index
+  showModal.value = true
+  document.body.style.overflow = 'hidden'
   // Reset touch values
-  touchStartX.value = 0;
-  touchEndX.value = 0;
+  touchStartX.value = 0
+  touchEndX.value = 0
 }
 
 function closeModal() {
-  showModal.value = false;
-  selectedImage.value = "";
-  document.body.style.overflow = ""; // Restore scrolling
+  showModal.value = false
+  selectedImage.value = ''
+  document.body.style.overflow = '' // Restore scrolling
 }
 
 function nextImage() {
   if (selectedImageIndex.value < cafe.value.cafe_pics.length - 1) {
-    selectedImageIndex.value++;
-    selectedImage.value = cafe.value.cafe_pics[selectedImageIndex.value].url;
+    selectedImageIndex.value++
+    selectedImage.value = cafe.value.cafe_pics[selectedImageIndex.value].url
   }
 }
 
 function previousImage() {
   if (selectedImageIndex.value > 0) {
-    selectedImageIndex.value--;
-    selectedImage.value = cafe.value.cafe_pics[selectedImageIndex.value].url;
+    selectedImageIndex.value--
+    selectedImage.value = cafe.value.cafe_pics[selectedImageIndex.value].url
   }
 }
 
 useSeo({
-  title: "Website Paling Lengkap buat Cari Tempat Ngopi!",
-  description: "Satu Klik, Ribuan Cafe! Temukan yang Pas untuk Kamu.",
-  image: "/img/OG-img.png",
+  title: 'Website Paling Lengkap buat Cari Tempat Ngopi!',
+  description: 'Satu Klik, Ribuan Cafe! Temukan yang Pas untuk Kamu.',
+  image: '/img/OG-img.png',
   url: `https://ngopi.di-mana.com/cafes/${route.params.id}`,
-  type: "article",
-});
+  type: 'article',
+})
 
 function openInGoogleMaps() {
   // encan
   // First priority: use location_link if available
   if (cafe.value?.data.location_link) {
-    window.open(cafe.value.data.location_link, "_blank");
-    return;
+    window.open(cafe.value.data.location_link, '_blank')
+    return
   }
 
   // // Second priority: use place_id
@@ -410,57 +371,55 @@ function openInGoogleMaps() {
 
   // Fallback: use coordinates if other options aren't available
   if (cafe.value.data?.lat && cafe.value?.data.long) {
-    const lat = cafe.value.data.lat.toString().replace(",", ".").trim();
-    const lng = cafe.value.data.long.toString().replace(",", ".").trim();
+    const lat = cafe.value.data.lat.toString().replace(',', '.').trim()
+    const lng = cafe.value.data.long.toString().replace(',', '.').trim()
     const url = `https://www.google.com/maps/search/${encodeURIComponent(
       cafe.value.data.name
-    )}/@${lat},${lng},17z`;
-    window.open(url, "_blank");
+    )}/@${lat},${lng},17z`
+    window.open(url, '_blank')
   } else {
-    console.error("No location data available");
+    console.error('No location data available')
   }
 }
 
 function openWebsite() {
   if (cafe.value?.data.site) {
-    window.open(cafe.value.data.site, "_blank");
+    window.open(cafe.value.data.site, '_blank')
   }
 }
 
 onMounted(async () => {
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && showModal.value) {
-      closeModal();
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && showModal.value) {
+      closeModal()
     }
-  });
+  })
   try {
     const cafeData = await $fetch(`/api/cafe/${route.params.id}`, {
-      headers: useRequestHeaders(["cookie"]),
+      headers: useRequestHeaders(['cookie']),
       onResponseError({ response }) {
-        console.error(
-          `Server error: ${response.status} ${response.statusText}`
-        );
-        loading.value = false;
+        console.error(`Server error: ${response.status} ${response.statusText}`)
+        loading.value = false
       },
-    });
+    })
 
-    cafe.value = cafeData;
+    cafe.value = cafeData
   } catch (err) {
-    console.error("Fetch error:", err);
+    console.error('Fetch error:', err)
   } finally {
-    loading.value = false;
+    loading.value = false
   }
-});
+})
 async function sharePage() {
   try {
     await navigator.share({
       title: document.title,
       url: window.location.href,
-      text: "Lagi cari tempat ngopi? Cek Cafe ini!", // Optional description
-    });
-    console.log("Shared successfully");
+      text: 'Lagi cari tempat ngopi? Cek Cafe ini!', // Optional description
+    })
+    console.log('Shared successfully')
   } catch (error) {
-    console.error("Error sharing:", error);
+    console.error('Error sharing:', error)
   }
 }
 </script>
