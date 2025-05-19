@@ -26,6 +26,25 @@
         </button>
       </div>
     </div>
+    <!-- @budi gua double in disini aja nya - ini tampilan buat yg mau kontak owner -->
+    <div class="login-card z-[2]">
+      <h1 class="title">Halo!</h1>
+      <p class="subtitle">Untuk melihat profil atau menghubungi pemilik kafe, silakan login terlebih dahulu menggunakan Akun Google Anda. </p>
+      <div class="auth-buttons mt-4">
+        <button
+          class="google-button"
+          @click="signInWithGoogle"
+          :disabled="loading"
+        >
+          <img
+            src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+            alt="Google logo"
+          />
+          {{ loading ? 'Signing in...' : 'Login / Daftar dengan Google' }}
+        </button>
+         <p class=" text-gray-500">Langkah ini membantu kami menjaga keamanan dan kenyamanan komunitas.</p>
+      </div>
+    </div>
   </div>
 </template>
 

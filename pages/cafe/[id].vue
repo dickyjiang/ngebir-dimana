@@ -55,12 +55,13 @@
                 </div>
               </div>
               <div class="flex items-center justify-center gap-2 max-w-1/2">
+                <!-- @budi kontak owner - open modal dulu sebelum dibawa ke page register/login  -->
                 <button class="flex flex-col gap-1 items-center px-2" @click="">
-                  <img src="/src/assets/img/send.svg" alt="share" class="h-5" />
+                  <img src="/src/assets/img/message.svg" alt="share" class="h-5 hover:transform hover:scale-110 transition-transform" />
                   <p class="text-xs">Kontak Owner</p>
                 </button>
-                <button class="flex flex-col gap-1 items-center px-2" @click="sharePage">
-                  <img src="/src/assets/img/send.svg" alt="share" class="h-5" />
+                <button class="flex flex-col gap-1 items-center px-2 " @click="sharePage">
+                  <img src="/src/assets/img/send.svg" alt="share" class="h-5 hover:transform hover:scale-110 transition-transform" />
                   <p class="text-xs">Share</p>
                 </button>
                 <!-- @budi add function add review ( engke iyeu mah teu urgent) -->
@@ -78,7 +79,7 @@
               </div>
             </div>
           </div>
-          <div class=" grid grid-cols-4 gap-2 items-start overflow-y-hidden mb-4">
+          <div class=" grid grid-cols-4 gap-2 items-start overflow-y-hidden mb-2">
             <div v-for="(cafePic, index) in cafe.cafe_pics" :key="index">
               <img
                 class="rounded-md object-cover cursor-pointer w-full h-full"
@@ -89,8 +90,8 @@
               />
             </div>
           </div>
-        <div class="">
-          <p class="text-md text-gray-500 mb-4">
+        <div>
+          <p class="text-md text-gray-500 mb-2">
             {{ cafe.data.description }}
           </p>
           <div
@@ -115,7 +116,6 @@
               Visit
             </button>
           </div>
-          <div>
             <div class="py-4">
               <div class="flex flex-wrap gap-2">
                 <a
@@ -128,7 +128,6 @@
                 </a>
               </div>
             </div>
-          </div>
         </div>
         <div class="flex flex-col mt-4" v-if="cafe.data.working_hours">
           <h2 class="text-lg font-semibold">Working Hours</h2>
