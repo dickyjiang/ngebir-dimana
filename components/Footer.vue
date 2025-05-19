@@ -13,6 +13,7 @@
         </div>
         <div class="flex gap-4">
             <NuxtLink to="/privacy-policy" class="text-gray-500 hover:text-gray-400">Privacy Policy</NuxtLink>
+            <NuxtLink to="/disclaimer" class="text-gray-500 hover:text-gray-400">Disclaimer</NuxtLink>
             <NuxtLink to="/about-us" class="text-gray-500 hover:text-gray-400">About Us</NuxtLink>
         </div>
       </div>
