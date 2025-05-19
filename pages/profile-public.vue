@@ -59,6 +59,7 @@
           <div class="pb-1 border-b border-gray-600 mb-4">
             <h1 class="text-2xl text-gray-800">Bisnis</h1>
           </div>
+          <!-- @budi jangan lupa show only published -->
           <div class="flex flex-col gap-2">
             <div
               v-for="cafe in cafesList"
