@@ -10,7 +10,8 @@
   <div class="bg-gray-100 min-h-screen">
     <div class="max-w-6xl mx-auto px-[5%]">
       <section class="pt-6 mb-8">
-        <h1 class="text-2xl font-semibold mb-2">{{ formTitle }}</h1>
+        <!-- @budi -->
+        <h1 class="text-2xl font-semibold mb-2">Tambah Bisnis</h1>
         <p class="text-gray-700 mb-4">
           Silahkan menambah atau mengedit informasi Bisnis kamu.
         </p>
@@ -27,7 +28,7 @@
                 >
                   
                   <div class="mb-8">
-                    <label for="cafeName">Nama Cafe:</label>
+                    <label for="cafeName">Nama Bisnis:</label>
                     <input
                       class="input-base"
                       :class="{ 'input-error': hasError('cafeName') }"
@@ -47,10 +48,10 @@
                   </div>
                   <div class="mb-8">
                     <label class="block mb-2"
-                      >Jenis usaha:</label
+                      >Jenis Bisnis:</label
                     >
                     <div class="px-2 py-2 mb-2 border bg-gray-50 border-gray-300 rounded-md">
-                      <p class="text-justify text-sm text-gray-500">Masukan jenis bisnis yang sesuai untuk setiap nama bisnis, misal kalau kamu punya cafe bernama "ABC" dan juga roastery bernama "ABC" maka pilih jenis: Cafe dan Roastery. Kalau nama cafe kamu "ABC" dan punya roastery bernama "XYZ" - buat Jenis usaha terpisah dengan nama "XYZ" dengan jenis usaha Roastery.</p>
+                      <p class="text-justify text-sm text-gray-500">Masukan jenis bisnis yang sesuai. Contoh kamu punya <strong>cafe</strong> bernama "ABC" DAN juga <strong>roastery</strong> bernama "ABC" maka pilih jenis: Cafe dan Roastery. Kalau nama cafe kamu "ABC" dan punya roastery bernama "XYZ" - buat terpisah nama: "ABC" Jenis Cafe & Nama:"XYZ" jenis Roastery.</p>
                     </div>
                     <div class="space-y-2">
                       <label class="flex items-center space-x-2">
@@ -86,7 +87,7 @@
                     </span> -->
                   </div>
                   <div class="mb-8">
-                    <label for="street">Alamat Cafe:</label>
+                    <label for="street">Alamat:</label>
                     <input
                       class="input-base"
                       :class="{ 'input-error': hasError('street') }"
@@ -284,7 +285,7 @@
                 </div>
                 <div class="px-4">
                   <div class="mb-8">
-                    <label for="logo">Logo Cafe:</label>
+                    <label for="logo">Logo Bisnis:</label>
                     <div
                       v-if="logoPreview.length == 0"
                       class="mt-2 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg"
@@ -356,7 +357,7 @@
                   </div>
 
                   <div class="flex flex-col space-y-2 mb-8">
-                    <label for="cafeImage">Main Photo Cafe:</label>
+                    <label for="cafeImage">Foto utama:</label>
                     <div
                       v-if="imagePreviews.length == 0"
                       class="mt-2 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg"
@@ -434,7 +435,7 @@
                   </div>
 
                   <div class="flex flex-col space-y-2 mb-8">
-                    <label for="menuImage">Photo Others:</label>
+                    <label for="menuImage">Foto lainnya:</label>
                     <div
                       class="mt-2 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg"
                     >
@@ -514,7 +515,7 @@
                   </div>
 
                   <div class="mb-10">
-                    <label for="features">Features Cafe:</label>
+                    <label for="features">Fitur Cafe:</label>
                     <div class="relative mt-2">
                       <div class="hs-dropdown relative w-full">
                         <div
@@ -612,8 +613,9 @@
                       dengan café anda.
                     </p>
                   </div>
+                  <!-- @budi fitur Beans & Roastery -->
                   <div class="mb-10">
-                    <label for="features">Features Beans & Roastery:</label>
+                    <label for="features">Fitur Beans & Roastery:</label>
                     <div class="relative mt-2">
                       <div class="hs-dropdown relative w-full">
                         <div
@@ -708,11 +710,12 @@
 
                     <p class="text-gray-500 text-sm mt-2">
                       <strong>Note:</strong> Pilih semua fitur yang sesuai
-                      dengan café anda.
+                      dengan Roastery anda.
                     </p>
                   </div>
+                  <!-- @budi fitur Tools & Supplies -->
                   <div class="mb-10">
-                    <label for="features">Features Tolls & Supplies:</label>
+                    <label for="features">Fitur Tools & Supplies:</label>
                     <div class="relative mt-2">
                       <div class="hs-dropdown relative w-full">
                         <div
@@ -806,8 +809,7 @@
                     </div>
 
                     <p class="text-gray-500 text-sm mt-2">
-                      <strong>Note:</strong> Pilih semua fitur yang sesuai
-                      dengan café anda.
+                      <strong>Note:</strong> Pilih semua fitur yang sesuai dengan Tools & Supplies anda.
                     </p>
                   </div>
 
