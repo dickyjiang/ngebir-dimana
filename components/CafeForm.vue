@@ -12,8 +12,7 @@
       <section class="pt-6 mb-8">
         <h1 class="text-2xl font-semibold mb-2">{{ formTitle }}</h1>
         <p class="text-gray-700 mb-4">
-          Silahkan menambah atau mengedit informasi cafe Anda. Pastikan semua
-          informasi yang Anda masukkan adalah benar dan sesuai dengan cafe Anda.
+          Silahkan menambah atau mengedit informasi Bisnis kamu.
         </p>
       </section>
 
@@ -26,13 +25,33 @@
                 <div
                   class="border-b sm:border-b-0 border-r-0 sm:border-r border-gray-300 px-4"
                 >
-                  <!-- <div class="mb-8">
-                    <label class="block mb-2"
-                      >Jenis usaha:
-                      <span class="text-sm text-gray-400"
-                        >(Pilih semua yang sesuai)</span
-                      ></label
+                  
+                  <div class="mb-8">
+                    <label for="cafeName">Nama Cafe:</label>
+                    <input
+                      class="input-base"
+                      :class="{ 'input-error': hasError('cafeName') }"
+                      type="text"
+                      id="cafeName"
+                      name="cafeName"
+                      v-model="cafeName"
+                      @input="validateOnChangeForm"
+                      required
+                    />
+                    <span
+                      v-if="hasError('cafeName')"
+                      class="text-red-500 text-sm"
                     >
+                      {{ formErrors.cafeName.join(', ') }}
+                    </span>
+                  </div>
+                  <div class="mb-8">
+                    <label class="block mb-2"
+                      >Jenis usaha:</label
+                    >
+                    <div class="px-2 py-2 mb-2 border bg-gray-50 border-gray-300 rounded-md">
+                      <p class="text-justify text-sm text-gray-500">Masukan jenis bisnis yang sesuai untuk setiap nama bisnis, misal kalau kamu punya cafe bernama "ABC" dan juga roastery bernama "ABC" maka pilih jenis: Cafe dan Roastery. Kalau nama cafe kamu "ABC" dan punya roastery bernama "XYZ" - buat Jenis usaha terpisah dengan nama "XYZ" dengan jenis usaha Roastery.</p>
+                    </div>
                     <div class="space-y-2">
                       <label class="flex items-center space-x-2">
                         <input
@@ -62,28 +81,9 @@
                         <span>Supplier Alat-alat</span>
                       </label>
                     </div>
-                    <span v-if="hasError('businessTypes')" class="text-red-500 text-sm">
+                    <!-- <span v-if="hasError('businessTypes')" class="text-red-500 text-sm">
                       {{ formErrors.businessTypes?.join(', ') }}
-                    </span>
-                  </div> -->
-                  <div class="mb-8">
-                    <label for="cafeName">Nama Cafe:</label>
-                    <input
-                      class="input-base"
-                      :class="{ 'input-error': hasError('cafeName') }"
-                      type="text"
-                      id="cafeName"
-                      name="cafeName"
-                      v-model="cafeName"
-                      @input="validateOnChangeForm"
-                      required
-                    />
-                    <span
-                      v-if="hasError('cafeName')"
-                      class="text-red-500 text-sm"
-                    >
-                      {{ formErrors.cafeName.join(', ') }}
-                    </span>
+                    </span> -->
                   </div>
                   <div class="mb-8">
                     <label for="street">Alamat Cafe:</label>
@@ -514,7 +514,205 @@
                   </div>
 
                   <div class="mb-10">
-                    <label for="features">Features:</label>
+                    <label for="features">Features Cafe:</label>
+                    <div class="relative mt-2">
+                      <div class="hs-dropdown relative w-full">
+                        <div
+                          class="flex flex-wrap items-center border border-gray-300 rounded-md p-2 bg-white"
+                        >
+                          <!-- Selected tags -->
+                          <div
+                            v-for="feature in selectedFeatures"
+                            :key="feature.id"
+                            class="inline-flex items-center px-2.5 py-0.5 m-0.5 rounded-full text-sm bg-blue-100 text-blue-800"
+                          >
+                            <span>{{ feature.name }}</span>
+                            <button
+                              type="button"
+                              class="flex-shrink-0 ml-1 h-4 w-4 inline-flex items-center justify-center rounded-full text-blue-600 hover:bg-blue-200 hover:text-blue-800 focus:outline-none focus:bg-blue-200 focus:text-blue-800"
+                              @click="removeSelectedFeature(feature)"
+                            >
+                              <span class="sr-only">Remove feature</span>
+                              <svg
+                                class="h-3 w-3"
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 20 20"
+                                fill="currentColor"
+                                aria-hidden="true"
+                              >
+                                <path
+                                  fill-rule="evenodd"
+                                  d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                                  clip-rule="evenodd"
+                                />
+                              </svg>
+                            </button>
+                          </div>
+
+                          <!-- Search input -->
+                          <input
+                            type="text"
+                            id="features-search"
+                            class="flex-grow min-w-[80px] border-0 p-0 pl-1 focus:ring-0 focus:outline-none text-sm"
+                            placeholder="Search and select features..."
+                            v-model="featureSearchQuery"
+                            @input="searchFeatures"
+                            @focus="showFeatureDropdown = true"
+                            @blur="handleBlur"
+                            @keydown.down="focusNextDropdownItem"
+                            @keydown.up="focusPreviousDropdownItem"
+                            @keydown.enter.prevent="selectFocusedFeature"
+                            @keydown.escape="hideDropdown"
+                          />
+                        </div>
+
+                        <!-- Dropdown -->
+                        <div
+                          v-if="
+                            showFeatureDropdown && filteredFeatures.length > 0
+                          "
+                          class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto"
+                          ref="dropdownRef"
+                        >
+                          <div
+                            v-for="(feature, index) in filteredFeatures"
+                            :key="feature.id"
+                            :class="[
+                              'px-4 py-2 hover:bg-blue-50 cursor-pointer flex items-center',
+                              focusedFeatureIndex === index ? 'bg-blue-50' : '',
+                              isFeatureSelected(feature) ? 'bg-blue-100' : '',
+                            ]"
+                            @click="handleFeatureClick(feature)"
+                            @mouseover="focusedFeatureIndex = index"
+                            :id="`feature-item-${index}`"
+                          >
+                            <div class="flex-shrink-0 mr-2">
+                              <svg
+                                class="h-4 w-4 text-blue-600"
+                                v-if="isFeatureSelected(feature)"
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 20 20"
+                                fill="currentColor"
+                              >
+                                <path
+                                  fill-rule="evenodd"
+                                  d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                  clip-rule="evenodd"
+                                />
+                              </svg>
+                            </div>
+                            <span>{{ feature.name }}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <p class="text-gray-500 text-sm mt-2">
+                      <strong>Note:</strong> Pilih semua fitur yang sesuai
+                      dengan café anda.
+                    </p>
+                  </div>
+                  <div class="mb-10">
+                    <label for="features">Features Beans & Roastery:</label>
+                    <div class="relative mt-2">
+                      <div class="hs-dropdown relative w-full">
+                        <div
+                          class="flex flex-wrap items-center border border-gray-300 rounded-md p-2 bg-white"
+                        >
+                          <!-- Selected tags -->
+                          <div
+                            v-for="feature in selectedFeatures"
+                            :key="feature.id"
+                            class="inline-flex items-center px-2.5 py-0.5 m-0.5 rounded-full text-sm bg-blue-100 text-blue-800"
+                          >
+                            <span>{{ feature.name }}</span>
+                            <button
+                              type="button"
+                              class="flex-shrink-0 ml-1 h-4 w-4 inline-flex items-center justify-center rounded-full text-blue-600 hover:bg-blue-200 hover:text-blue-800 focus:outline-none focus:bg-blue-200 focus:text-blue-800"
+                              @click="removeSelectedFeature(feature)"
+                            >
+                              <span class="sr-only">Remove feature</span>
+                              <svg
+                                class="h-3 w-3"
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 20 20"
+                                fill="currentColor"
+                                aria-hidden="true"
+                              >
+                                <path
+                                  fill-rule="evenodd"
+                                  d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                                  clip-rule="evenodd"
+                                />
+                              </svg>
+                            </button>
+                          </div>
+
+                          <!-- Search input -->
+                          <input
+                            type="text"
+                            id="features-search"
+                            class="flex-grow min-w-[80px] border-0 p-0 pl-1 focus:ring-0 focus:outline-none text-sm"
+                            placeholder="Search and select features..."
+                            v-model="featureSearchQuery"
+                            @input="searchFeatures"
+                            @focus="showFeatureDropdown = true"
+                            @blur="handleBlur"
+                            @keydown.down="focusNextDropdownItem"
+                            @keydown.up="focusPreviousDropdownItem"
+                            @keydown.enter.prevent="selectFocusedFeature"
+                            @keydown.escape="hideDropdown"
+                          />
+                        </div>
+
+                        <!-- Dropdown -->
+                        <div
+                          v-if="
+                            showFeatureDropdown && filteredFeatures.length > 0
+                          "
+                          class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto"
+                          ref="dropdownRef"
+                        >
+                          <div
+                            v-for="(feature, index) in filteredFeatures"
+                            :key="feature.id"
+                            :class="[
+                              'px-4 py-2 hover:bg-blue-50 cursor-pointer flex items-center',
+                              focusedFeatureIndex === index ? 'bg-blue-50' : '',
+                              isFeatureSelected(feature) ? 'bg-blue-100' : '',
+                            ]"
+                            @click="handleFeatureClick(feature)"
+                            @mouseover="focusedFeatureIndex = index"
+                            :id="`feature-item-${index}`"
+                          >
+                            <div class="flex-shrink-0 mr-2">
+                              <svg
+                                class="h-4 w-4 text-blue-600"
+                                v-if="isFeatureSelected(feature)"
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 20 20"
+                                fill="currentColor"
+                              >
+                                <path
+                                  fill-rule="evenodd"
+                                  d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                  clip-rule="evenodd"
+                                />
+                              </svg>
+                            </div>
+                            <span>{{ feature.name }}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <p class="text-gray-500 text-sm mt-2">
+                      <strong>Note:</strong> Pilih semua fitur yang sesuai
+                      dengan café anda.
+                    </p>
+                  </div>
+                  <div class="mb-10">
+                    <label for="features">Features Tolls & Supplies:</label>
                     <div class="relative mt-2">
                       <div class="hs-dropdown relative w-full">
                         <div

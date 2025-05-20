@@ -90,7 +90,7 @@
           </div>
           <div class="">
             <div>
-              <h2 class="mb-3 text-2xl text-gray-800">Tambah Usaha</h2>
+              <h2 class="mb-3 text-2xl text-gray-800">Tambah Bisnis</h2>
               <p class="font-medium text-gray-600">Pilih Jenis usaha yang mau ditambahkan.</p>
               <p class="text-gray-500">Kamu boleh menambah lebih dari satu jenis usaha.</p>
             </div>
