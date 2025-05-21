@@ -10,78 +10,87 @@
       <h1 class="text-2xl sm:text-4xl font-bold mb-4">{{ cafe.data.name }}</h1>
       <div class="grid grid-cols-1 md:grid-cols-2 grid-flow-row items-stretch gap-8">
         <div>
-          <NuxtImg
-            :src="cafe.data.photo"
-            alt="Cafe Image"
-            class="object-cover mb-4 rounded-lg"
-            placeholder="/img/noimg.webp" />
+          <div class="rounded-lg overflow-hidden max-h-96 mb-2">
+            <NuxtImg
+              :src="cafe.data.photo"
+              alt="Cafe Image"
+              class="object-cover mb-4 rounded-lg w-full h-full"
+              placeholder="/img/noimg.webp" />
+          </div>
           <div
-            class="flex flex-row sm:items-start gap-4 sm:gap-2 justify-between border-y border-gray-500 py-2">
-            <div class="flex items-center gap-4">
-              <div class="w-10 h-10 rounded-full overflow-hidden">
-                <NuxtImg
-                  :src="cafe.data.logo"
-                  alt="Cafe Logo"
-                  class="w-full h-full object-cover mb-4"
-                  placeholder="/img/logo-default.png" />
-              </div>
-
-              <div>
-                <div class="flex items-center gap-4">
-                  <div class="flex items-center gap-1">
-                    <img src="/src/assets/img/city.svg" alt="location" class="h-4" />
-                    <p class="text-gray-500">{{ cafe.data.city }}</p>
-                  </div>
+            class="flex flex-row sm:items-start gap-4 sm:gap-2 justify-between border-b border-gray-500 py-2">
+            <div class="flex items-center">
+              <div class="flex flex-col gap-2">
+                <div class="flex justify-between items-center gap-2">
                   <div class="flex items-center gap-2">
-                    <div class="flex items-center gap-2">
-                      <img src="/src/assets/img/rating.svg" alt="rating" class="h-4" />
-                      <p class="text-gray-500">{{ cafe.data.rating }}</p>
+                    <div class="w-10 h-10 rounded-full overflow-hidden mr-2">
+                      <NuxtImg
+                        :src="cafe.data.logo"
+                        alt="Cafe Logo"
+                        class="w-full h-full object-cover mb-4"
+                        placeholder="/img/logo-default.png" />
                     </div>
-                    <p class="text-gray-500 font-semibold">
-                      {{ cafe.data.range }}
-                    </p>
+                    <div class="flex flex-col ">
+                      <h2 class="text-lg font-semibold">
+                        {{ cafe.data.name }}
+                      </h2>
+                      <div class="flex items-center gap-3">
+                        <div class="flex items-center">
+                          <img src="/src/assets/img/city.svg" alt="location" class="h-4" />
+                          <p class="text-gray-500">{{ cafe.data.city }}</p>
+                        </div>
+                        <div class="flex items-center gap-1">
+                            <img src="/src/assets/img/rating.svg" alt="rating" class="h-4" />
+                            <p class="text-gray-500">{{ cafe.data.rating }}</p>
+                          <p class="text-gray-500 font-semibold">
+                            {{ cafe.data.range }}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                </div>
-                <p class="text-sm text-gray-500">{{ cafe.data.street }}</p>
-              </div>
-            </div>
-            <div class="flex items-center justify-center gap-2 max-w-1/2">
-              <!-- kl owner na budi enggak keluar  -->
-              <NuxtLink
-                :to="`/profile-public/${cafe.data.uuid}`"
-                v-if="cafe.data.uuid != 'b069ef6a-046b-440b-9004-d5fdd0758c80'">
-                <button class="flex flex-col gap-1 items-center px-2">
-                  <img
-                    src="/src/assets/img/message.svg"
-                    alt="share"
-                    class="h-5 hover:transform hover:scale-110 transition-transform" />
-                  <p class="text-xs">Kontak Owner</p>
-                </button>
-              </NuxtLink>
-              <button class="flex flex-col gap-1 items-center px-2" @click="sharePage">
-                <img
-                  src="/src/assets/img/send.svg"
-                  alt="share"
-                  class="h-5 hover:transform hover:scale-110 transition-transform" />
-                <p class="text-xs">Share</p>
-              </button>
-              <!-- @budi add function add review ( engke iyeu mah teu urgent) -->
-              <!-- <button class="flex fl items-center px-2">
+                  <div class="flex items-center justify-center gap-2 max-w-1/2">
+                      <!-- kl owner na budi enggak keluar  -->
+                      <NuxtLink
+                        :to="`/profile-public/${cafe.data.uuid}`"
+                        v-if="cafe.data.uuid != 'b069ef6a-046b-440b-9004-d5fdd0758c80'">
+                        <button class="flex flex-col gap-1 items-center px-2">
+                          <img
+                            src="/src/assets/img/message.svg"
+                            alt="share"
+                            class="h-5 hover:transform hover:scale-110 transition-transform" />
+                          <p class="text-xs">Kontak Owner</p>
+                        </button>
+                      </NuxtLink>
+                      <button class="flex flex-col gap-1 items-center px-2" @click="sharePage">
+                        <img
+                          src="/src/assets/img/send.svg"
+                          alt="share"
+                          class="h-5 hover:transform hover:scale-110 transition-transform" />
+                        <p class="text-xs">Share</p>
+                      </button>
+                      <!-- @budi add function add review ( engke iyeu mah teu urgent) -->
+                      <!-- <button class="flex fl items-center px-2">
                   <img
                     src="/src/assets/img/add-review.svg"
                     alt="review"
                     class="h-6"
                   />
                 </button> -->
-              <!-- @budi add function like nantinya kita bisa show how many likes nya  -->
-              <!-- <button class="flex items-center px-2">
+                      <!-- @budi add function like nantinya kita bisa show how many likes nya  -->
+                      <!-- <button class="flex items-center px-2">
                   <img src="/src/assets/img/love.svg" alt="like" class="h-6" />
                 </button> -->
+                    </div>
+                </div>
+                <div class="w-3/4">
+                  <p class="text-sm text-gray-500">{{ cafe.data.street }}</p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-        <div class="grid grid-cols-4 gap-2 items-start overflow-y-hidden mb-2">
-          <div v-for="(cafePic, index) in cafe.cafe_pics" :key="index">
+          <div class="grid grid-cols-4 gap-2 items-start overflow-y-hidden mb-2" v-for="(cafePic, index) in cafe.cafe_pics" :key="index">
             <img
               class="rounded-md object-cover cursor-pointer w-full h-full"
               :src="cafePic.url"
@@ -89,7 +98,7 @@
               :alt="`Cafe photo ${index + 1}`"
               style="aspect-ratio: 1/1" />
           </div>
-        </div>
+
         <div>
           <p class="text-md text-gray-500 mb-2">
             {{ cafe.data.description }}
