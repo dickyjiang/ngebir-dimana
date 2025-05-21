@@ -90,7 +90,8 @@
             </div>
           </div>
         </div>
-          <div class="grid grid-cols-4 gap-2 items-start overflow-y-hidden mb-2" v-for="(cafePic, index) in cafe.cafe_pics" :key="index">
+        <div class="grid grid-cols-4 gap-2 items-start overflow-y-hidden mb-2">
+          <div v-for="(cafePic, index) in cafe.cafe_pics" :key="index">
             <img
               class="rounded-md object-cover cursor-pointer w-full h-full"
               :src="cafePic.url"
@@ -98,7 +99,7 @@
               :alt="`Cafe photo ${index + 1}`"
               style="aspect-ratio: 1/1" />
           </div>
-
+        </div>
         <div>
           <p class="text-md text-gray-500 mb-2">
             {{ cafe.data.description }}
