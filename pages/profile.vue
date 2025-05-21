@@ -99,7 +99,7 @@
                 class="flex flex-col items-center justify-end gap-8 bg-gray-100 px-4 py-3 rounded-md border border-gray-600">
                 <img class="w-20" src="/src/assets/img/newCafe.svg" alt="" />
                 <NuxtLink
-                  to="/cafe/owner/form"
+                  to="/cafe/owner/form?business_type=Cafe"
                   class="border w-full border-gray-600 text-gray-600 py-2 px-3 rounded-md text-sm text-center font-medium hover:bg-gray-800 hover:text-yellow-500 transition-colors">
                   Cafe</NuxtLink
                 >
@@ -109,21 +109,22 @@
                 class="flex flex-col items-center justify-between gap-4 bg-gray-100 px-4 py-3 rounded-md border border-gray-600">
                 <img class="w-20 opacity-70" src="/src/assets/img/coffee-beans.svg" alt="" />
                 <p class="text-red-500">Coming Soon</p>
-                <div
-                  to="/cafe/owner/form"
+                <NuxtLink
+                  to="/cafe/owner/form?business_type=roastery"
                   class="border w-full border-gray-600 text-gray-600 py-2 px-3 rounded-md text-sm text-center font-medium">
                   Beans & Roastery
-                </div>
+                </NuxtLink>
               </div>
               <!-- @budi create page form buat add supplies -->
               <div
                 class="flex flex-col items-center justify-center gap-4 bg-gray-100 px-4 py-3 rounded-md border border-gray-600">
                 <img class="w-20 opacity-70" src="/src/assets/img/portafilter.svg" alt="" />
                 <p class="text-red-500">Coming Soon</p>
-                <div
+                <NuxtLink
+                  to="/cafe/owner/form?business_type=Supplier"
                   class="border w-full border-gray-600 text-gray-600 py-2 px-3 rounded-md text-sm text-center font-medium">
                   Tools & Supplies
-                </div>
+                </NuxtLink>
               </div>
             </div>
           </div>
@@ -149,10 +150,14 @@
                     </p>
                     <p>{{ cafe.city.city_name }}</p>
                   </div>
-                  <div class="flex flex-col gap-2">
+                  <!-- Replace the single business_type display with this -->
+                  <div class="flex flex-wrap gap-2">
                     <div
+                      v-for="type in cafe.business_type"
+                      :key="type"
                       class="px-3 py-1 rounded-full bg-yellow-400 text-gray-800 text-center text-sm font-medium">
-                      {{ cafe.business_type }}
+                      @dicky aneh kok nyatu
+                      {{ type }}
                     </div>
                   </div>
                 </div>

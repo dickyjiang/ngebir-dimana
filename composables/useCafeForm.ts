@@ -30,6 +30,7 @@ export interface FormErrors {
   logo: string[];
   location_link: string[];
   general: string[];
+  businessTypes: string[];
 }
 export const formErrors = ref<FormErrors>({
   cafeName: [],
@@ -49,6 +50,7 @@ export const formErrors = ref<FormErrors>({
   rating: [],
   logo: [],
   general: [],
+  businessTypes: [],
 });
 
 export function useCafeForm(isEditMode: Ref<boolean>, cafeId: Ref<string | null>) {
@@ -264,7 +266,7 @@ export function useCafeForm(isEditMode: Ref<boolean>, cafeId: Ref<string | null>
         // Populate form fields
         cafeName.value = data.data.name || '';
         cafeIdInteger.value = data.data.id || 0;
-        businessTypes.value = data.businessTypes || [];
+        businessTypes.value = data.data.business_type || [];
         cafeStreet.value = data.data.street || '';
         cafeSite.value = data.data.site || '';
         cafeDescription.value = data.data.description || '';
@@ -341,6 +343,10 @@ export function useCafeForm(isEditMode: Ref<boolean>, cafeId: Ref<string | null>
       formErrors.value.cafeName.push('Nama cafe tidak boleh kosong');
       isValid = false;
     }
+    if (!businessTypes.value || businessTypes.value.length === 0) {
+      formErrors.value.businessTypes.push('Pilih minimal satu jenis bisnis');
+      isValid = false;
+    }
 
     if (!selectedParentCity.value) {
       formErrors.value.state.push('Provinsi/Kota Besar tidak boleh kosong');
@@ -404,6 +410,7 @@ export function useCafeForm(isEditMode: Ref<boolean>, cafeId: Ref<string | null>
     formData.append('cafeCity', selectedChildCity.value);
     formData.append('cafeState', selectedParentCity.value);
     formData.append('cafeLocationLink', locationLink.value);
+    formData.append('businessType', businessTypes.value);
 
     // if (logoFile.value) {
     //   formData.append('cafeLogo', logoFile.value);

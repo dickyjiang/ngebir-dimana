@@ -192,7 +192,7 @@ onBeforeUnmount(() => {
                 v-model="searchQuery"
                 type="text"
                 placeholder="Search cafes..."
-                class="text-sm sm:text-base border w-full border-gray-600 rounded-lg p-2 sm:p-3 pl-4 pr-[120px]" 
+                class="text-sm sm:text-base border w-full border-gray-600 rounded-lg p-2 sm:p-3 pl-4 pr-[120px]"
                 @input="handleSearch" />
               <!-- @budi add fungsi dropdown select buat cafe, roastery & supplies)  -->
               <div class="absolute right-0 top-0 h-full flex items-center gap-2 pr-2">
@@ -208,7 +208,6 @@ onBeforeUnmount(() => {
                   <option value="roastery">Roastery</option>
                   <option value="supplies">Supplies</option>
                 </select>
-                
               </div>
             </div>
           </div>
@@ -284,13 +283,19 @@ onBeforeUnmount(() => {
             <button
               @click="handleFeatureToggle('accessibility-wheelchair-accessible')"
               @mouseenter="playAnimation(wheelchairAnim)"
-              @mouseleave="pauseAnimation(wheelchairAnim, activeFilters.features.includes('accessibility-wheelchair-accessible'))"
+              @mouseleave="
+                pauseAnimation(
+                  wheelchairAnim,
+                  activeFilters.features.includes('accessibility-wheelchair-accessible')
+                )
+              "
               class="text-white border border-white mt-2 px-3 sm:px-4 py-0 sm:py-1 rounded-full flex items-center gap-2 text-xs sm:text-base cursor-pointer touch-manipulation"
               :class="{
                 'text-yellow-500 bg-black border border-yellow-500':
                   activeFilters.features.includes('accessibility-wheelchair-accessible'),
-                'text-gray-100 border-gray-400':
-                  !activeFilters.features.includes('accessibility-wheelchair-accessible'),
+                'text-gray-100 border-gray-400': !activeFilters.features.includes(
+                  'accessibility-wheelchair-accessible'
+                ),
               }">
               <span id="wheelchair-animate" class="w-8 h-8"></span>
               <span>Wheelchair Friendly</span>
@@ -314,8 +319,7 @@ onBeforeUnmount(() => {
               :class="{
                 'text-yellow-500 bg-black border border-yellow-500':
                   activeFilters.features.includes('wfc'),
-                'text-gray-100 border-gray-400':
-                  !activeFilters.features.includes('wfc'),
+                'text-gray-100 border-gray-400': !activeFilters.features.includes('wfc'),
               }">
               <span id="wfc-animate" class="w-8 h-8"></span>
               <span>WFC</span>

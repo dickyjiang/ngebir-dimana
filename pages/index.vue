@@ -1,195 +1,190 @@
 <script setup lang="ts">
-  const route = useRoute();
-  import { ref, computed, onMounted, watch } from 'vue';
-  import Sidebar from '~/components/Sidebar.vue';
-  import CafeList from '~/components/cafe/CafeList.vue';
-  import NewCafesList from '~/components/cafe/NewCafesList.vue';
-  import HeroSearch from '~/components/HeroSearch.vue';
-  import WorldOfCoffeeBanner from '~/components/WorldOfCoffeeBanner.vue';
-  import '@fortawesome/fontawesome-free/css/all.css';
-  import { debounce } from 'lodash';
-  import { useFilterToggle } from '~/composables/useFilterToggle';
-  import { useFetchCafes } from '~/composables/useFetchCafes';
-  import { useNearbyFilter } from '~/composables/useNearbyFilter';
+const route = useRoute()
+import { ref, computed, onMounted, watch } from 'vue'
+import Sidebar from '~/components/Sidebar.vue'
+import CafeList from '~/components/cafe/CafeList.vue'
+import NewCafesList from '~/components/cafe/NewCafesList.vue'
+import HeroSearch from '~/components/HeroSearch.vue'
+import WorldOfCoffeeBanner from '~/components/WorldOfCoffeeBanner.vue'
+import '@fortawesome/fontawesome-free/css/all.css'
+import { debounce } from 'lodash'
+import { useFilterToggle } from '~/composables/useFilterToggle'
+import { useFetchCafes } from '~/composables/useFetchCafes'
+import { useNearbyFilter } from '~/composables/useNearbyFilter'
 
-  // Use the fetching composable
-  const {
-    data,
-    loading,
-    totalCafes,
-    fetchCafes: fetchCafesFromComposable,
-  } = useFetchCafes();
+// Use the fetching composable
+const { data, loading, totalCafes, fetchCafes: fetchCafesFromComposable } = useFetchCafes()
 
-  // Use the nearby filter composable
-  const {
-    userLocation,
-    locationLoading,
-    locationError,
-    isNearbyActive,
-    showLocationModal,
-    manualLatitude,
-    manualLongitude,
-    showToast,
-    toastMessage,
-    toastType,
-    isValidCoordinates,
-    getUserLocation,
-    setManualLocation,
-    calculateDistance,
-    toggleNearbyFilter: toggleNearbyFilterComposable,
-  } = useNearbyFilter();
+// Use the nearby filter composable
+const {
+  userLocation,
+  locationLoading,
+  locationError,
+  isNearbyActive,
+  showLocationModal,
+  manualLatitude,
+  manualLongitude,
+  showToast,
+  toastMessage,
+  toastType,
+  isValidCoordinates,
+  getUserLocation,
+  setManualLocation,
+  calculateDistance,
+  toggleNearbyFilter: toggleNearbyFilterComposable,
+} = useNearbyFilter()
 
-  // Add these variables for new cafes section
-  const newCafes = ref([]);
-  const loadingNewCafes = ref(false);
+// Add these variables for new cafes section
+const newCafes = ref([])
+const loadingNewCafes = ref(false)
 
-  const currentPage = ref(1);
-  const itemsPerPage = 24;
-  const searchQuery = ref('');
+const currentPage = ref(1)
+const itemsPerPage = 24
+const searchQuery = ref('')
+const filterType = ref('all') // Add this new ref
 
-  // Initialize filter options with empty arrays
-  const uniqueCities = ref([]);
-  const zoom = ref(6);
+// Initialize filter options with empty arrays
+const uniqueCities = ref([])
+const zoom = ref(6)
 
-  // Initialize activeFilters with all expected properties
-  const activeFilters = ref({
-    city: [],
-    borough: [],
-    features: [],
-  });
+// Initialize activeFilters with all expected properties
+const activeFilters = ref({
+  city: [],
+  borough: [],
+  features: [],
+})
 
-  // Add state for sidebar visibility
-  const isSidebarOpen = ref(false);
+// Add state for sidebar visibility
+const isSidebarOpen = ref(false)
 
-  // Get filter toggle functions from composable
-  const { toggleFeature } = useFilterToggle();
+// Get filter toggle functions from composable
+const { toggleFeature } = useFilterToggle()
 
-  // Debounced search function
-  const debouncedFetchBySearch = debounce((query, filters) => {
-    currentPage.value = 1;
-    fetchCafes(1, filters);
-  }, 500); // 500ms delay
+// Debounced search function
+const debouncedFetchBySearch = debounce((query, filters) => {
+  currentPage.value = 1
+  fetchCafes(1, filters)
+}, 1000) // 500ms delay
 
-  async function fetchNewCafes() {
-    loadingNewCafes.value = true;
-    try {
-      await fetchCafesFromComposable(
-        1,
-        itemsPerPage,
-        {
-          city: [],
-          borough: [],
-          features: [],
-        },
-        '',
-        false,
-        null
-      );
-      newCafes.value = data.value || [];
-    } catch (error) {
-      console.error('Error fetching new cafes:', error);
-      newCafes.value = [];
-    } finally {
-      loadingNewCafes.value = false;
-    }
-  }
-  // Use the composable function instead of the original function
-  async function fetchCafes(page, filters = null) {
+async function fetchNewCafes() {
+  loadingNewCafes.value = true
+  try {
     await fetchCafesFromComposable(
-      page,
+      1,
       itemsPerPage,
-      filters,
-      searchQuery.value,
-      isNearbyActive.value,
-      userLocation.value
-    );
+      {
+        city: [],
+        borough: [],
+        features: [],
+      },
+      '',
+      false,
+      null
+    )
+    newCafes.value = data.value || []
+  } catch (error) {
+    console.error('Error fetching new cafes:', error)
+    newCafes.value = []
+  } finally {
+    loadingNewCafes.value = false
   }
+}
+// Use the composable function instead of the original function
+async function fetchCafes(page, filters = null) {
+  console.log('Fetching cafes with filters:', filters)
+  await fetchCafesFromComposable(
+    page,
+    itemsPerPage,
+    filters,
+    searchQuery.value,
+    isNearbyActive.value,
+    userLocation.value
+  )
+}
 
-  // Update the watch functionality to apply filters
-  watch(
-    () => [
-      JSON.stringify(activeFilters.value.city),
-      JSON.stringify(activeFilters.value.features),
-    ],
-    () => {
-      currentPage.value = 1;
-      fetchCafes(1, activeFilters.value);
-    }
-  );
-
-  // Also watch search query to trigger filtering
-  watch(searchQuery, (newQuery) => {
-    debouncedFetchBySearch(newQuery, activeFilters.value);
-  });
-
-  // Use data directly
-  const paginatedData = computed(() => {
-    return data.value;
-  });
-
-  const totalPages = computed(() => {
-    return Math.ceil(totalCafes.value / itemsPerPage);
-  });
-
-  // Handler for page changes from CafeList component
-  const mainContent = ref(null);
-  function changePage(page) {
-    if (page >= 1 && page <= totalPages.value) {
-      currentPage.value = page;
-      fetchCafes(page, activeFilters.value);
-      // Add scroll behavior
-      mainContent.value?.scrollIntoView({ behavior: 'smooth' });
-    }
+// Update the watch functionality to apply filters
+watch(
+  () => [JSON.stringify(activeFilters.value.city), JSON.stringify(activeFilters.value.features)],
+  () => {
+    currentPage.value = 1
+    fetchCafes(1, activeFilters.value)
   }
+)
 
-  // Wrapper function for the composable toggleNearbyFilter
-  async function toggleNearbyFilter() {
-    await toggleNearbyFilterComposable(activeFilters.value, fetchCafes);
+// Also watch search query to trigger filtering
+watch(searchQuery, (newQuery) => {
+  debouncedFetchBySearch(newQuery, activeFilters.value)
+})
+
+// Use data directly
+const paginatedData = computed(() => {
+  return data.value
+})
+
+const totalPages = computed(() => {
+  return Math.ceil(totalCafes.value / itemsPerPage)
+})
+
+// Handler for page changes from CafeList component
+const mainContent = ref(null)
+function changePage(page) {
+  if (page >= 1 && page <= totalPages.value) {
+    currentPage.value = page
+    fetchCafes(page, activeFilters.value)
+    // Add scroll behavior
+    mainContent.value?.scrollIntoView({ behavior: 'smooth' })
   }
+}
 
-  // Use the toggleFeature from the composable
-  async function handleFeatureToggle(feature_id) {
-    await toggleFeature(activeFilters.value, feature_id);
-  }
+// Wrapper function for the composable toggleNearbyFilter
+async function toggleNearbyFilter() {
+  await toggleNearbyFilterComposable(activeFilters.value, fetchCafes)
+}
 
-  // Function to handle search from HeroSearch component
-  function handleSearch(query) {
-    searchQuery.value = query;
-  }
+// Use the toggleFeature from the composable
+async function handleFeatureToggle(feature_id) {
+  await toggleFeature(activeFilters.value, feature_id)
+}
 
-  // Function to toggle sidebar
-  function toggleSidebar() {
-    isSidebarOpen.value = !isSidebarOpen.value;
-  }
+// Function to handle search from HeroSearch component
+function handleSearch(query) {
+  searchQuery.value = query
+  console.log('Search query:', searchQuery.value)
+}
 
-  onMounted(async () => {
-    // Fetch city options for filters first
-    try {
-      uniqueCities.value = await useFetchFilterOptions();
+// Function to toggle sidebar
+function toggleSidebar() {
+  isSidebarOpen.value = !isSidebarOpen.value
+}
 
-      // Parse URL parameters to set initial filters
-      if (route.query) {
-        // Parse city filter
-        if (route.query.city) {
-          const cities = route.query.city.split(',');
-          activeFilters.value.city = cities;
-        }
-        if (route.query.features) {
-          const features = route.query.features.split(',');
-          activeFilters.value.features = cities;
-        }
+onMounted(async () => {
+  // Fetch city options for filters first
+  try {
+    uniqueCities.value = await useFetchFilterOptions()
+
+    // Parse URL parameters to set initial filters
+    if (route.query) {
+      // Parse city filter
+      if (route.query.city) {
+        const cities = route.query.city.split(',')
+        activeFilters.value.city = cities
       }
-
-      // Then fetch cafes with the initial filters
-      // await fetchNewCafes();
-      await fetchCafes(currentPage.value, activeFilters.value);
-    } catch (error) {
-      console.error('Error in onMounted:', error);
+      if (route.query.features) {
+        const features = route.query.features.split(',')
+        activeFilters.value.features = cities
+      }
     }
 
-    // Automatically trigger nearby cafes functionality on load if needed
-    // toggleNearbyFilter();
-  });
+    // Then fetch cafes with the initial filters
+    // await fetchNewCafes();
+    await fetchCafes(currentPage.value, activeFilters.value)
+  } catch (error) {
+    console.error('Error in onMounted:', error)
+  }
+
+  // Automatically trigger nearby cafes functionality on load if needed
+  // toggleNearbyFilter();
+})
 </script>
 
 <template>
@@ -200,66 +195,54 @@
     :class="{
       'bg-red-500': toastType === 'error',
       'bg-green-500': toastType === 'success',
-    }"
-  >
+    }">
     <div class="flex items-center justify-between">
       <span>{{ toastMessage }}</span>
-      <button @click="showToast = false" class="ml-4 text-white font-bold">
-        ×
-      </button>
+      <button @click="showToast = false" class="ml-4 text-white font-bold">×</button>
     </div>
   </div>
 
   <!-- Manual Location Modal -->
   <div
     v-if="showLocationModal"
-    class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
-  >
+    class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
     <div class="bg-white rounded-lg shadow-xl p-6 max-w-md w-full">
       <h3 class="text-lg font-semibold mb-4">Set Your Location Manually</h3>
       <p class="text-sm text-gray-600 mb-4">
-        We couldn't access your device location. Please enter your coordinates
-        manually:
+        We couldn't access your device location. Please enter your coordinates manually:
       </p>
 
       <div class="mb-4">
-        <label class="block text-sm font-medium text-gray-700 mb-1"
-          >Latitude</label
-        >
+        <label class="block text-sm font-medium text-gray-700 mb-1">Latitude</label>
         <input
           v-model="manualLatitude"
           type="number"
           step="0.000001"
           placeholder="e.g. -6.9175"
-          class="w-full px-3 py-2 border border-gray-300 rounded-md"
-        />
+          class="w-full px-3 py-2 border border-gray-300 rounded-md" />
       </div>
 
       <div class="mb-6">
-        <label class="block text-sm font-medium text-gray-700 mb-1"
-          >Longitude</label
-        >
+        <label class="block text-sm font-medium text-gray-700 mb-1">Longitude</label>
         <input
           v-model="manualLongitude"
           type="number"
           step="0.000001"
           placeholder="e.g. 107.6191"
-          class="w-full px-3 py-2 border border-gray-300 rounded-md"
-        />
+          class="w-full px-3 py-2 border border-gray-300 rounded-md" />
       </div>
 
       <div class="text-xs text-gray-500 mb-4">
         <p>
-          Tip: You can get your coordinates from Google Maps by right-clicking
-          on your location and selecting "What's here?"
+          Tip: You can get your coordinates from Google Maps by right-clicking on your location and
+          selecting "What's here?"
         </p>
       </div>
 
       <div class="flex justify-end gap-2">
         <button
           @click="showLocationModal = false"
-          class="px-4 py-2 border border-gray-300 rounded-md text-gray-700"
-        >
+          class="px-4 py-2 border border-gray-300 rounded-md text-gray-700">
           Cancel
         </button>
         <button
@@ -269,8 +252,7 @@
             'bg-blue-500 text-white': isValidCoordinates,
             'bg-gray-300 text-gray-500': !isValidCoordinates,
           }"
-          class="px-4 py-2 rounded-md"
-        >
+          class="px-4 py-2 rounded-md">
           Use Location
         </button>
       </div>
@@ -285,13 +267,11 @@
     :locationLoading="locationLoading"
     @search="handleSearch"
     @toggle-nearby="toggleNearbyFilter"
-    @toggle-feature="handleFeatureToggle"
-  />
+    @toggle-feature="handleFeatureToggle" />
 
   <section id="popular-categories" class="my-4">
     <div
-      class="my-4 sm:my-4 w-full py-2 sm:max-w-[90%] mx-auto flex flex-row gap-4 items-center justify-center rounded-lg"
-    >
+      class="my-4 sm:my-4 w-full py-2 sm:max-w-[90%] mx-auto flex flex-row gap-4 items-center justify-center rounded-lg">
       <!-- Button removed from here -->
     </div>
   </section>
@@ -300,11 +280,7 @@
     <NewCafesList :cafes="newCafes" :loading="loadingNewCafes" />
   </section>
   <!-- Add ref to the main-content section -->
-  <section
-    id="main-content"
-    ref="mainContent"
-    class="flex sm:px-4 sm:max-w-[98%] mx-auto"
-  >
+  <section id="main-content" ref="mainContent" class="flex sm:px-4 sm:max-w-[98%] mx-auto">
     <!-- Mobile Toggle Button -->
     <button
       @click="toggleSidebar"
@@ -312,8 +288,7 @@
       :class="{
         'text-yellow-500': activeFilters.city.length > 0,
         'text-white': activeFilters.city.length === 0,
-      }"
-    >
+      }">
       {{ isSidebarOpen ? 'Tutup' : 'Lokasi' }}
     </button>
 
@@ -321,8 +296,7 @@
     <div
       v-if="isSidebarOpen"
       @click="toggleSidebar"
-      class="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
-    ></div>
+      class="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"></div>
 
     <!-- Sidebar -->
     <div
@@ -333,15 +307,13 @@
         'md:translate-x-0 md:static  md:max-w-[20%] md:sticky md:top-4': true,
       }"
       class="p-4 border border-gray-400 rounded-md"
-      style="max-height: 100vh; overflow-y: auto"
-    >
+      style="max-height: 100vh; overflow-y: auto">
       <Sidebar
         :activeFilters="activeFilters"
         :cities="uniqueCities"
         :onNearbyToggle="toggleNearbyFilter"
         :isNearbyActive="isNearbyActive"
-        :locationLoading="locationLoading"
-      />
+        :locationLoading="locationLoading" />
     </div>
 
     <div class="px-4 flex-1">
@@ -353,37 +325,35 @@
         :currentPage="currentPage"
         :totalPages="totalPages"
         :bannerPosition="12"
-        @page-change="changePage"
-      />
+        @page-change="changePage" />
     </div>
   </section>
 </template>
 
 <style scoped>
-  @font-face {
-    font-family: 'Sharp Grotesk';
-    src: url('~/assets/fonts/sharp-grotesk-medium-25-regular.woff')
-      format('woff');
-    font-weight: normal;
-    font-style: normal;
-  }
+@font-face {
+  font-family: 'Sharp Grotesk';
+  src: url('~/assets/fonts/sharp-grotesk-medium-25-regular.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
 
-  h1 {
-    font-family: 'Sharp Grotesk', sans-serif; /* Fallback to sans-serif */
-  }
+h1 {
+  font-family: 'Sharp Grotesk', sans-serif; /* Fallback to sans-serif */
+}
 
-  /* Global focus styles */
-  :focus {
-    outline: none !important;
-    box-shadow: 0 0 0 1px black !important;
-  }
+/* Global focus styles */
+:focus {
+  outline: none !important;
+  box-shadow: 0 0 0 1px black !important;
+}
 
-  :focus:not(:focus-visible) {
-    box-shadow: none !important;
-  }
+:focus:not(:focus-visible) {
+  box-shadow: none !important;
+}
 
-  :focus-visible {
-    outline: none !important;
-    box-shadow: 0 0 0 1px black !important;
-  }
+:focus-visible {
+  outline: none !important;
+  box-shadow: 0 0 0 1px black !important;
+}
 </style>
