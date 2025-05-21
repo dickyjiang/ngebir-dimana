@@ -83,14 +83,14 @@
                 </button> -->
                     </div>
                 </div>
-                <div class="w-3/4">
+                <div class="md:w-3/4">
                   <p class="text-sm text-gray-500">{{ cafe.data.street }}</p>
                 </div>
               </div>
             </div>
           </div>
         </div>
-        <div class="grid grid-cols-4 gap-2 items-start overflow-y-hidden mb-2">
+        <div v-if="cafe.cafe_pics && cafe.cafe_pics.length > 0" class="grid grid-cols-4 gap-2 items-start overflow-y-hidden mb-2">
           <div v-for="(cafePic, index) in cafe.cafe_pics" :key="index">
             <img
               class="rounded-md object-cover cursor-pointer w-full h-full"
