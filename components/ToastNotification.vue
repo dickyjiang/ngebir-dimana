@@ -3,7 +3,7 @@
     <div
       v-if="show"
       :class="[
-        'fixed z-50 p-4 rounded-md shadow-lg max-w-sm',
+        'fixed z-50 p-4 rounded-md shadow-lg ',
         'top-4 right-4',
         type === 'error'
           ? 'bg-red-100 text-red-800 border-l-4 border-red-500'
@@ -12,7 +12,7 @@
           : 'bg-blue-100 text-blue-800 border-l-4 border-blue-500',
       ]"
     >
-      <div class="flex items-start">
+      <div class="flex items-start w-[400px]">
         <div class="flex-shrink-0">
           <svg
             v-if="type === 'error'"
