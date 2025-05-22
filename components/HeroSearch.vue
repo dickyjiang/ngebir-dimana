@@ -180,22 +180,24 @@ onBeforeUnmount(() => {
                 v-model="searchQuery"
                 type="text"
                 placeholder="Search cafes..."
-                class="text-sm sm:text-base border w-full border-gray-600 rounded-lg p-2 sm:p-3 pl-4 pr-32"
+                class="text-sm sm:text-base border w-full border-gray-600 rounded-lg p-2 sm:p-3 pl-4 pr-[120px]" 
                 @input="handleSearch" />
               
-              @budi di comment heula   
-              <select
-                v-model="filterType"
-                class="absolute right-8 h-full bg-transparent text-gray-600 focus:outline-none text-sm sm:text-base pl-2 border-l border-gray-300"
-                @change="handleSearch">
-                <option value="all">All</option>
-                <option value="cafes">Cafes</option>
-                <option value="roastery">Roastery</option>
-                <option value="supplies">Supplies</option>
-              </select>
-              <button class="text-gray-500 absolute right-2" @click="handleSearchButton">
-                <i :class="searchQuery ? 'fa fa-times' : 'fas fa-search'"></i>
-              </button>
+              <div class="absolute right-0 top-0 h-full flex items-center gap-2 pr-2">
+                <button class="text-gray-500 mr-2" @click="handleSearchButton">
+                  <i :class="searchQuery ? 'fa fa-times' : 'fas fa-search'"></i>
+                </button>
+                <select
+                  v-model="filterType"
+                  class="h-full bg-transparent text-gray-600 focus:outline-none text-sm sm:text-base pl-2 border-l border-gray-300"
+                  @change="handleSearch">
+                  <option value="all">All</option>
+                  <option value="cafes">Cafes</option>
+                  <option value="roastery">Roastery</option>
+                  <option value="supplies">Supplies</option>
+                </select>
+                
+              </div>
             </div>
           </div>
           <div class="flex flex-wrap items-center justify-center gap-2 w-full">
