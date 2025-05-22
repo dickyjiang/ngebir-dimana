@@ -39,11 +39,7 @@
                     <label class="block mb-2">Jenis Bisnis:</label>
                     <div class="px-2 py-2 mb-2 border bg-gray-50 border-gray-300 rounded-md">
                       <p class="text-justify text-sm text-gray-500">
-                        Masukan jenis bisnis yang sesuai. Contoh kamu punya
-                        <strong>cafe</strong> bernama "ABC" DAN juga
-                        <strong>roastery</strong> bernama "ABC" maka pilih jenis: Cafe dan Roastery.
-                        Kalau nama cafe kamu "ABC" dan punya roastery bernama "XYZ" - buat terpisah
-                        nama: "ABC" Jenis Cafe & Nama:"XYZ" jenis Roastery.
+                        Boleh memilih lebih dari satu jenis bisnis.
                       </p>
                     </div>
                     <!-- Replace the existing business types checkboxes with this code -->

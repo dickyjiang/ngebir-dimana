@@ -3,7 +3,7 @@
     <div
       v-if="show"
       :class="[
-        'fixed z-50 p-4 rounded-md shadow-lg w-[500px]',
+        'fixed z-50 p-4 rounded-md shadow-lg w-[400px]',
         'top-4 right-4',
         type === 'error'
           ? 'bg-red-100 text-red-800 border-l-4 border-red-500'
