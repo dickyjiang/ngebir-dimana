@@ -104,7 +104,6 @@
                   Cafe</NuxtLink
                 >
               </div>
-              <!-- @budi create page form buat roastery -->
               <div
                 class="flex flex-col items-center justify-between gap-4 bg-gray-100 px-4 py-3 rounded-md border border-gray-600">
                 <img class="w-20 opacity-70" src="/src/assets/img/coffee-beans.svg" alt="" />
@@ -115,7 +114,6 @@
                   Beans & Roastery
                 </NuxtLink>
               </div>
-              <!-- @budi create page form buat add supplies -->
               <div
                 class="flex flex-col items-center justify-center gap-4 bg-gray-100 px-4 py-3 rounded-md border border-gray-600">
                 <img class="w-20 opacity-70" src="/src/assets/img/portafilter.svg" alt="" />

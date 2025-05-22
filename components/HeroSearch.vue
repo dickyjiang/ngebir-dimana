@@ -194,7 +194,6 @@ onBeforeUnmount(() => {
                 placeholder="Search cafes..."
                 class="text-sm sm:text-base border w-full border-gray-600 rounded-lg p-2 sm:p-3 pl-4 pr-[120px]"
                 @input="handleSearch" />
-              <!-- @budi add fungsi dropdown select buat cafe, roastery & supplies)  -->
               <div class="absolute right-0 top-0 h-full flex items-center gap-2 pr-2">
                 <button class="text-gray-500 mr-2" @click="handleSearchButton">
                   <i :class="searchQuery ? 'fa fa-times' : 'fas fa-search'"></i>
@@ -310,7 +309,6 @@ onBeforeUnmount(() => {
               }">
               Outdoor
             </button> -->
-            <!-- @budi in iadd search wfc - pang liatin nge query nya bener ga? -->
             <button
               @click="handleFeatureToggle('wfc')"
               @mouseenter="playAnimation(wfcAnim)"
