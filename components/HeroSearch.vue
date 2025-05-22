@@ -204,9 +204,9 @@ onBeforeUnmount(() => {
                   class="h-full bg-transparent text-gray-600 focus:outline-none text-sm sm:text-base pl-2 border-l border-gray-300"
                   @change="handleSearch">
                   <option value="all">All</option>
-                  <option value="cafes">Cafes</option>
+                  <option value="cafe">Cafes</option>
                   <option value="roastery">Roastery</option>
-                  <option value="supplies">Supplies</option>
+                  <option value="supplier">Supplies</option>
                 </select>
               </div>
             </div>
