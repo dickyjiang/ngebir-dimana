@@ -1021,7 +1021,7 @@ const submitForm = async () => {
     // First check for validation errors
     if (!validateForm()) {
       // Show validation error toast
-      toastMessage.value = 'Please fix the form errors before submitting.'
+      toastMessage.value = 'Perbaiki kesalahan pada formulir sebelum mengirim.'
       toastType.value = 'error'
       showToast.value = true
       return
