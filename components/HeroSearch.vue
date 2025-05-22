@@ -6,6 +6,7 @@ import goldenRetrieverAnimationData from '../public/animations/golden-retriever.
 import coffeeBeansAnimationData from '../public/animations/coffee-beans.json'
 import wfcAnimationData from '../public/animations/wfc.json'
 import terdekatAnimationData from '../public/animations/terdekat.json'
+import wheelchairAnimationData from '../public/animations/wheelchair.json'
 
 const { resetFiltersFeature } = useFilterToggle()
 
@@ -78,6 +79,7 @@ let petAnim = null
 let specialtyAnim = null
 let wfcAnim = null
 let terdekatAnim = null
+let wheelchairAnim = null // Add this line
 
 // Modify the play animation function to handle active state
 function playAnimation(anim) {
@@ -102,6 +104,7 @@ onMounted(async () => {
     const specialtyContainer = document.getElementById('specialty-animate')
     const wfcContainer = document.getElementById('wfc-animate')
     const terdekatContainer = document.getElementById('terdekat-animate')
+    const wheelchairContainer = document.getElementById('wheelchair-animate')
 
     hoursAnim = lottie.loadAnimation({
       container: hoursContainer,
@@ -131,7 +134,7 @@ onMounted(async () => {
       container: wfcContainer,
       renderer: 'svg',
       loop: true,
-      autoplay: props.activeFilters.features.includes('wfc-friendly'),
+      autoplay: props.activeFilters.features.includes('wfc'),
       animationData: wfcAnimationData,
     })
 
@@ -142,6 +145,14 @@ onMounted(async () => {
       autoplay: props.isNearbyActive,
       animationData: terdekatAnimationData,
     })
+
+    wheelchairAnim = lottie.loadAnimation({
+      container: wheelchairContainer,
+      renderer: 'svg',
+      loop: true,
+      autoplay: props.activeFilters.features.includes('accessibility-wheelchair-accessible'),
+      animationData: wheelchairAnimationData,
+    })
   }
 })
 
@@ -151,6 +162,7 @@ onBeforeUnmount(() => {
   if (specialtyAnim) specialtyAnim.destroy()
   if (wfcAnim) wfcAnim.destroy()
   if (terdekatAnim) terdekatAnim.destroy()
+  if (wheelchairAnim) wheelchairAnim.destroy()
 })
 </script>
 
@@ -182,7 +194,7 @@ onBeforeUnmount(() => {
                 placeholder="Search cafes..."
                 class="text-sm sm:text-base border w-full border-gray-600 rounded-lg p-2 sm:p-3 pl-4 pr-[120px]" 
                 @input="handleSearch" />
-              
+              <!-- @budi add fungsi dropdown select buat cafe, roastery & supplies)  -->
               <div class="absolute right-0 top-0 h-full flex items-center gap-2 pr-2">
                 <button class="text-gray-500 mr-2" @click="handleSearchButton">
                   <i :class="searchQuery ? 'fa fa-times' : 'fas fa-search'"></i>
@@ -271,15 +283,17 @@ onBeforeUnmount(() => {
             </button> -->
             <button
               @click="handleFeatureToggle('accessibility-wheelchair-accessible')"
-              class="text-white border border-white mt-2 px-3 sm:px-4 py-1 sm:py-2 rounded-full flex items-center gap-2 text-xs sm:text-base cursor-pointer touch-manipulation"
+              @mouseenter="playAnimation(wheelchairAnim)"
+              @mouseleave="pauseAnimation(wheelchairAnim, activeFilters.features.includes('accessibility-wheelchair-accessible'))"
+              class="text-white border border-white mt-2 px-3 sm:px-4 py-0 sm:py-1 rounded-full flex items-center gap-2 text-xs sm:text-base cursor-pointer touch-manipulation"
               :class="{
                 'text-yellow-500 bg-black border border-yellow-500':
                   activeFilters.features.includes('accessibility-wheelchair-accessible'),
-                'border-black': !activeFilters.features.includes(
-                  'accessibility-wheelchair-accessible'
-                ),
+                'text-gray-100 border-gray-400':
+                  !activeFilters.features.includes('accessibility-wheelchair-accessible'),
               }">
-              Wheelchair Friendly
+              <span id="wheelchair-animate" class="w-8 h-8"></span>
+              <span>Wheelchair Friendly</span>
             </button>
             <!-- <button
               @click="handleFeatureToggle('service-options-outdoor-seating')"
@@ -291,23 +305,24 @@ onBeforeUnmount(() => {
               }">
               Outdoor
             </button> -->
+            <!-- @budi in iadd search wfc - pang liatin nge query nya bener ga? -->
             <button
-              @click="handleFeatureToggle('wfc-friendly')"
+              @click="handleFeatureToggle('wfc')"
               @mouseenter="playAnimation(wfcAnim)"
-              @mouseleave="pauseAnimation(wfcAnim, activeFilters.features.includes('wfc-friendly'))"
+              @mouseleave="pauseAnimation(wfcAnim, activeFilters.features.includes('wfc'))"
               class="text-white border border-white mt-2 px-3 sm:px-4 py-0 sm:py-1 rounded-full flex items-center gap-2 text-xs sm:text-base cursor-pointer touch-manipulation"
               :class="{
                 'text-yellow-500 bg-black border border-yellow-500':
-                  activeFilters.features.includes('wfc-friendly'),
+                  activeFilters.features.includes('wfc'),
                 'text-gray-100 border-gray-400':
-                  !activeFilters.features.includes('wfc-friendly'),
+                  !activeFilters.features.includes('wfc'),
               }">
               <span id="wfc-animate" class="w-8 h-8"></span>
               <span>WFC</span>
             </button>
             <button
               v-if="activeFilters.features.length > 0"
-              class="text-yellow-500 text-xs sm:text-base cursor-pointer touch-manipulation"
+              class="ml-2 text-yellow-500 text-xs sm:text-base cursor-pointer touch-manipulation"
               @click="resetFeatureFilter">
               Reset Filter
             </button>
