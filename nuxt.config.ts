@@ -3,7 +3,10 @@ export default defineNuxtConfig({
    modules: ['nuxt-gtag'],
 
   gtag: {
-    id: 'G-BNWTEJPQY2'
+    id: 'G-BNWTEJPQY2',
+    config: {
+      gtm_id: 'GTM-5KS68GXM'
+    }
   },
   compatibilityDate: '2025-04-30',
   devtools: { enabled: true },
