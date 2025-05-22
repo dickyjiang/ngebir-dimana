@@ -4,7 +4,7 @@ export default defineNuxtConfig({
 
   gtag: {
     id: 'G-BNWTEJPQY2'
-  }
+  },
   compatibilityDate: '2025-04-30',
   devtools: { enabled: true },
   modules: [
