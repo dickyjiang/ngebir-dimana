@@ -149,19 +149,27 @@
                     <p>{{ cafe.city.city_name }}</p>
                   </div>
                   <!-- Replace the single business_type display with this -->
-                  <div class="flex flex-wrap gap-2">
-                    <div
-                      v-for="type in cafe.business_type"
-                      :key="type"
-                      class="px-3 py-1 rounded-full bg-yellow-400 text-gray-800 text-center text-sm font-medium">
-                      @dicky aneh kok nyatu
-                      {{ type }}
-                    </div>
+                  <div 
+                  v-for="type in cafe.business_type"
+                  :key="type"
+                  class="px-3 py-1 rounded-full bg-yellow-400 text-gray-800 text-center text-sm font-medium">
+                    {{ type }}
+                  </div>
+                  <div 
+                  v-for="type in cafe.business_type"
+                  :key="type"
+                  class="px-3 py-1 rounded-full bg-yellow-800 text-white text-center text-sm font-medium">
+                    {{ type }}
+                  </div>
+                  <div 
+                  v-for="type in cafe.business_type"
+                  :key="type"
+                  class="px-3 py-1 rounded-full bg-stone-500 text-white text-center text-sm font-medium">
+                    {{ type }}
                   </div>
                 </div>
               </div>
               <div class="mt-2 flex justify-between gap-4">
-                <!-- @dicky ttg publish & unpublish -->
                 <div
                   v-if="cafe.is_published"
                   class="text-green-700 border border-green-700 py-2 px-4 rounded-full text-sm text-center font-medium bg-green-100">
