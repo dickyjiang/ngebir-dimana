@@ -117,13 +117,13 @@
                 v-for="feature in cafe.features"
                 :key="feature.id"
                 :href="`/cafes?features=${feature.feature_slug}`"
-                class="px-3 py-2 flex text-white text-xs items-center gap-2 border rounded-full border-gray-300 bg-gray-800 hover:bg-gray-600 transition-colors"
+                class="px-3 py-2 flex text-white text-xs items-center gap-2  rounded-full bg-gray-800 hover:bg-gray-800 transition-colors"
                 :class="{
-                  'bg-yellow-400 text-gray-800': feature.business_type === 'cafe',
+                  'bg-yellow-500 text-gray-800': feature.business_type === 'cafe',
                   'bg-yellow-800 text-white': feature.business_type === 'roastery',
                   'bg-stone-500 text-white': feature.business_type === 'supplier',
                 }">
-                @dicky{{ feature.name }}
+                  {{ feature.name }}
               </a>
             </div>
           </div>
