@@ -1,5 +1,10 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
+   modules: ['@nuxtjs/gtm'],
+      gtm: {
+        id: 'GTM-5KS68GXM', // Replace with your GTM container ID
+        enableRouterSync: true // Optional: Enable router sync
+      },
   compatibilityDate: '2025-04-30',
   devtools: { enabled: true },
   modules: [
