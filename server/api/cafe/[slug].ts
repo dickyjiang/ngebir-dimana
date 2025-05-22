@@ -4,7 +4,7 @@ import { serverSupabaseClient, serverSupabaseUser } from "#supabase/server";
 export default defineEventHandler(async (event) => {
     const { slug } = event.context.params;
     const client = await serverSupabaseClient<Database>(event);
-    let query = client.from("cafes").select("id,name,city, photo, city, slug_name, description, city_slug,rating, range, rating_num, logo, lat, long, street, state, phone, site, working_hours, location_link, uuid, cafe_features(cafe_id, feature_id)", { count: "exact" });
+    let query = client.from("cafes").select("id,name,city, photo, city, slug_name, description, city_slug,rating, range, rating_num, logo, lat, long, street, state, phone, site, working_hours, location_link, uuid, business_type, cafe_features(cafe_id, feature_id)", { count: "exact" });
     query = query.eq('slug_name', slug)
     query = query.single();
 
@@ -29,7 +29,7 @@ export default defineEventHandler(async (event) => {
         }
     }
 
-    let query2 = client.from("features").select("id, name, feature_slug")
+    let query2 = client.from("features").select("id, name, feature_slug,business_type")
     query2 = query2.in('id', featureIds)
 
     const { data: data2, error: error2, count: count2 } = await query2

@@ -63,9 +63,13 @@ export default defineEventHandler(async (event) => {
         query.in('range', body.ranges)
     }
 
-    if (body.searchQuery && body.searchQuery.query) {
+    if (body.searchQuery) {
         // Use the search query to filter by name
-        query = query.ilike("name", `%${body.searchQuery.query}%`);
+        query = query.ilike("name", `%${body.searchQuery}%`);
+    }
+
+    if (body.filterTypes && body.filterTypes != 'all') {
+        query = query.contains('business_type', [body.filterTypes])
     }
     // query = query.lt('st_distance(location, st_point(107.59655891385863, -6.879245721118651)::geography)', 5000)
     // query = query.filter(
@@ -78,7 +82,7 @@ export default defineEventHandler(async (event) => {
     // );
     // query = query.gt('id', 5000)
     query = query.eq('is_published', true)
-    query = query.order('datetime', { ascending: false })
+    query = query.order('id', { ascending: false })
 
     query = query.range(body.from, body.to)
 
@@ -115,6 +119,7 @@ export default defineEventHandler(async (event) => {
 
     const { data, error, count } = await query
     if (error) throw createError({ statusMessage: error.message });
+    // console.log('data:', data)
 
     return { 'data': data, 'count': count };
 });

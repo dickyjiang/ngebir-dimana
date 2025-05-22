@@ -90,7 +90,7 @@
           </div>
           <div class="">
             <div>
-              <h2 class="mb-3 text-2xl text-gray-800">Tambah Usaha</h2>
+              <h2 class="mb-3 text-2xl text-gray-800">Tambah Bisnis</h2>
               <p class="font-medium text-gray-600">Pilih Jenis usaha yang mau ditambahkan.</p>
               <p class="text-gray-500">Kamu boleh menambah lebih dari satu jenis usaha.</p>
             </div>
@@ -99,31 +99,28 @@
                 class="flex flex-col items-center justify-end gap-8 bg-gray-100 px-4 py-3 rounded-md border border-gray-600">
                 <img class="w-20" src="/src/assets/img/newCafe.svg" alt="" />
                 <NuxtLink
-                  to="/cafe/owner/form"
+                  to="/cafe/owner/form?business_type=cafe"
                   class="border w-full border-gray-600 text-gray-600 py-2 px-3 rounded-md text-sm text-center font-medium hover:bg-gray-800 hover:text-yellow-500 transition-colors">
                   Cafe</NuxtLink
                 >
               </div>
-              <!-- @budi create page form buat roastery -->
               <div
                 class="flex flex-col items-center justify-between gap-4 bg-gray-100 px-4 py-3 rounded-md border border-gray-600">
                 <img class="w-20 opacity-70" src="/src/assets/img/coffee-beans.svg" alt="" />
-                <p class="text-red-500">Coming Soon</p>
-                <div
-                  to="/cafe/owner/form"
+                <NuxtLink
+                  to="/cafe/owner/form?business_type=roastery"
                   class="border w-full border-gray-600 text-gray-600 py-2 px-3 rounded-md text-sm text-center font-medium">
                   Beans & Roastery
-                </div>
+                </NuxtLink>
               </div>
-              <!-- @budi create page form buat add supplies -->
               <div
                 class="flex flex-col items-center justify-center gap-4 bg-gray-100 px-4 py-3 rounded-md border border-gray-600">
                 <img class="w-20 opacity-70" src="/src/assets/img/portafilter.svg" alt="" />
-                <p class="text-red-500">Coming Soon</p>
-                <div
+                <NuxtLink
+                  to="/cafe/owner/form?business_type=supplier"
                   class="border w-full border-gray-600 text-gray-600 py-2 px-3 rounded-md text-sm text-center font-medium">
                   Tools & Supplies
-                </div>
+                </NuxtLink>
               </div>
             </div>
           </div>
@@ -149,16 +146,31 @@
                     </p>
                     <p>{{ cafe.city.city_name }}</p>
                   </div>
-                  <div class="flex flex-col gap-2">
+                  <!-- Replace the single business_type display with this -->
+                  <div class="flex flex-wrap gap-1 justify-end">
                     <div
-                      class="px-3 py-1 rounded-full bg-yellow-400 text-gray-800 text-center text-sm font-medium">
-                      {{ cafe.business_type }}
+                      v-for="type in getBusinessTypes(cafe.business_type)"
+                      :key="type"
+                      class="px-3 py-1 rounded-full text-center text-sm font-medium"
+                      :class="{
+                        'bg-yellow-400 text-gray-800': type.trim().toLowerCase() === 'cafe',
+                        'bg-yellow-800 text-white': type.trim().toLowerCase() === 'roastery',
+                        'bg-stone-500 text-white': type.trim().toLowerCase() === 'supplier',
+                      }">
+                      {{
+                        type.trim() === 'cafe'
+                          ? 'Cafe'
+                          : type.trim() === 'roastery'
+                            ? 'Roastery'
+                            : type.trim() === 'supplier'
+                              ? 'Tools & Supplies'
+                              : type.trim()
+                      }}
                     </div>
                   </div>
                 </div>
               </div>
               <div class="mt-2 flex justify-between gap-4">
-                <!-- @dicky ttg publish & unpublish -->
                 <div
                   v-if="cafe.is_published"
                   class="text-green-700 border border-green-700 py-2 px-4 rounded-full text-sm text-center font-medium bg-green-100">
@@ -242,7 +254,27 @@ onMounted(async () => {
     router.push('/')
   }
 })
+const getBusinessTypes = (businessType) => {
+  if (!businessType) return []
 
+  // If it's already an array
+  if (Array.isArray(businessType)) {
+    return businessType
+  }
+
+  // If it's a string, split by comma
+  if (typeof businessType === 'string') {
+    return businessType.split(',')
+  }
+
+  // If it's an object or some other type, convert to string and try to split
+  try {
+    return String(businessType).split(',')
+  } catch (e) {
+    console.error('Error processing business types:', e)
+    return []
+  }
+}
 // Fetch user profile data
 const fetchProfile = async () => {
   try {

@@ -64,7 +64,7 @@ export type Database = {
           booking_appointment_link: string | null
           borough: string | null
           business_status: string | null
-          business_type: string
+          business_type: string[] | null
           category: string | null
           cid: string | null
           city: string | null
@@ -135,7 +135,7 @@ export type Database = {
           booking_appointment_link?: string | null
           borough?: string | null
           business_status?: string | null
-          business_type?: string
+          business_type?: string[] | null
           category?: string | null
           cid?: string | null
           city?: string | null
@@ -206,7 +206,7 @@ export type Database = {
           booking_appointment_link?: string | null
           borough?: string | null
           business_status?: string | null
-          business_type?: string
+          business_type?: string[] | null
           category?: string | null
           cid?: string | null
           city?: string | null
@@ -301,16 +301,19 @@ export type Database = {
       }
       features: {
         Row: {
+          business_type: string | null
           feature_slug: string | null
           id: number
           name: string | null
         }
         Insert: {
+          business_type?: string | null
           feature_slug?: string | null
           id?: number
           name?: string | null
         }
         Update: {
+          business_type?: string | null
           feature_slug?: string | null
           id?: number
           name?: string | null
@@ -347,6 +350,21 @@ export type Database = {
           updated_at?: string | null
           username?: string | null
           website?: string | null
+        }
+        Relationships: []
+      }
+      table_name: {
+        Row: {
+          aaa: string[] | null
+          id: number | null
+        }
+        Insert: {
+          aaa?: string[] | null
+          id?: number | null
+        }
+        Update: {
+          aaa?: string[] | null
+          id?: number | null
         }
         Relationships: []
       }

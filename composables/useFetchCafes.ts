@@ -48,10 +48,12 @@ export function useFetchCafes() {
                 payload = {
                     ...payload,
                     city: filters.city || [],
-                    searchQuery: searchQuery || '',
+                    searchQuery: searchQuery.query || '',
                     features: filters.features || [],
+                    filterTypes: searchQuery.filter || [],
                 };
             }
+            console.log('Payload:', payload);
 
             const hasil = await $fetch('/api/search', {
                 method: 'POST',

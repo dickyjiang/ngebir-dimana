@@ -47,6 +47,13 @@ export default defineEventHandler(async (event) => {
 	const hasExistingLogo = formData.find((f) => f.name === "hasExistingLogo")?.data?.toString() === "true";
 	const existingLogoUrls = formData.find((f) => f.name === "existingLogoUrls")?.data?.toString();
 
+
+	const businessTypes = formData
+		.filter((f) => f.name === "businessType")
+		.map(item => (item.data?.toString() ?? '').split(','))
+		.flat()
+		.filter(type => type.trim() !== '');
+
 	const image = formData.find((f) => f.name === "image");
 	const cafeLogo = formData.find((f) => f.name === "cafeLogo");
 	const multipleImages = formData.filter((f) => f.name === "images");
@@ -194,6 +201,7 @@ export default defineEventHandler(async (event) => {
 			logo: logoUrl,
 			photo: primaryImageUrl,
 			datetime: new Date().toISOString(),
+			business_type: businessTypes,
 		})
 		.eq("id", cafeId)
 		.select()
