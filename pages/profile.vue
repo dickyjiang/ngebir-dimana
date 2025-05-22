@@ -99,7 +99,7 @@
                 class="flex flex-col items-center justify-end gap-8 bg-gray-100 px-4 py-3 rounded-md border border-gray-600">
                 <img class="w-20" src="/src/assets/img/newCafe.svg" alt="" />
                 <NuxtLink
-                  to="/cafe/owner/form?business_type=Cafe"
+                  to="/cafe/owner/form?business_type=cafe"
                   class="border w-full border-gray-600 text-gray-600 py-2 px-3 rounded-md text-sm text-center font-medium hover:bg-gray-800 hover:text-yellow-500 transition-colors">
                   Cafe</NuxtLink
                 >
@@ -107,7 +107,6 @@
               <div
                 class="flex flex-col items-center justify-between gap-4 bg-gray-100 px-4 py-3 rounded-md border border-gray-600">
                 <img class="w-20 opacity-70" src="/src/assets/img/coffee-beans.svg" alt="" />
-                <p class="text-red-500">Coming Soon</p>
                 <NuxtLink
                   to="/cafe/owner/form?business_type=roastery"
                   class="border w-full border-gray-600 text-gray-600 py-2 px-3 rounded-md text-sm text-center font-medium">
@@ -117,9 +116,8 @@
               <div
                 class="flex flex-col items-center justify-center gap-4 bg-gray-100 px-4 py-3 rounded-md border border-gray-600">
                 <img class="w-20 opacity-70" src="/src/assets/img/portafilter.svg" alt="" />
-                <p class="text-red-500">Coming Soon</p>
                 <NuxtLink
-                  to="/cafe/owner/form?business_type=Supplier"
+                  to="/cafe/owner/form?business_type=supplier"
                   class="border w-full border-gray-600 text-gray-600 py-2 px-3 rounded-md text-sm text-center font-medium">
                   Tools & Supplies
                 </NuxtLink>
@@ -149,23 +147,26 @@
                     <p>{{ cafe.city.city_name }}</p>
                   </div>
                   <!-- Replace the single business_type display with this -->
-                  <div 
-                  v-for="type in cafe.business_type"
-                  :key="type"
-                  class="px-3 py-1 rounded-full bg-yellow-400 text-gray-800 text-center text-sm font-medium">
-                    {{ type }}
-                  </div>
-                  <div 
-                  v-for="type in cafe.business_type"
-                  :key="type"
-                  class="px-3 py-1 rounded-full bg-yellow-800 text-white text-center text-sm font-medium">
-                    {{ type }}
-                  </div>
-                  <div 
-                  v-for="type in cafe.business_type"
-                  :key="type"
-                  class="px-3 py-1 rounded-full bg-stone-500 text-white text-center text-sm font-medium">
-                    {{ type }}
+                  <div class="flex flex-wrap gap-1 justify-end">
+                    <div
+                      v-for="type in getBusinessTypes(cafe.business_type)"
+                      :key="type"
+                      class="px-3 py-1 rounded-full text-center text-sm font-medium"
+                      :class="{
+                        'bg-yellow-400 text-gray-800': type.trim().toLowerCase() === 'cafe',
+                        'bg-yellow-800 text-white': type.trim().toLowerCase() === 'roastery',
+                        'bg-stone-500 text-white': type.trim().toLowerCase() === 'supplier',
+                      }">
+                      {{
+                        type.trim() === 'cafe'
+                          ? 'Cafe'
+                          : type.trim() === 'roastery'
+                            ? 'Roastery'
+                            : type.trim() === 'supplier'
+                              ? 'Tools & Supplies'
+                              : type.trim()
+                      }}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -253,7 +254,27 @@ onMounted(async () => {
     router.push('/')
   }
 })
+const getBusinessTypes = (businessType) => {
+  if (!businessType) return []
 
+  // If it's already an array
+  if (Array.isArray(businessType)) {
+    return businessType
+  }
+
+  // If it's a string, split by comma
+  if (typeof businessType === 'string') {
+    return businessType.split(',')
+  }
+
+  // If it's an object or some other type, convert to string and try to split
+  try {
+    return String(businessType).split(',')
+  } catch (e) {
+    console.error('Error processing business types:', e)
+    return []
+  }
+}
 // Fetch user profile data
 const fetchProfile = async () => {
   try {

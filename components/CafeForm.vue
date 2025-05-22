@@ -72,7 +72,7 @@
                             :checked="includesBusinessType('supplier')"
                             @change="toggleBusinessType('supplier')"
                             class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500" />
-                          <span>Supplier Alat-alat</span>
+                          <span>Tools & Supplies</span>
                         </label>
                       </div>
                       <div v-if="hasError('businessTypes')" class="text-red-500 text-sm mt-1">

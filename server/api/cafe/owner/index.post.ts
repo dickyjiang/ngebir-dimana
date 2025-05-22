@@ -20,7 +20,11 @@ export default defineEventHandler(async (event) => {
 	// formData.append('cafeLocationLink', locationLink.value);
 	const cafeLocationLink = formData.find((f) => f.name === "cafeLocationLink")?.data?.toString() ?? '';
 	const cafeWorkingHours = formData.find((f) => f.name === "cafeWorkingHours")?.data?.toString() ?? '';
-	const businessTypes = formData.filter((f) => f.name === "businessType").map(item => item.data?.toString() ?? '');
+	const businessTypes = formData
+		.filter((f) => f.name === "businessType")
+		.map(item => (item.data?.toString() ?? '').split(','))
+		.flat()
+		.filter(type => type.trim() !== '');
 
 	// const features = formData.filter((f) => f.name === "features");
 	const features = formData.find((f) => f.name === "features")
