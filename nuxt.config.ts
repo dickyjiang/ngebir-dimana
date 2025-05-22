@@ -1,22 +1,23 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-   modules: ['nuxt-gtag'],
-
-  gtag: {
-    id: 'G-BNWTEJPQY2',
-    config: {
-      gtm_id: 'GTM-5KS68GXM'
-    }
-  },
-  compatibilityDate: '2025-04-30',
-  devtools: { enabled: true },
   modules: [
     '@nuxtjs/tailwindcss',
     '@nuxt/image',
     '@nuxtjs/supabase',
     '@nuxtjs/leaflet',
-    'nuxt-gtag'
+    'nuxt-gtag',
   ],
+
+  gtag: {
+    id: 'G-BNWTEJPQY2',
+    config: {
+      send_page_view: true
+    }
+  },
+
+
+  compatibilityDate: '2025-04-30',
+  devtools: { enabled: true },
   sourcemap: {
     server: true,
     client: true
