@@ -1,17 +1,18 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-   modules: ['@nuxtjs/gtm'],
-      gtm: {
-        id: 'GTM-5KS68GXM', // Replace with your GTM container ID
-        enableRouterSync: true // Optional: Enable router sync
-      },
+   modules: ['nuxt-gtag'],
+
+  gtag: {
+    id: 'G-BNWTEJPQY2'
+  }
   compatibilityDate: '2025-04-30',
   devtools: { enabled: true },
   modules: [
     '@nuxtjs/tailwindcss',
     '@nuxt/image',
     '@nuxtjs/supabase',
-    '@nuxtjs/leaflet'
+    '@nuxtjs/leaflet',
+    'nuxt-gtag'
   ],
   sourcemap: {
     server: true,
