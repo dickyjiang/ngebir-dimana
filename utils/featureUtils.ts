@@ -5,6 +5,7 @@
 export interface Feature {
     id: string;
     name: string;
+    business_type: string;
     [key: string]: any;
 }
 

@@ -9,7 +9,6 @@
   <div class="bg-gray-100 min-h-screen">
     <div class="max-w-6xl mx-auto px-[5%]">
       <section class="pt-6 mb-8">
-        <!-- @budi -->
         <h1 class="text-2xl font-semibold mb-2">Tambah Bisnis</h1>
         <p class="text-gray-700 mb-4">Silahkan menambah atau mengedit informasi Bisnis kamu.</p>
       </section>
@@ -418,7 +417,7 @@
                     </div>
                   </div>
 
-                  <div class="mb-10">
+                  <div class="mb-10" v-if="includesBusinessType('cafe')">
                     <label for="features">Fitur Cafe:</label>
                     <div class="relative mt-2">
                       <div class="hs-dropdown relative w-full">
@@ -426,7 +425,9 @@
                           class="flex flex-wrap items-center border border-gray-300 rounded-md p-2 bg-white">
                           <!-- Selected tags -->
                           <div
-                            v-for="feature in selectedFeatures"
+                            v-for="feature in selectedFeatures.filter(
+                              (feature) => feature.business_type === 'cafe'
+                            )"
                             :key="feature.id"
                             class="inline-flex items-center px-2.5 py-0.5 m-0.5 rounded-full text-sm bg-blue-100 text-blue-800">
                             <span>{{ feature.name }}</span>
@@ -452,12 +453,17 @@
                           <!-- Search input -->
                           <input
                             type="text"
-                            id="features-search"
+                            id="cafe-features-search"
                             class="flex-grow min-w-[80px] border-0 p-0 pl-1 focus:ring-0 focus:outline-none text-sm"
                             placeholder="Search and select features..."
-                            v-model="featureSearchQuery"
-                            @input="searchFeatures"
-                            @focus="showFeatureDropdown = true"
+                            v-model="cafeFeatureSearchQuery"
+                            @input="() => searchFeaturesByType('cafe')"
+                            @focus="
+                              () => {
+                                showFeatureDropdown = true
+                                currentFeatureType = 'cafe'
+                              }
+                            "
                             @blur="handleBlur"
                             @keydown.down="focusNextDropdownItem"
                             @keydown.up="focusPreviousDropdownItem"
@@ -467,11 +473,15 @@
 
                         <!-- Dropdown -->
                         <div
-                          v-if="showFeatureDropdown && filteredFeatures.length > 0"
+                          v-if="
+                            showFeatureDropdown &&
+                            filteredCafeFeatures.length > 0 &&
+                            currentFeatureType === 'cafe'
+                          "
                           class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto"
-                          ref="dropdownRef">
+                          ref="cafeDropdownRef">
                           <div
-                            v-for="(feature, index) in filteredFeatures"
+                            v-for="(feature, index) in filteredCafeFeatures"
                             :key="feature.id"
                             :class="[
                               'px-4 py-2 hover:bg-blue-50 cursor-pointer flex items-center',
@@ -504,8 +514,8 @@
                       <strong>Note:</strong> Pilih semua fitur yang sesuai dengan café anda.
                     </p>
                   </div>
-                  <!-- @budi fitur Beans & Roastery -->
-                  <div class="mb-10">
+
+                  <div class="mb-10" v-if="includesBusinessType('roastery')">
                     <label for="features">Fitur Beans & Roastery:</label>
                     <div class="relative mt-2">
                       <div class="hs-dropdown relative w-full">
@@ -513,7 +523,9 @@
                           class="flex flex-wrap items-center border border-gray-300 rounded-md p-2 bg-white">
                           <!-- Selected tags -->
                           <div
-                            v-for="feature in selectedFeatures"
+                            v-for="feature in selectedFeatures.filter(
+                              (feature) => feature.business_type === 'roastery'
+                            )"
                             :key="feature.id"
                             class="inline-flex items-center px-2.5 py-0.5 m-0.5 rounded-full text-sm bg-blue-100 text-blue-800">
                             <span>{{ feature.name }}</span>
@@ -539,12 +551,17 @@
                           <!-- Search input -->
                           <input
                             type="text"
-                            id="features-search"
+                            id="roastery-features-search"
                             class="flex-grow min-w-[80px] border-0 p-0 pl-1 focus:ring-0 focus:outline-none text-sm"
                             placeholder="Search and select features..."
-                            v-model="featureSearchQuery"
-                            @input="searchFeatures"
-                            @focus="showFeatureDropdown = true"
+                            v-model="roasteryFeatureSearchQuery"
+                            @input="() => searchFeaturesByType('roastery')"
+                            @focus="
+                              () => {
+                                showFeatureDropdown = true
+                                currentFeatureType = 'roastery'
+                              }
+                            "
                             @blur="handleBlur"
                             @keydown.down="focusNextDropdownItem"
                             @keydown.up="focusPreviousDropdownItem"
@@ -554,11 +571,15 @@
 
                         <!-- Dropdown -->
                         <div
-                          v-if="showFeatureDropdown && filteredFeatures.length > 0"
+                          v-if="
+                            showFeatureDropdown &&
+                            filteredRoasteryFeatures.length > 0 &&
+                            currentFeatureType === 'roastery'
+                          "
                           class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto"
-                          ref="dropdownRef">
+                          ref="roasteryDropdownRef">
                           <div
-                            v-for="(feature, index) in filteredFeatures"
+                            v-for="(feature, index) in filteredRoasteryFeatures"
                             :key="feature.id"
                             :class="[
                               'px-4 py-2 hover:bg-blue-50 cursor-pointer flex items-center',
@@ -591,8 +612,8 @@
                       <strong>Note:</strong> Pilih semua fitur yang sesuai dengan Roastery anda.
                     </p>
                   </div>
-                  <!-- @budi fitur Tools & Supplies -->
-                  <div class="mb-10">
+
+                  <div class="mb-10" v-if="includesBusinessType('supplier')">
                     <label for="features">Fitur Tools & Supplies:</label>
                     <div class="relative mt-2">
                       <div class="hs-dropdown relative w-full">
@@ -600,7 +621,9 @@
                           class="flex flex-wrap items-center border border-gray-300 rounded-md p-2 bg-white">
                           <!-- Selected tags -->
                           <div
-                            v-for="feature in selectedFeatures"
+                            v-for="feature in selectedFeatures.filter(
+                              (feature) => feature.business_type === 'supplier'
+                            )"
                             :key="feature.id"
                             class="inline-flex items-center px-2.5 py-0.5 m-0.5 rounded-full text-sm bg-blue-100 text-blue-800">
                             <span>{{ feature.name }}</span>
@@ -626,12 +649,17 @@
                           <!-- Search input -->
                           <input
                             type="text"
-                            id="features-search"
+                            id="supplier-features-search"
                             class="flex-grow min-w-[80px] border-0 p-0 pl-1 focus:ring-0 focus:outline-none text-sm"
                             placeholder="Search and select features..."
-                            v-model="featureSearchQuery"
-                            @input="searchFeatures"
-                            @focus="showFeatureDropdown = true"
+                            v-model="supplierFeatureSearchQuery"
+                            @input="() => searchFeaturesByType('supplier')"
+                            @focus="
+                              () => {
+                                showFeatureDropdown = true
+                                currentFeatureType = 'supplier'
+                              }
+                            "
                             @blur="handleBlur"
                             @keydown.down="focusNextDropdownItem"
                             @keydown.up="focusPreviousDropdownItem"
@@ -641,11 +669,15 @@
 
                         <!-- Dropdown -->
                         <div
-                          v-if="showFeatureDropdown && filteredFeatures.length > 0"
+                          v-if="
+                            showFeatureDropdown &&
+                            filteredSupplierFeatures.length > 0 &&
+                            currentFeatureType === 'supplier'
+                          "
                           class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto"
-                          ref="dropdownRef">
+                          ref="supplierDropdownRef">
                           <div
-                            v-for="(feature, index) in filteredFeatures"
+                            v-for="(feature, index) in filteredSupplierFeatures"
                             :key="feature.id"
                             :class="[
                               'px-4 py-2 hover:bg-blue-50 cursor-pointer flex items-center',
@@ -806,7 +838,7 @@ const showToast = ref(false)
 const toastMessage = ref('')
 const toastType = ref('info') // 'info', 'success', or 'error'
 
-// const parentCities = ref<ParentCity[]>([]);
+// const parentCities = ref<ParentCity[]>();
 // const selectedParentCity = ref('');
 // const selectedChildCity = ref('');
 // const availableChildCities = ref<ChildCity[]>([]);
@@ -848,8 +880,16 @@ const allFeatures = ref<Feature[]>(features || [])
 
 const featureSearchQuery = ref('')
 
-const filteredFeatures = ref<Feature[]>([])
-// Add this function to your script section
+// Add after the existing featureSearchQuery ref
+const cafeFeatureSearchQuery = ref('')
+const roasteryFeatureSearchQuery = ref('')
+const supplierFeatureSearchQuery = ref('')
+const currentFeatureType = ref('cafe') // Default to cafe
+
+const filteredCafeFeatures = ref<Feature[]>([])
+const filteredRoasteryFeatures = ref<Feature[]>([])
+const filteredSupplierFeatures = ref<Feature[]>([])
+
 // Add this helper method to handle both array formats
 const includesBusinessType = (type) => {
   if (!businessTypes.value || businessTypes.value.length === 0) {
@@ -1061,7 +1101,10 @@ onMounted(() => {
       loadImagePreviews()
     })
   }
-  searchFeatures()
+  // Initialize all feature types
+  searchFeaturesByType('cafe')
+  searchFeaturesByType('roastery')
+  searchFeaturesByType('supplier')
 })
 
 const validateOnChangeForm = () => {
@@ -1216,15 +1259,75 @@ const removeSelectedFeature = (feature: Feature) => {
 }
 
 const searchFeatures = () => {
-  if (featureSearchQuery.value.trim() === '') {
-    filteredFeatures.value = allFeatures.value
-  } else {
-    filteredFeatures.value = allFeatures.value.filter((feature) =>
-      feature.name?.toLowerCase().includes(featureSearchQuery.value.toLowerCase())
-    )
+  searchFeaturesByType(currentFeatureType.value)
+}
+
+// Add this new function to search features by business type
+const searchFeaturesByType = (businessType) => {
+  let query = ''
+
+  // Get the appropriate search query based on business type
+  if (businessType === 'cafe') {
+    query = cafeFeatureSearchQuery.value
+
+    // Filter by both business type and search query
+    if (query.trim() === '') {
+      filteredCafeFeatures.value = allFeatures.value.filter(
+        (feature) => feature.business_type === 'cafe'
+      )
+    } else {
+      filteredCafeFeatures.value = allFeatures.value.filter(
+        (feature) =>
+          feature.business_type === 'cafe' &&
+          feature.name?.toLowerCase().includes(query.toLowerCase())
+      )
+    }
+  } else if (businessType === 'roastery') {
+    query = roasteryFeatureSearchQuery.value
+
+    // Filter by both business type and search query
+    if (query.trim() === '') {
+      filteredRoasteryFeatures.value = allFeatures.value.filter(
+        (feature) => feature.business_type === 'roastery'
+      )
+    } else {
+      filteredRoasteryFeatures.value = allFeatures.value.filter(
+        (feature) =>
+          feature.business_type === 'roastery' &&
+          feature.name?.toLowerCase().includes(query.toLowerCase())
+      )
+    }
+  } else if (businessType === 'supplier') {
+    query = supplierFeatureSearchQuery.value
+
+    // Filter by both business type and search query
+    if (query.trim() === '') {
+      filteredSupplierFeatures.value = allFeatures.value.filter(
+        (feature) => feature.business_type === 'supplier'
+      )
+    } else {
+      filteredSupplierFeatures.value = allFeatures.value.filter(
+        (feature) =>
+          feature.business_type === 'supplier' &&
+          feature.name?.toLowerCase().includes(query.toLowerCase())
+      )
+    }
   }
 }
 
+// Modify the onMounted hook to initialize all feature lists
+onMounted(() => {
+  if (props.isEditMode && props.cafeId) {
+    loadCafeData().then(() => {
+      loadImagePreviews()
+    })
+  }
+
+  // Initialize all feature types
+  searchFeaturesByType('cafe')
+  searchFeaturesByType('roastery')
+  searchFeaturesByType('supplier')
+})
 const handleBlur = (event: FocusEvent) => {
   // Use a small timeout to allow click events on dropdown items to finish
   // before determining if we should hide the dropdown
@@ -1239,22 +1342,53 @@ const handleBlur = (event: FocusEvent) => {
   }, 150)
 }
 
+// Update these keyboard navigation functions to work with separate feature arrays
 const focusNextDropdownItem = () => {
-  if (filteredFeatures.value.length === 0) return
-  focusedFeatureIndex.value = (focusedFeatureIndex.value + 1) % filteredFeatures.value.length
+  let featuresList = []
+
+  if (currentFeatureType.value === 'cafe') {
+    featuresList = filteredCafeFeatures.value
+  } else if (currentFeatureType.value === 'roastery') {
+    featuresList = filteredRoasteryFeatures.value
+  } else if (currentFeatureType.value === 'supplier') {
+    featuresList = filteredSupplierFeatures.value
+  }
+
+  if (featuresList.length === 0) return
+  focusedFeatureIndex.value = (focusedFeatureIndex.value + 1) % featuresList.length
   scrollToFocusedItem()
 }
 
 const focusPreviousDropdownItem = () => {
-  if (filteredFeatures.value.length === 0) return
+  let featuresList = []
+
+  if (currentFeatureType.value === 'cafe') {
+    featuresList = filteredCafeFeatures.value
+  } else if (currentFeatureType.value === 'roastery') {
+    featuresList = filteredRoasteryFeatures.value
+  } else if (currentFeatureType.value === 'supplier') {
+    featuresList = filteredSupplierFeatures.value
+  }
+
+  if (featuresList.length === 0) return
   focusedFeatureIndex.value =
-    (focusedFeatureIndex.value - 1 + filteredFeatures.value.length) % filteredFeatures.value.length
+    (focusedFeatureIndex.value - 1 + featuresList.length) % featuresList.length
   scrollToFocusedItem()
 }
 
 const selectFocusedFeature = () => {
-  if (focusedFeatureIndex.value >= 0 && focusedFeatureIndex.value < filteredFeatures.value.length) {
-    handleFeatureClick(filteredFeatures.value[focusedFeatureIndex.value])
+  let featuresList = []
+
+  if (currentFeatureType.value === 'cafe') {
+    featuresList = filteredCafeFeatures.value
+  } else if (currentFeatureType.value === 'roastery') {
+    featuresList = filteredRoasteryFeatures.value
+  } else if (currentFeatureType.value === 'supplier') {
+    featuresList = filteredSupplierFeatures.value
+  }
+
+  if (focusedFeatureIndex.value >= 0 && focusedFeatureIndex.value < featuresList.length) {
+    handleFeatureClick(featuresList[focusedFeatureIndex.value])
   }
 }
 

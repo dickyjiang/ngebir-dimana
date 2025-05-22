@@ -41,29 +41,21 @@ export type Database = {
       }
       cafe_pics: {
         Row: {
-          cafe_id: number | null
+          cafe_id: number
           id: number
-          url: string | null
+          url: string
         }
         Insert: {
-          cafe_id?: number | null
+          cafe_id: number
           id?: number
-          url?: string | null
+          url: string
         }
         Update: {
-          cafe_id?: number | null
+          cafe_id?: number
           id?: number
-          url?: string | null
+          url?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "cafe_pics_cafes_id_fk"
-            columns: ["cafe_id"]
-            isOneToOne: false
-            referencedRelation: "cafes"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       cafes: {
         Row: {
@@ -72,7 +64,7 @@ export type Database = {
           booking_appointment_link: string | null
           borough: string | null
           business_status: string | null
-          business_type: string
+          business_type: string[] | null
           category: string | null
           cid: string | null
           city: string | null
@@ -132,7 +124,7 @@ export type Database = {
           time_zone: string | null
           type: string | null
           typical_time_spent: string | null
-          uuid: string
+          uuid: string | null
           verified: boolean | null
           working_hours: string | null
           working_hours_old_format: string | null
@@ -143,7 +135,7 @@ export type Database = {
           booking_appointment_link?: string | null
           borough?: string | null
           business_status?: string | null
-          business_type?: string
+          business_type?: string[] | null
           category?: string | null
           cid?: string | null
           city?: string | null
@@ -203,7 +195,7 @@ export type Database = {
           time_zone?: string | null
           type?: string | null
           typical_time_spent?: string | null
-          uuid?: string
+          uuid?: string | null
           verified?: boolean | null
           working_hours?: string | null
           working_hours_old_format?: string | null
@@ -214,7 +206,7 @@ export type Database = {
           booking_appointment_link?: string | null
           borough?: string | null
           business_status?: string | null
-          business_type?: string
+          business_type?: string[] | null
           category?: string | null
           cid?: string | null
           city?: string | null
@@ -274,7 +266,7 @@ export type Database = {
           time_zone?: string | null
           type?: string | null
           typical_time_spent?: string | null
-          uuid?: string
+          uuid?: string | null
           verified?: boolean | null
           working_hours?: string | null
           working_hours_old_format?: string | null
@@ -288,192 +280,6 @@ export type Database = {
             referencedColumns: ["city_slug"]
           },
         ]
-      }
-      cafes_komplit: {
-        Row: {
-          about: Json | null
-          area_service: boolean | null
-          booking_appointment_link: string | null
-          borough: string | null
-          business_status: string | null
-          category: string | null
-          cid: string | null
-          city: string | null
-          description: string | null
-          full_address: string | null
-          google_id: string | null
-          h3: string | null
-          id: number
-          kgmid: string | null
-          latitude: string | null
-          located_in: string | null
-          location_link: string | null
-          location_reviews_link: string | null
-          logo: string | null
-          longitude: string | null
-          name: string | null
-          order_links: string | null
-          other_hours: string | null
-          owner_id: string | null
-          owner_link: string | null
-          owner_title: string | null
-          phone: string | null
-          photo: string | null
-          photos_count: number | null
-          place_id: string | null
-          plus_code: string | null
-          popular_times: string | null
-          postal_code: string | null
-          posts: string | null
-          query: string | null
-          range: string | null
-          rating: string | null
-          reservation_links: string | null
-          reviews: number | null
-          reviews_id: string | null
-          reviews_link: string | null
-          reviews_per_score: string | null
-          reviews_per_score_2: string | null
-          reviews_per_score_3: string | null
-          reviews_per_score_4: string | null
-          reviews_per_score_5: string | null
-          reviews_per_score_6: number | null
-          reviews_tags: string | null
-          site: string | null
-          state: string | null
-          street: string | null
-          street_view: string | null
-          subtypes: string | null
-          time_zone: string | null
-          type: string | null
-          typical_time_spent: string | null
-          verified: boolean | null
-          working_hours: string | null
-          working_hours_old_format: string | null
-        }
-        Insert: {
-          about?: Json | null
-          area_service?: boolean | null
-          booking_appointment_link?: string | null
-          borough?: string | null
-          business_status?: string | null
-          category?: string | null
-          cid?: string | null
-          city?: string | null
-          description?: string | null
-          full_address?: string | null
-          google_id?: string | null
-          h3?: string | null
-          id?: number
-          kgmid?: string | null
-          latitude?: string | null
-          located_in?: string | null
-          location_link?: string | null
-          location_reviews_link?: string | null
-          logo?: string | null
-          longitude?: string | null
-          name?: string | null
-          order_links?: string | null
-          other_hours?: string | null
-          owner_id?: string | null
-          owner_link?: string | null
-          owner_title?: string | null
-          phone?: string | null
-          photo?: string | null
-          photos_count?: number | null
-          place_id?: string | null
-          plus_code?: string | null
-          popular_times?: string | null
-          postal_code?: string | null
-          posts?: string | null
-          query?: string | null
-          range?: string | null
-          rating?: string | null
-          reservation_links?: string | null
-          reviews?: number | null
-          reviews_id?: string | null
-          reviews_link?: string | null
-          reviews_per_score?: string | null
-          reviews_per_score_2?: string | null
-          reviews_per_score_3?: string | null
-          reviews_per_score_4?: string | null
-          reviews_per_score_5?: string | null
-          reviews_per_score_6?: number | null
-          reviews_tags?: string | null
-          site?: string | null
-          state?: string | null
-          street?: string | null
-          street_view?: string | null
-          subtypes?: string | null
-          time_zone?: string | null
-          type?: string | null
-          typical_time_spent?: string | null
-          verified?: boolean | null
-          working_hours?: string | null
-          working_hours_old_format?: string | null
-        }
-        Update: {
-          about?: Json | null
-          area_service?: boolean | null
-          booking_appointment_link?: string | null
-          borough?: string | null
-          business_status?: string | null
-          category?: string | null
-          cid?: string | null
-          city?: string | null
-          description?: string | null
-          full_address?: string | null
-          google_id?: string | null
-          h3?: string | null
-          id?: number
-          kgmid?: string | null
-          latitude?: string | null
-          located_in?: string | null
-          location_link?: string | null
-          location_reviews_link?: string | null
-          logo?: string | null
-          longitude?: string | null
-          name?: string | null
-          order_links?: string | null
-          other_hours?: string | null
-          owner_id?: string | null
-          owner_link?: string | null
-          owner_title?: string | null
-          phone?: string | null
-          photo?: string | null
-          photos_count?: number | null
-          place_id?: string | null
-          plus_code?: string | null
-          popular_times?: string | null
-          postal_code?: string | null
-          posts?: string | null
-          query?: string | null
-          range?: string | null
-          rating?: string | null
-          reservation_links?: string | null
-          reviews?: number | null
-          reviews_id?: string | null
-          reviews_link?: string | null
-          reviews_per_score?: string | null
-          reviews_per_score_2?: string | null
-          reviews_per_score_3?: string | null
-          reviews_per_score_4?: string | null
-          reviews_per_score_5?: string | null
-          reviews_per_score_6?: number | null
-          reviews_tags?: string | null
-          site?: string | null
-          state?: string | null
-          street?: string | null
-          street_view?: string | null
-          subtypes?: string | null
-          time_zone?: string | null
-          type?: string | null
-          typical_time_spent?: string | null
-          verified?: boolean | null
-          working_hours?: string | null
-          working_hours_old_format?: string | null
-        }
-        Relationships: []
       }
       city: {
         Row: {
@@ -495,49 +301,22 @@ export type Database = {
       }
       features: {
         Row: {
+          business_type: string | null
           feature_slug: string | null
           id: number
           name: string | null
         }
         Insert: {
+          business_type?: string | null
           feature_slug?: string | null
           id?: number
           name?: string | null
         }
         Update: {
+          business_type?: string | null
           feature_slug?: string | null
           id?: number
           name?: string | null
-        }
-        Relationships: []
-      }
-      old_cafe_directories_sheet1: {
-        Row: {
-          c1: string | null
-          c2: string | null
-        }
-        Insert: {
-          c1?: string | null
-          c2?: string | null
-        }
-        Update: {
-          c1?: string | null
-          c2?: string | null
-        }
-        Relationships: []
-      }
-      old_transformed_cafe_data: {
-        Row: {
-          feature: string | null
-          id: number | null
-        }
-        Insert: {
-          feature?: string | null
-          id?: number | null
-        }
-        Update: {
-          feature?: string | null
-          id?: number | null
         }
         Relationships: []
       }
@@ -574,108 +353,27 @@ export type Database = {
         }
         Relationships: []
       }
-      restaurants: {
+      table_name: {
         Row: {
-          id: number
-          location: unknown
-          name: string
+          aaa: string[] | null
+          id: number | null
         }
         Insert: {
-          id?: number
-          location: unknown
-          name: string
+          aaa?: string[] | null
+          id?: number | null
         }
         Update: {
-          id?: number
-          location?: unknown
-          name?: string
-        }
-        Relationships: []
-      }
-      stores: {
-        Row: {
-          description: string | null
-          id: number
-          location: unknown
-          name: string
-        }
-        Insert: {
-          description?: string | null
-          id?: number
-          location: unknown
-          name: string
-        }
-        Update: {
-          description?: string | null
-          id?: number
-          location?: unknown
-          name?: string
+          aaa?: string[] | null
+          id?: number | null
         }
         Relationships: []
       }
     }
     Views: {
-      v_city: {
-        Row: {
-          city: string | null
-          city_slug: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "city_fk"
-            columns: ["city_slug"]
-            isOneToOne: false
-            referencedRelation: "city"
-            referencedColumns: ["city_slug"]
-          },
-        ]
-      }
-      v_price_range: {
-        Row: {
-          range: string | null
-        }
-        Relationships: []
-      }
-      v_rating: {
-        Row: {
-          rating: number | null
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Functions: {
-      gtrgm_compress: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      gtrgm_decompress: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      gtrgm_in: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      gtrgm_options: {
-        Args: { "": unknown }
-        Returns: undefined
-      }
-      gtrgm_out: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      set_limit: {
-        Args: { "": number }
-        Returns: number
-      }
-      show_limit: {
-        Args: Record<PropertyKey, never>
-        Returns: number
-      }
-      show_trgm: {
-        Args: { "": string }
-        Returns: string[]
-      }
+      [_ in never]: never
     }
     Enums: {
       [_ in never]: never
