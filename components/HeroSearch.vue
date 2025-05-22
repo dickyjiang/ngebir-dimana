@@ -4,6 +4,8 @@ import '@fortawesome/fontawesome-free/css/all.css'
 import hoursAnimationData from '../public/animations/24-hours.json'
 import goldenRetrieverAnimationData from '../public/animations/golden-retriever.json'
 import coffeeBeansAnimationData from '../public/animations/coffee-beans.json'
+import wfcAnimationData from '../public/animations/wfc.json'
+import terdekatAnimationData from '../public/animations/terdekat.json'
 
 const { resetFiltersFeature } = useFilterToggle()
 
@@ -74,6 +76,8 @@ async function resetFeatureFilter() {
 let hoursAnim = null
 let petAnim = null
 let specialtyAnim = null
+let wfcAnim = null
+let terdekatAnim = null
 
 // Modify the play animation function to handle active state
 function playAnimation(anim) {
@@ -96,6 +100,8 @@ onMounted(async () => {
     const hoursContainer = document.getElementById('hours-animate')
     const petContainer = document.getElementById('pet-animate')
     const specialtyContainer = document.getElementById('specialty-animate')
+    const wfcContainer = document.getElementById('wfc-animate')
+    const terdekatContainer = document.getElementById('terdekat-animate')
 
     hoursAnim = lottie.loadAnimation({
       container: hoursContainer,
@@ -120,6 +126,22 @@ onMounted(async () => {
       autoplay: props.activeFilters.features.includes('specialty-coffee'),
       animationData: coffeeBeansAnimationData,
     })
+
+    wfcAnim = lottie.loadAnimation({
+      container: wfcContainer,
+      renderer: 'svg',
+      loop: true,
+      autoplay: props.activeFilters.features.includes('wfc-friendly'),
+      animationData: wfcAnimationData,
+    })
+
+    terdekatAnim = lottie.loadAnimation({
+      container: terdekatContainer,
+      renderer: 'svg',
+      loop: true,
+      autoplay: props.isNearbyActive,
+      animationData: terdekatAnimationData,
+    })
   }
 })
 
@@ -127,6 +149,8 @@ onBeforeUnmount(() => {
   if (hoursAnim) hoursAnim.destroy()
   if (petAnim) petAnim.destroy()
   if (specialtyAnim) specialtyAnim.destroy()
+  if (wfcAnim) wfcAnim.destroy()
+  if (terdekatAnim) terdekatAnim.destroy()
 })
 </script>
 
@@ -158,7 +182,7 @@ onBeforeUnmount(() => {
                 placeholder="Search cafes..."
                 class="text-sm sm:text-base border w-full border-gray-600 rounded-lg p-2 sm:p-3 pl-4 pr-32"
                 @input="handleSearch" />
-              <!-- 
+              
               @budi di comment heula   
               <select
                 v-model="filterType"
@@ -168,7 +192,7 @@ onBeforeUnmount(() => {
                 <option value="cafes">Cafes</option>
                 <option value="roastery">Roastery</option>
                 <option value="supplies">Supplies</option>
-              </select> -->
+              </select>
               <button class="text-gray-500 absolute right-2" @click="handleSearchButton">
                 <i :class="searchQuery ? 'fa fa-times' : 'fas fa-search'"></i>
               </button>
@@ -177,18 +201,14 @@ onBeforeUnmount(() => {
           <div class="flex flex-wrap items-center justify-center gap-2 w-full">
             <button
               @click="toggleNearbyFilter"
+              @mouseenter="playAnimation(terdekatAnim)"
+              @mouseleave="pauseAnimation(terdekatAnim, isNearbyActive)"
               :class="{
                 'text-yellow-500 bg-black border border-yellow-500': isNearbyActive,
-                'text-gray-100 border border-gray-400': !isNearbyActive,
+                'text-gray-100 border-gray-400': !isNearbyActive,
               }"
-              class="mt-2 px-3 sm:px-4 py-1 sm:py-2 rounded-full flex items-center gap-2 text-xs sm:text-base cursor-pointer touch-manipulation">
-              <span
-                v-if="locationLoading"
-                class="inline-block w-3 h-3 border-2 border-t-transparent rounded-full animate-spin"
-                :class="{
-                  'border-yellow-500': isNearbyActive,
-                  'border-black': !isNearbyActive,
-                }"></span>
+              class="text-white border border-white mt-2 px-3 sm:px-4 py-0 sm:py-1 rounded-full flex items-center gap-2 text-xs sm:text-base cursor-pointer touch-manipulation">
+              <span id="terdekat-animate" class="w-8 h-8"></span>
               <span>Cafe terdekat</span>
             </button>
             <!-- Cafe Terbaru filter -->
@@ -237,7 +257,7 @@ onBeforeUnmount(() => {
               <span id="pet-animate" class="w-8 h-8"></span>
               <span>Pet Friendly</span>
             </button>
-            <button
+            <!-- <button
               @click="handleFeatureToggle('crowd-family-friendly')"
               class="text-white border border-white mt-2 px-3 sm:px-4 py-1 sm:py-2 rounded-full flex items-center gap-2 text-xs sm:text-base cursor-pointer touch-manipulation"
               :class="{
@@ -246,7 +266,7 @@ onBeforeUnmount(() => {
                 'border-black': !activeFilters.features.includes('crowd-family-friendly'),
               }">
               Family Friendly
-            </button>
+            </button> -->
             <button
               @click="handleFeatureToggle('accessibility-wheelchair-accessible')"
               class="text-white border border-white mt-2 px-3 sm:px-4 py-1 sm:py-2 rounded-full flex items-center gap-2 text-xs sm:text-base cursor-pointer touch-manipulation"
@@ -259,7 +279,7 @@ onBeforeUnmount(() => {
               }">
               Wheelchair Friendly
             </button>
-            <button
+            <!-- <button
               @click="handleFeatureToggle('service-options-outdoor-seating')"
               class="text-white border border-white mt-2 px-3 sm:px-4 py-1 sm:py-2 rounded-full flex items-center gap-2 text-xs sm:text-base cursor-pointer touch-manipulation"
               :class="{
@@ -268,6 +288,20 @@ onBeforeUnmount(() => {
                 'border-black': !activeFilters.features.includes('service-options-outdoor-seating'),
               }">
               Outdoor
+            </button> -->
+            <button
+              @click="handleFeatureToggle('wfc-friendly')"
+              @mouseenter="playAnimation(wfcAnim)"
+              @mouseleave="pauseAnimation(wfcAnim, activeFilters.features.includes('wfc-friendly'))"
+              class="text-white border border-white mt-2 px-3 sm:px-4 py-0 sm:py-1 rounded-full flex items-center gap-2 text-xs sm:text-base cursor-pointer touch-manipulation"
+              :class="{
+                'text-yellow-500 bg-black border border-yellow-500':
+                  activeFilters.features.includes('wfc-friendly'),
+                'text-gray-100 border-gray-400':
+                  !activeFilters.features.includes('wfc-friendly'),
+              }">
+              <span id="wfc-animate" class="w-8 h-8"></span>
+              <span>WFC</span>
             </button>
             <button
               v-if="activeFilters.features.length > 0"
