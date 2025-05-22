@@ -29,7 +29,7 @@ export default defineEventHandler(async (event) => {
         }
     }
 
-    let query2 = client.from("features").select("id, name, feature_slug")
+    let query2 = client.from("features").select("id, name, feature_slug,business_type")
     query2 = query2.in('id', featureIds)
 
     const { data: data2, error: error2, count: count2 } = await query2

@@ -118,7 +118,8 @@
                 :key="feature.id"
                 :href="`/cafes?features=${feature.feature_slug}`"
                 class="px-3 py-2 flex text-white text-xs items-center gap-2 border rounded-full border-gray-300 bg-gray-800 hover:bg-gray-600 transition-colors">
-                {{ feature.name }}
+                @dicky harus beda warna {{ feature.name }}
+                {{ feature }}
               </a>
             </div>
           </div>
