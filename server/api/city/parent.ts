@@ -5,46 +5,42 @@ import { serverSupabaseClient } from "#supabase/server";
 export default defineEventHandler(async (event) => {
     const client = await serverSupabaseClient<Database>(event);
 
-    // Get parent values first, deduplicate them, then query
-    const { data: parentData } = await client.from('city')
-        .select('city_parent')
-        .not('city_parent', 'is', null);
+    // Get all cities with their parent information in a single query
+    const { data: allCities, error } = await client.from('city')
+        .select('city_name, city_slug, city_parent')
+        .order('city_name', { ascending: true });
 
-    // Extract and deduplicate parent values
-    const uniqueParents = [...new Set(parentData?.map(item => item.city_parent).filter(Boolean))];
+    if (error) throw createError({ statusMessage: error.message });
 
-    if (uniqueParents.length > 0) {
-        // Get the parent cities
-        const { data: parentCities, error: sqlError } = await client.from('city')
-            .select('city_name, city_slug')
-            .in('city_slug', uniqueParents);
+    // Filter cities with parent values
+    const citiesWithParent = allCities?.filter(city => city.city_parent) || [];
 
-        if (sqlError) throw createError({ statusMessage: sqlError.message });
+    // Get unique parent slugs
+    const uniqueParents = [...new Set(citiesWithParent.map(city => city.city_parent))];
 
-        // Get all child cities
-        const { data: allChildCities, error: childError } = await client.from('city')
-            .select('city_name, city_slug, city_parent')
-            .not('city_parent', 'is', null);
+    // Create the result structure
+    const parentCitiesWithChildren = [];
 
-        if (childError) throw createError({ statusMessage: childError.message });
+    for (const parentSlug of uniqueParents) {
+        // Find the parent city details from all cities
+        const parentCity = allCities.find(city => city.city_slug === parentSlug);
 
-        // Organize child cities by parent
-        const parentCitiesWithChildren = parentCities.map(parent => {
-            const childCities = allChildCities.filter(child =>
-                child.city_parent === parent.city_slug
-            );
-
-            return {
-                ...parent,
-                childCities: childCities.map(child => ({
+        if (parentCity) {
+            // Find all child cities for this parent, excluding the one with the same slug as parent
+            const childCities = citiesWithParent
+                .filter(city => city.city_parent === parentSlug && city.city_slug !== parentSlug)
+                .map(child => ({
                     city_name: child.city_name,
                     city_slug: child.city_slug
-                }))
-            };
-        });
+                }));
 
-        return { parentCities: parentCitiesWithChildren };
+            parentCitiesWithChildren.push({
+                city_name: parentCity.city_name,
+                city_slug: parentCity.city_slug,
+                childCities
+            });
+        }
     }
 
-    return { parentCities: [] };
+    return { parentCities: parentCitiesWithChildren };
 });
