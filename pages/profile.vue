@@ -110,7 +110,7 @@
                 <NuxtLink
                   to="/cafe/owner/form?business_type=roastery"
                   class="border w-full border-gray-600 text-gray-600 py-2 px-3 rounded-md text-sm text-center font-medium">
-                  Beans & Roastery
+                  Roastery
                 </NuxtLink>
               </div>
               <div
@@ -121,6 +121,7 @@
                   class="border w-full border-gray-600 text-gray-600 py-2 px-3 rounded-md text-sm text-center font-medium">
                   Tools & Supplies
                 </NuxtLink>
+                <p class="text-gray-500 text-sm">Contoh: Alat Manual Brew, biji kopi (Green bean), Alat Cafe dll.</p>
               </div>
             </div>
           </div>
