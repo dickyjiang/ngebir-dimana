@@ -286,9 +286,9 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useRoute, useNuxtApp } from '#app'
-import { useSeo } from '~/composables/useSeo'
+import { useHead } from '#imports'
 
 const route = useRoute()
 const cafe = ref(null)
@@ -366,13 +366,45 @@ function previousImage() {
   }
 }
 
-useSeo({
-  title: 'Website Paling Lengkap buat Cari Tempat Ngopi!',
-  description: 'Satu Klik, Ribuan Cafe! Temukan yang Pas untuk Kamu.',
-  image: '/img/OG-img.png',
-  url: `https://ngopi.di-mana.com/cafes/${route.params.id}`,
-  type: 'article',
-})
+// Watch for changes in cafe data and update meta
+watch(() => cafe.value, (newCafe) => {
+  if (newCafe && newCafe.data) {
+    const cafeData = newCafe.data
+    const features = newCafe.features?.map(f => f.name).join(', ') || ''
+    
+    useHead({
+      title: `${cafeData.name} – Tempat Ngopi di ${cafeData.city}`,
+      meta: [
+        {
+          name: 'description',
+          content: `${cafeData.description?.substring(0, 155)}...` || 
+                  `Temukan ${cafeData.name} di ${cafeData.city}. ${features}`
+        },
+        {
+          property: 'og:title',
+          content: `${cafeData.name} – Tempat Ngopi di ${cafeData.city}`
+        },
+        {
+          property: 'og:description',
+          content: cafeData.description || 
+                  `Nikmati kopi dan suasana di ${cafeData.name}, ${cafeData.city}. ${features}`
+        },
+        {
+          property: 'og:image',
+          content: cafeData.photo || '/img/OG-img.png'
+        },
+        {
+          property: 'og:url',
+          content: `https://ngopi.di-mana.com/cafe/${route.params.id}`
+        },
+        {
+          name: 'twitter:card',
+          content: 'summary_large_image'
+        }
+      ]
+    })
+  }
+}, { immediate: true })
 
 function openInGoogleMaps() {
   // encan

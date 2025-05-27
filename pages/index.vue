@@ -11,6 +11,26 @@ import { debounce } from 'lodash'
 import { useFilterToggle } from '~/composables/useFilterToggle'
 import { useFetchCafes } from '~/composables/useFetchCafes'
 import { useNearbyFilter } from '~/composables/useNearbyFilter'
+import { useHead } from '#imports'
+
+useHead({
+  script: [
+    {
+      type: 'application/ld+json',
+      children: JSON.stringify({
+        "@context": "https://schema.org/",
+        "@type": "WebSite",
+        "name": "ngopi.di-mana",
+        "url": "https://ngopi.di-mana.com/",
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": "https://ngopi.di-mana.com/cafes?city=bandung&features={search_term_string}/cafes?city=bandung&features=",
+          "query-input": "required name=search_term_string"
+        }
+      })
+    }
+  ]
+})
 
 // Use the fetching composable
 const { data, loading, totalCafes, fetchCafes: fetchCafesFromComposable } = useFetchCafes()
