@@ -19,9 +19,9 @@
           </div>
           <div
             class="flex flex-row sm:items-start gap-4 sm:gap-2 justify-between border-b border-gray-500 py-2">
-            <div class="flex items-center">
-              <div class="flex flex-col gap-2">
-                <div class="flex justify-between items-center gap-2">
+            <div class="flex items-center w-full ">
+              <div class="flex flex-col gap-2 w-full">
+                <div class="flex justify-between items-center gap-2 ">
                   <div class="flex items-center gap-2">
                     <div class="w-10 h-10 rounded-full overflow-hidden mr-2">
                       <NuxtImg
@@ -101,9 +101,7 @@
           </div>
         </div>
         <div>
-          <p class="text-md text-gray-500 mb-2">
-            {{ cafe.data.description }}
-          </p>
+          <p class="text-md text-gray-500 mb-2" v-html="sanitizedDescription"></p>
           <div
             class="flex flex-col sm:flex-row gap-2 items-center justify-center mb-4 pb-4 border-b border-gray-500">
             <button
@@ -286,9 +284,10 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch, computed } from 'vue'
 import { useRoute, useNuxtApp } from '#app'
 import { useHead } from '#imports'
+import DOMPurify from 'dompurify'
 
 const route = useRoute()
 const cafe = ref(null)
@@ -483,6 +482,12 @@ async function sharePage() {
     console.error('Error sharing:', error)
   }
 }
+
+const sanitizedDescription = computed(() => {
+  return cafe.value?.data.description 
+    ? DOMPurify.sanitize(cafe.value.data.description)
+    : ''
+})
 </script>
 
 <style scoped>
