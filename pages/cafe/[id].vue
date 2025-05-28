@@ -101,7 +101,9 @@
           </div>
         </div>
         <div>
-          <p class="text-md text-gray-500 mb-2" v-html="sanitizedDescription"></p>
+          <div class="description-content">
+            <p class="text-md text-gray-500 mb-2" v-html="sanitizedDescription"></p>
+          </div>
           <div
             class="flex flex-col sm:flex-row gap-2 items-center justify-center mb-4 pb-4 border-b border-gray-500">
             <button
@@ -541,4 +543,37 @@ const sanitizedDescription = computed(() => {
 img:hover {
   transform: scale(1.05);
 } */
+
+.description-content :deep(p) {
+  margin-bottom: 1rem;
+}
+
+.description-content :deep(a) {
+  color: #3182ce;
+  text-decoration: underline;
+}
+
+.description-content :deep(ul) {
+  list-style-type: disc;
+  margin-left: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.description-content :deep(ol) {
+  list-style-type: decimal;
+  margin-left: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.description-content :deep(h2) {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+
+.description-content :deep(h3) {
+  font-size: 1.25rem;
+  font-weight: bold;
+  margin-bottom: 0.75rem;
+}
 </style>
