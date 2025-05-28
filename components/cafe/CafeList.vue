@@ -1,5 +1,6 @@
 <script setup lang="ts">
   import { ref, computed } from 'vue';
+  import DOMPurify from 'dompurify';
 
   // Define props for the component
   const props = defineProps({
@@ -57,7 +58,10 @@
       // Scroll to top of the list container
       listContainer.value?.scrollIntoView({ behavior: 'smooth' });
     }
-  }
+  };
+  const sanitizeDescription = (description: string) => {
+  return description ? DOMPurify.sanitize(description) : '';
+};
 </script>
 
 <template>
@@ -101,9 +105,9 @@
                   >
                     {{ cafe.name }}
                   </h2>
-                  <p class="text-sm text-gray-500 line-clamp-2 mt-2">
-                    {{ cafe.description }}
-                  </p>
+                  <p class="text-sm text-gray-500 line-clamp-2 mt-2" 
+     v-html="sanitizeDescription(cafe.description)">
+  </p>
                 </div>
 
                 <div class="flex justify-between mt-8">

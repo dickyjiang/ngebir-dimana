@@ -19,9 +19,9 @@
           </div>
           <div
             class="flex flex-row sm:items-start gap-4 sm:gap-2 justify-between border-b border-gray-500 py-2">
-            <div class="flex items-center">
-              <div class="flex flex-col gap-2">
-                <div class="flex justify-between items-center gap-2">
+            <div class="flex items-center w-full ">
+              <div class="flex flex-col gap-2 w-full">
+                <div class="flex justify-between items-center gap-2 ">
                   <div class="flex items-center gap-2">
                     <div class="w-10 h-10 rounded-full overflow-hidden mr-2">
                       <NuxtImg
@@ -101,9 +101,9 @@
           </div>
         </div>
         <div>
-          <p class="text-md text-gray-500 mb-2">
-            {{ cafe.data.description }}
-          </p>
+          <div class="description-content">
+            <p class="text-md text-gray-500 mb-2" v-html="sanitizedDescription"></p>
+          </div>
           <div
             class="flex flex-col sm:flex-row gap-2 items-center justify-center mb-4 pb-4 border-b border-gray-500">
             <button
@@ -286,9 +286,10 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch, computed } from 'vue'
 import { useRoute, useNuxtApp } from '#app'
-import { useSeo } from '~/composables/useSeo'
+import { useHead } from '#imports'
+import DOMPurify from 'dompurify'
 
 const route = useRoute()
 const cafe = ref(null)
@@ -366,13 +367,45 @@ function previousImage() {
   }
 }
 
-useSeo({
-  title: 'Website Paling Lengkap buat Cari Tempat Ngopi!',
-  description: 'Satu Klik, Ribuan Cafe! Temukan yang Pas untuk Kamu.',
-  image: '/img/OG-img.png',
-  url: `https://ngopi.di-mana.com/cafes/${route.params.id}`,
-  type: 'article',
-})
+// Watch for changes in cafe data and update meta
+watch(() => cafe.value, (newCafe) => {
+  if (newCafe && newCafe.data) {
+    const cafeData = newCafe.data
+    const features = newCafe.features?.map(f => f.name).join(', ') || ''
+    
+    useHead({
+      title: `${cafeData.name} – Tempat Ngopi di ${cafeData.city}`,
+      meta: [
+        {
+          name: 'description',
+          content: `${cafeData.description?.substring(0, 155)}...` || 
+                  `Temukan ${cafeData.name} di ${cafeData.city}. ${features}`
+        },
+        {
+          property: 'og:title',
+          content: `${cafeData.name} – Tempat Ngopi di ${cafeData.city}`
+        },
+        {
+          property: 'og:description',
+          content: cafeData.description || 
+                  `Nikmati kopi dan suasana di ${cafeData.name}, ${cafeData.city}. ${features}`
+        },
+        {
+          property: 'og:image',
+          content: cafeData.photo || '/img/OG-img.png'
+        },
+        {
+          property: 'og:url',
+          content: `https://ngopi.di-mana.com/cafe/${route.params.id}`
+        },
+        {
+          name: 'twitter:card',
+          content: 'summary_large_image'
+        }
+      ]
+    })
+  }
+}, { immediate: true })
 
 function openInGoogleMaps() {
   // encan
@@ -451,6 +484,12 @@ async function sharePage() {
     console.error('Error sharing:', error)
   }
 }
+
+const sanitizedDescription = computed(() => {
+  return cafe.value?.data.description 
+    ? DOMPurify.sanitize(cafe.value.data.description)
+    : ''
+})
 </script>
 
 <style scoped>
@@ -504,4 +543,37 @@ async function sharePage() {
 img:hover {
   transform: scale(1.05);
 } */
+
+.description-content :deep(p) {
+  margin-bottom: 1rem;
+}
+
+.description-content :deep(a) {
+  color: #3182ce;
+  text-decoration: underline;
+}
+
+.description-content :deep(ul) {
+  list-style-type: disc;
+  margin-left: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.description-content :deep(ol) {
+  list-style-type: decimal;
+  margin-left: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.description-content :deep(h2) {
+  font-size: 1.1rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+
+.description-content :deep(h1) {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 0.75rem;
+}
 </style>
