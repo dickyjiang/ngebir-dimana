@@ -566,13 +566,13 @@ img:hover {
 }
 
 .description-content :deep(h2) {
-  font-size: 1.5rem;
+  font-size: 1.1rem;
   font-weight: bold;
   margin-bottom: 1rem;
 }
 
-.description-content :deep(h3) {
-  font-size: 1.25rem;
+.description-content :deep(h1) {
+  font-size: 1.2rem;
   font-weight: bold;
   margin-bottom: 0.75rem;
 }
