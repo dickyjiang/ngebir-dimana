@@ -337,7 +337,7 @@ onMounted(async () => {
     </div>
 
     <div class="px-4 flex-1">
-      <WorldOfCoffeeBanner />
+      <!-- <WorldOfCoffeeBanner /> -->
       <CafeList
         :loading="loading"
         :cafes="paginatedData"
