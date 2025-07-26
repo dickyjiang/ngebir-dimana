@@ -36,6 +36,10 @@
     setManualLocation,
     calculateDistance,
     toggleNearbyFilter: toggleNearbyFilterComposable,
+    showLocationPermissionPrompt,
+    handleLocationPermissionResponse,
+    showLocationPermissionModal,
+    hasSeenLocationModal,
   } = useNearbyFilter();
 
   const newCafes = ref([]);
@@ -182,8 +186,8 @@
       console.error('Error in onMounted:', error);
     }
 
-    // Automatically trigger nearby cafes functionality on load if needed
-    // toggleNearbyFilter();
+    // Show location permission modal on first visit
+    showLocationPermissionPrompt();
   });
 </script>
 <template>
@@ -267,6 +271,40 @@
         >
           Use Location
         </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Location Permission Modal -->
+  <div
+    v-if="showLocationPermissionModal"
+    class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-lg shadow-xl p-6 max-w-md w-full">
+      <div class="text-center">
+        <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 mb-4">
+          <i class="fas fa-map-marker-alt text-blue-600 text-xl"></i>
+        </div>
+        <h3 class="text-lg font-semibold mb-2">Find Cafes Near You</h3>
+        <p class="text-sm text-gray-600 mb-6">
+          We'd like to use your location to show you the nearest cafes. This helps you discover great coffee spots in your area.
+        </p>
+        
+        <div class="flex flex-col gap-3">
+          <button
+            @click="handleLocationPermissionResponse(true, fetchCafes)"
+            class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-lg font-medium transition-colors">
+            Allow Location Access
+          </button>
+          <button
+            @click="handleLocationPermissionResponse(false, fetchCafes)"
+            class="w-full bg-gray-200 hover:bg-gray-300 text-gray-800 py-3 px-4 rounded-lg font-medium transition-colors">
+            Maybe Later
+          </button>
+        </div>
+        
+        <p class="text-xs text-gray-500 mt-4">
+          You can always enable location access later from your browser settings.
+        </p>
       </div>
     </div>
   </div>
