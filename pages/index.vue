@@ -191,19 +191,18 @@ onMounted(async () => {
       }
       if (route.query.features) {
         const features = route.query.features.split(',')
-        activeFilters.value.features = cities
+        activeFilters.value.features = features
       }
     }
 
     // Then fetch cafes with the initial filters
-    // await fetchNewCafes();
     await fetchCafes(currentPage.value, activeFilters.value)
   } catch (error) {
     console.error('Error in onMounted:', error)
   }
 
-  // Automatically trigger nearby cafes functionality on load if needed
-  // toggleNearbyFilter();
+  // Automatically trigger nearby cafes functionality on load
+  await toggleNearbyFilterComposable(activeFilters.value, fetchCafes)
 })
 </script>
 
