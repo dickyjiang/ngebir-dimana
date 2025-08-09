@@ -1,125 +1,153 @@
-import { createError } from "h3";
-import type { Database } from "~~/types/database.types";
-import { serverSupabaseClient, serverSupabaseUser } from "#supabase/server";
+import { createError } from 'h3'
+import type { Database } from '~~/types/database.types'
+import { serverSupabaseClient, serverSupabaseUser } from '#supabase/server'
 
 export default defineEventHandler(async (event) => {
-    // const user = await serverSupabaseUser(event);
-    const client = await serverSupabaseClient<Database>(event);
-    const body = await readBody(event);
-    let query = client.from("cafes").select("name,city, photo, city, slug_name, description, city_slug,rating, range, rating_num, site, cafe_features(cafe_id, feature_id)", { count: "exact" });
+  const client = await serverSupabaseClient<Database>(event)
+  const body = await readBody(event)
+  
+  console.log('📥 API Request Body:', {
+    hasLocationFilter: !!body.cariLocation,
+    latitude: body.latitude,
+    longitude: body.longitude,
+    filters: {
+      city: body.city?.length || 0,
+      features: body.features?.length || 0,
+      searchQuery: body.searchQuery || 'none'
+    }
+  })
 
-    if (body.features && body.features.length > 0) {
-        const { data: feature_id, error: error1 } = await client.from("features")
-            .select('id')
-            .in('feature_slug', body.features)
+  // 🔍 Build base query with ALL required fields including location
+  let query = client
+    .from('cafes')
+    .select(
+      'id, name, city, photo, slug_name, description, city_slug, rating, range, rating_num, site, latitude, longitude, cafe_features(cafe_id, feature_id)',
+      { count: 'exact' }
+    )
 
-        // Create an array of feature IDs
-        const featureIds = feature_id?.map(feature => feature.id) || [];
+  // Feature filtering
+  if (body.features && body.features.length > 0) {
+    const { data: feature_id, error: error1 } = await client
+      .from('features')
+      .select('id')
+      .in('feature_slug', body.features)
 
-        // Modified approach to find cafes with ALL specified features
-        if (featureIds.length > 0) {
-            // Get all cafe_features combinations
-            const { data: cafe_features, error: cfError } = await client
-                .from("cafe_features")
-                .select('cafe_id, feature_id')
-                .in('feature_id', featureIds);
+    const featureIds = feature_id?.map((feature) => feature.id) || []
 
-            if (cafe_features) {
-                // Group by cafe_id to count features per cafe
-                const cafesWithFeatureCounts = cafe_features.reduce<Record<number, number>>((acc, record) => {
-                    acc[record.cafe_id] = (acc[record.cafe_id] || 0) + 1;
-                    return acc;
-                }, {});
+    if (featureIds.length > 0) {
+      const { data: cafe_features, error: cfError } = await client
+        .from('cafe_features')
+        .select('cafe_id, feature_id')
+        .in('feature_id', featureIds)
 
-                // Filter cafes that have ALL the specified features
-                const cafeIdsWithAllFeatures = Object.entries(cafesWithFeatureCounts)
-                    .filter(([cafeId, count]) => count >= featureIds.length)
-                    .map(([cafeId]) => Number(cafeId));
+      if (cafe_features) {
+        const cafesWithFeatureCounts = cafe_features.reduce<Record<number, number>>(
+          (acc, record) => {
+            acc[record.cafe_id] = (acc[record.cafe_id] || 0) + 1
+            return acc
+          },
+          {}
+        )
 
-                // Only include cafes with all specified features
-                if (cafeIdsWithAllFeatures.length > 0) {
-                    query = query.in('id', cafeIdsWithAllFeatures);
-                } else {
-                    // If no cafes have all features, return empty result
-                    query = query.eq('id', -1); // This will return no results
-                }
-            }
+        const cafeIdsWithAllFeatures = Object.entries(cafesWithFeatureCounts)
+          .filter(([cafeId, count]) => count >= featureIds.length)
+          .map(([cafeId]) => Number(cafeId))
+
+        if (cafeIdsWithAllFeatures.length > 0) {
+          query = query.in('id', cafeIdsWithAllFeatures)
+        } else {
+          query = query.eq('id', -1) // No results
         }
+      }
     }
+  }
 
-    if (body.city && body.city.length > 0) {
-        query.in('city_slug', body.city)
-    }
+  // City filtering
+  if (body.city && body.city.length > 0) {
+    query = query.in('city_slug', body.city)
+  }
 
-    if (body.ratings && body.ratings.length > 0) {
-        const ratingFilters = body.ratings.map((rating: number) =>
-            `and(rating_num.gte.${rating},rating_num.lt.${rating + 1})`
-        ).join(',');
-        query = query.or(ratingFilters);
-    }
+  // Search query filtering
+  if (body.searchQuery) {
+    query = query.ilike('name', `%${body.searchQuery}%`)
+  }
 
-    if (body.ranges && body.ranges.length > 0) {
-        const rangeArray = body.ranges.map((range: number) => `"${range}"`);
-        query.in('range', body.ranges)
-    }
+  // Filter types
+  if (body.filterTypes && body.filterTypes !== 'all') {
+    query = query.contains('business_type', [body.filterTypes])
+  }
 
-    if (body.searchQuery) {
-        // Use the search query to filter by name
-        query = query.ilike("name", `%${body.searchQuery}%`);
-    }
+  // Base filters
+  query = query.eq('is_published', true)
+  query = query.order('id', { ascending: false })
 
-    if (body.filterTypes && body.filterTypes != 'all') {
-        query = query.contains('business_type', [body.filterTypes])
-    }
-    // query = query.lt('st_distance(location, st_point(107.59655891385863, -6.879245721118651)::geography)', 5000)
-    // query = query.filter(
-    //     'ST_Distance(location::geometry, ST_MakePoint(107.59655891385863, -6.879245721118651)::geometry)',
-    //     'gt',
-    //     5000
-    // )
-    // query = query.filter(
-    //     `ST_Distance(location::geography, ST_MakePoint(107.59655891385863, -6.879245721118651)::geography) > 5000`
-    // );
-    // query = query.gt('id', 5000)
-    query = query.eq('is_published', true)
-    query = query.order('id', { ascending: false })
+  // 🎯 LOCATION FILTERING - 5KM RADIUS
+  if (body.cariLocation && body.latitude && body.longitude) {
+    console.log('🎯 Applying location filter with 5km radius')
+    
+    const lat = parseFloat(body.latitude)
+    const lng = parseFloat(body.longitude)
+    
+    // Calculate 5km bounds (approximately 0.045 degrees = 5km)
+    const latitudeNorth = lat + (5 / 111)  // 5km north
+    const latitudeSouth = lat - (5 / 111)  // 5km south
+    const longitudeEast = lng + (5 / (111 * Math.cos(lat * Math.PI / 180))) // 5km east
+    const longitudeWest = lng - (5 / (111 * Math.cos(lat * Math.PI / 180))) // 5km west
 
-    query = query.range(body.from, body.to)
+    console.log('🗺️ Location bounds:', {
+      userLat: lat,
+      userLng: lng,
+      bounds: {
+        north: latitudeNorth,
+        south: latitudeSouth,
+        east: longitudeEast,
+        west: longitudeWest
+      }
+    })
 
-    if (body.cariLocation) {
-        // Calculating the Shift:
-        // Latitude: To shift 5 km north, you would add approximately 0.0449 degrees to the current latitude. To shift south, you would subtract 0.0449 degrees. 
-        // Longitude: To shift 5 km east, you would add approximately 0.0449/cos(latitude) degrees to the current longitude. To shift west, you would subtract 0.0449/cos(latitude) degrees. 
-        // body.latitude -6.874430493406096
-        // body.longtitude 107.4717864955787
-        let latitude = body.latitude
-        let latitudeS = body.latitude
-        let latitudeB = body.latitude
+    // Apply location filters - FIXED column names
+    query = query.not('latitude', 'is', null)
+    query = query.not('longitude', 'is', null)
+    query = query.gte('latitude', latitudeSouth.toString())
+    query = query.lte('latitude', latitudeNorth.toString())
+    query = query.gte('longitude', longitudeWest.toString())
+    query = query.lte('longitude', longitudeEast.toString())
 
-        let longitude = body.longitude
-        let longitudeS = body.longitude
-        let longitudeB = body.longitude
+    // Debug: Count total cafes with location data
+    const { count: totalWithLocation } = await client
+      .from('cafes')
+      .select('*', { count: 'exact', head: true })
+      .not('latitude', 'is', null)
+      .not('longitude', 'is', null)
+      .eq('is_published', true)
 
-        latitudeS = body.latitude + (5 / 111)
-        latitudeB = body.latitude - (5 / 111)
-        longitudeS = longitude - (5 / (111 * Math.cos(latitude)))
-        longitudeB = longitude + (5 / (111 * Math.cos(latitude)))
+    console.log('📍 Database stats:', {
+      totalCafesWithLocation: totalWithLocation,
+      searchRadius: '5km'
+    })
+  }
 
+  // Apply pagination
+  query = query.range(body.from, body.to)
 
-        query = query.not('latitude', 'is', null)
-        query = query.not('longitude', 'is', null)
-        query = query.gt('lat', latitudeB)
-        query = query.lt('lat', latitudeS)
-        query = query.gt('long', longitudeS)
-        query = query.lt('long', longitudeB)
-        // query = query.rangeGte('lat', '[latitudeB, latitudeS]')
-        // query = query.range('long', longitudeS, longitudeB)
-    }
-    // console.log(query)
+  // Execute query
+  const { data, error, count } = await query
+  
+  if (error) {
+    console.error('🚨 Database Error:', error)
+    throw createError({ statusMessage: error.message })
+  }
 
-    const { data, error, count } = await query
-    if (error) throw createError({ statusMessage: error.message });
-    // console.log('data:', data)
+  console.log('📊 Query Results:', {
+    totalCount: count,
+    returnedItems: data?.length || 0,
+    hasLocationFilter: !!body.cariLocation,
+    sampleCafe: data?.[0] ? {
+      name: data[0].name,
+      city: data[0].city,
+      hasCoordinates: !!(data[0].latitude && data[0].longitude)
+    } : null
+  })
 
-    return { 'data': data, 'count': count };
-});
+  return { data: data, count: count }
+})

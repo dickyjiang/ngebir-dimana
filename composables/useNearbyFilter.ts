@@ -1,5 +1,4 @@
 import { ref, computed } from 'vue'
-import { useRouter } from 'vue-router'
 
 export function useNearbyFilter() {
   // State for user location and nearby filter
@@ -16,27 +15,42 @@ export function useNearbyFilter() {
   const toastMessage = ref('')
   const toastType = ref('error') // 'error' or 'success'
 
-  // New state for location permission modal
+  // Location permission modal state
   const showLocationPermissionModal = ref(false)
   const hasSeenLocationModal = ref(false)
 
-  // Check if user has seen the modal before (using localStorage)
-  if (process.client) {
-    hasSeenLocationModal.value = localStorage.getItem('hasSeenLocationModal') === 'true'
+  // Initialize localStorage check
+  if (process.client && typeof localStorage !== 'undefined') {
+    const hasSeenBefore = localStorage.getItem('hasSeenLocationModal')
+    hasSeenLocationModal.value = hasSeenBefore === 'true'
+    
+    console.log('🔍 Location modal history:', {
+      hasSeenBefore,
+      hasSeenLocationModal: hasSeenLocationModal.value
+    })
   }
 
   // Computed property to validate coordinates
   const isValidCoordinates = computed(() => {
     const lat = parseFloat(manualLatitude.value)
     const lng = parseFloat(manualLongitude.value)
-
     return !isNaN(lat) && !isNaN(lng) && lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180
   })
 
-  // Function to get user's current location
+  // Show toast notification
+  function showToastNotification(message: string, type: 'success' | 'error' = 'error', duration: number = 3000) {
+    toastMessage.value = message
+    toastType.value = type
+    showToast.value = true
+    setTimeout(() => {
+      showToast.value = false
+    }, duration)
+  }
+
+  // Get user's current location using browser geolocation
   async function getUserLocation() {
     if (userLocation.value) {
-      // If we already have the location, just use it
+      console.log('📍 Using cached location:', userLocation.value)
       return userLocation.value
     }
 
@@ -46,29 +60,37 @@ export function useNearbyFilter() {
     try {
       // Check if geolocation is available
       if (!navigator.geolocation) {
-        locationError.value = 'Geolocation is not supported by your browser'
         throw new Error('Geolocation not supported')
       }
 
-      // Get current position with a shorter timeout
+      // Check if site is secure (required for geolocation)
+      if (!window.isSecureContext && location.protocol !== 'https:' && location.hostname !== 'localhost') {
+        throw new Error('Geolocation requires HTTPS')
+      }
+
+      console.log('🌍 Requesting browser geolocation...')
+      
       const position = await new Promise((resolve, reject) => {
-        // iOS Safari needs secure context (HTTPS) to use geolocation
-        // Also, iOS requires explicit user interaction for geolocation permissions
-        const geoOptions = {
-          enableHighAccuracy: true, // Set to true for iOS
-          timeout: 15000, // Increased timeout for iOS (15 seconds)
-          maximumAge: 0, // Don't use cached position on iOS
+        const options = {
+          enableHighAccuracy: true,
+          timeout: 15000,
+          maximumAge: 0,
         }
 
-        const handleSuccess = (position) => {
-          resolve(position)
-        }
-
-        const handleError = (error) => {
-          reject(error)
-        }
-
-        navigator.geolocation.getCurrentPosition(handleSuccess, handleError, geoOptions)
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            console.log('✅ Geolocation success:', position.coords)
+            resolve(position)
+          },
+          (error) => {
+            console.error('❌ Geolocation error:', {
+              code: error.code,
+              message: error.message
+            })
+            reject(error)
+          },
+          options
+        )
       })
 
       userLocation.value = {
@@ -76,25 +98,29 @@ export function useNearbyFilter() {
         longitude: position.coords.longitude,
       }
 
+      console.log('📍 User location set:', userLocation.value)
       return userLocation.value
-    } catch (error) {
-      // More user-friendly error message for common geolocation errors
-      if (error.code === 1) {
-        locationError.value =
-          'Location access was denied. Please enable location services for this website in your browser settings.'
-      } else if (error.code === 2) {
-        // POSITION_UNAVAILABLE - More detailed guidance
-        locationError.value =
-          "Unable to determine your location. Please check that:\n\n1. Your device's location is turned on\n2. You're using a secure connection (HTTPS)\n3. You're not in private/incognito mode\n4. You've granted location permissions"
 
-        // Show the manual location input modal
-        showLocationModal.value = true
+    } catch (error) {
+      console.error('🚨 Location error:', error)
+      
+      let errorMessage = 'Unable to get your location.'
+      
+      if (error.code === 1) {
+        errorMessage = 'Location access was denied. Please enable location services in your browser settings.'
+      } else if (error.code === 2) {
+        errorMessage = 'Unable to determine your location. Please check your device settings and try again.'
       } else if (error.code === 3) {
-        locationError.value =
-          'Location request timed out. Please try again with a better connection.'
-      } else {
-        locationError.value = error.message || 'Unable to get your location'
+        errorMessage = 'Location request timed out. Please try again.'
       }
+
+      locationError.value = errorMessage
+      showToastNotification(errorMessage, 'error', 5000)
+      
+      // Show manual location modal as fallback
+      setTimeout(() => {
+        showLocationModal.value = true
+      }, 1000)
 
       throw error
     } finally {
@@ -102,69 +128,84 @@ export function useNearbyFilter() {
     }
   }
 
-  // Function to set location manually
-  async function setManualLocation() {
-    if (!isValidCoordinates.value) return
+  // Set location manually
+  async function setManualLocation(fetchCafesCallback = null, activeFilters = null) {
+    if (!isValidCoordinates.value) {
+      showToastNotification('Please enter valid coordinates.', 'error')
+      return
+    }
 
     userLocation.value = {
       latitude: parseFloat(manualLatitude.value),
       longitude: parseFloat(manualLongitude.value),
     }
 
+    console.log('📍 Manual location set:', userLocation.value)
+    
     showLocationModal.value = false
-
-    // Continue with nearby filter
     isNearbyActive.value = true
 
-    // Show success message
-    toastMessage.value = 'Location set manually. Finding nearby cafes...'
-    toastType.value = 'success'
-    showToast.value = true
-    setTimeout(() => {
-      showToast.value = false
-    }, 3000)
+    showToastNotification('Location set! Finding nearby cafes...', 'success')
+
+    // Trigger cafe fetching if callback provided
+    if (fetchCafesCallback && activeFilters) {
+      console.log('🔄 Triggering cafe fetch with manual location...')
+      await fetchCafesCallback(1, activeFilters)
+    }
 
     return userLocation.value
   }
 
-  // Function to show location permission modal
+  // Show location permission modal on first visit
   function showLocationPermissionPrompt() {
-    if (!hasSeenLocationModal.value) {
+    console.log('🔍 Checking if should show location prompt:', {
+      hasSeenLocationModal: hasSeenLocationModal.value,
+      hasUserLocation: !!userLocation.value
+    })
+
+    // Show modal if user hasn't seen it, or if they've seen it but don't have location
+    if (!hasSeenLocationModal.value || (!userLocation.value && hasSeenLocationModal.value)) {
+      console.log('📱 Showing location permission modal')
       showLocationPermissionModal.value = true
+      
+      // Reset localStorage if they've seen it but don't have location
+      if (hasSeenLocationModal.value && !userLocation.value) {
+        hasSeenLocationModal.value = false
+        if (process.client) {
+          localStorage.removeItem('hasSeenLocationModal')
+        }
+      }
     }
   }
 
-  // Function to handle location permission response
-  async function handleLocationPermissionResponse(granted, fetchCafes = null) {
+  // Handle location permission response
+  async function handleLocationPermissionResponse(granted: boolean, fetchCafesCallback = null, activeFilters = null) {
+    console.log('🎯 Location permission response:', { granted })
+    
     showLocationPermissionModal.value = false
-
-    // Mark as seen
     hasSeenLocationModal.value = true
+    
     if (process.client) {
       localStorage.setItem('hasSeenLocationModal', 'true')
     }
 
     if (granted) {
-      // User agreed to share location, now request it
       try {
         await getUserLocation()
         if (userLocation.value) {
           isNearbyActive.value = true
+          
           // Trigger cafe fetching if callback provided
-          if (fetchCafes) {
-            await fetchCafes(1, { city: [], borough: [], features: [] })
+          if (fetchCafesCallback && activeFilters) {
+            console.log('🔄 Fetching nearby cafes after permission granted...')
+            await fetchCafesCallback(1, activeFilters)
           }
-          toastMessage.value = 'Location access granted! Finding nearby cafes...'
-          toastType.value = 'success'
-          showToast.value = true
-          setTimeout(() => {
-            showToast.value = false
-          }, 3000)
+          
+          showToastNotification('Location access granted! Finding nearby cafes...', 'success')
         }
       } catch (error) {
-        // Handle location error
-        console.error('Location error:', error)
-        // Show manual location modal as fallback
+        console.error('Location error after permission granted:', error)
+        // Show manual location as fallback
         showLocationModal.value = true
       }
     } else {
@@ -173,8 +214,61 @@ export function useNearbyFilter() {
     }
   }
 
-  // Calculate distance between two points using Haversine formula
-  function calculateDistance(lat1, lon1, lat2, lon2) {
+  // Toggle nearby filter (main function called by "cafe terdekat" button)
+  async function toggleNearbyFilter(fetchCafesCallback, activeFilters) {
+    console.log('🎯 Toggle nearby filter:', {
+      currentlyActive: isNearbyActive.value,
+      hasLocation: !!userLocation.value
+    })
+
+    try {
+      if (isNearbyActive.value) {
+        // If already active, deactivate it
+        isNearbyActive.value = false
+        console.log('❌ Nearby filter deactivated')
+        
+        // Fetch all cafes without location filter
+        await fetchCafesCallback(1, activeFilters)
+        return
+      }
+
+      // If we have location, activate nearby filter
+      if (userLocation.value) {
+        isNearbyActive.value = true
+        console.log('✅ Nearby filter activated with existing location')
+        await fetchCafesCallback(1, activeFilters)
+        return
+      }
+
+      // No location - show permission modal or try to get location
+      if (!hasSeenLocationModal.value) {
+        console.log('📱 Showing location permission modal for first time')
+        showLocationPermissionModal.value = true
+      } else {
+        console.log('🌍 Attempting to get location directly')
+        showToastNotification('Getting your location...', 'success')
+        
+        try {
+          await getUserLocation()
+          if (userLocation.value) {
+            isNearbyActive.value = true
+            await fetchCafesCallback(1, activeFilters)
+          }
+        } catch (error) {
+          // Show manual location as fallback
+          showLocationModal.value = true
+        }
+      }
+
+    } catch (error) {
+      console.error('🚨 Error in toggleNearbyFilter:', error)
+      isNearbyActive.value = false
+      showToastNotification('An error occurred. Please try again.', 'error')
+    }
+  }
+
+  // Calculate distance between two points (Haversine formula)
+  function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number) {
     const R = 6371 // Radius of the earth in km
     const dLat = deg2rad(lat2 - lat1)
     const dLon = deg2rad(lon2 - lon1)
@@ -182,95 +276,30 @@ export function useNearbyFilter() {
       Math.sin(dLat / 2) * Math.sin(dLat / 2) +
       Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.sin(dLon / 2) * Math.sin(dLon / 2)
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
-    const distance = R * c // Distance in km
+    const distance = R * c
     return distance
   }
 
-  function deg2rad(deg) {
+  function deg2rad(deg: number) {
     return deg * (Math.PI / 180)
   }
 
-  // Main function to toggle nearby filter
-  async function toggleNearbyFilter(activeFilters, fetchCafes) {
-    try {
-      if (isNearbyActive.value) {
-        // If already active, deactivate it
-        isNearbyActive.value = false
-        // Clear any city filters that might have been set
-        activeFilters.city = []
-        activeFilters.borough = []
-        // Fetch all cafes
-        fetchCafes(1, activeFilters)
-        return
-      }
-
-      // Before requesting location, show instructions toast for better UX
-      toastMessage.value = 'Requesting your location... Please allow access when prompted.'
-      toastType.value = 'success'
-      showToast.value = true
-
-      // Hide after 3 seconds
-      setTimeout(() => {
-        showToast.value = false
-      }, 3000)
-
-      // Get user location
-      try {
-        await getUserLocation()
-      } catch (error) {
-        // Don't show error toast if we're showing the manual location modal instead
-        if (!showLocationModal.value) {
-          // Show a toast notification for location errors
-          toastMessage.value = locationError.value || 'Unable to get your location'
-          toastType.value = 'error'
-          showToast.value = true
-
-          // Hide toast after 8 seconds (longer for detailed error messages)
-          setTimeout(() => {
-            showToast.value = false
-          }, 8000)
-        }
-
-        // Only exit if we're not showing the manual location modal
-        if (!showLocationModal.value) {
-          return // Exit the function if location can't be obtained and not showing manual modal
-        }
-      }
-
-      if (!userLocation.value && !showLocationModal.value) {
-        toastMessage.value = 'Unable to get your location. Do you want to enter it manually?'
-        toastType.value = 'error'
-        showToast.value = true
-
-        setTimeout(() => {
-          showToast.value = false
-          // Show manual location modal as a fallback
-          showLocationModal.value = true
-        }, 3000)
-
-        return
-      }
-
-      // If we have a location (auto or manual) and we're not showing the modal
-      if (userLocation.value && !showLocationModal.value) {
-        isNearbyActive.value = true
-
-        await fetchCafes(1, activeFilters)
-      }
-    } catch (error) {
-      isNearbyActive.value = false
-
-      toastMessage.value = 'An error occurred. Please try again.'
-      toastType.value = 'error'
-      showToast.value = true
-
-      setTimeout(() => {
-        showToast.value = false
-      }, 5000)
+  // Reset location state (for testing/debugging)
+  function resetLocationState() {
+    userLocation.value = null
+    isNearbyActive.value = false
+    hasSeenLocationModal.value = false
+    showLocationPermissionModal.value = false
+    showLocationModal.value = false
+    locationError.value = null
+    if (process.client) {
+      localStorage.removeItem('hasSeenLocationModal')
     }
+    console.log('🔄 Location state reset')
   }
 
   return {
+    // State
     userLocation,
     locationLoading,
     locationError,
@@ -281,14 +310,20 @@ export function useNearbyFilter() {
     showToast,
     toastMessage,
     toastType,
-    isValidCoordinates,
-    getUserLocation,
-    setManualLocation,
-    calculateDistance,
-    toggleNearbyFilter,
-    showLocationPermissionPrompt,
-    handleLocationPermissionResponse,
     showLocationPermissionModal,
     hasSeenLocationModal,
+    
+    // Computed
+    isValidCoordinates,
+    
+    // Methods
+    getUserLocation,
+    setManualLocation,
+    showLocationPermissionPrompt,
+    handleLocationPermissionResponse,
+    toggleNearbyFilter,
+    calculateDistance,
+    resetLocationState,
+    showToastNotification,
   }
 }

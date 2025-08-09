@@ -97,6 +97,13 @@
 
   // Use the composable function instead of the original function
   async function fetchCafes(page, filters = null) {
+    console.log('🔍 Fetching cafes:', { 
+      page, 
+      filters, 
+      isNearbyActive: isNearbyActive.value,
+      hasLocation: !!userLocation.value 
+    })
+    
     await fetchCafesFromComposable(
       page,
       itemsPerPage,
@@ -143,7 +150,8 @@
 
   // Wrapper function for the composable toggleNearbyFilter
   async function toggleNearbyFilter() {
-    await toggleNearbyFilterComposable(activeFilters.value, fetchCafes);
+    console.log('🎯 Toggle nearby filter clicked')
+    await toggleNearbyFilterComposable(fetchCafes, activeFilters.value);
   }
 
   // Use the toggleFeature from the composable
@@ -247,10 +255,24 @@
       </div>
 
       <div class="text-xs text-gray-500 mb-4">
-        <p>
-          Tip: You can get your coordinates from Google Maps by right-clicking
-          on your location and selecting "What's here?"
+        <p class="mb-2">
+          <strong>How to find your coordinates:</strong>
         </p>
+        <ul class="list-disc list-inside space-y-1 mb-3">
+          <li>Open Google Maps and find your location</li>
+          <li>Right-click on your exact location</li>
+          <li>Select "What's here?" from the menu</li>
+          <li>Copy the coordinates that appear</li>
+        </ul>
+        <p class="mt-2 mb-2">
+          <strong>Or quick-select a city:</strong>
+        </p>
+        <div class="flex flex-wrap gap-1">
+          <button @click="manualLatitude = '-6.2088'; manualLongitude = '106.8456'" class="text-xs bg-blue-100 hover:bg-blue-200 px-2 py-1 rounded transition-colors">Jakarta</button>
+          <button @click="manualLatitude = '-6.9175'; manualLongitude = '107.6191'" class="text-xs bg-blue-100 hover:bg-blue-200 px-2 py-1 rounded transition-colors">Bandung</button>
+          <button @click="manualLatitude = '-7.2575'; manualLongitude = '112.7521'" class="text-xs bg-blue-100 hover:bg-blue-200 px-2 py-1 rounded transition-colors">Surabaya</button>
+          <button @click="manualLatitude = '-8.6500'; manualLongitude = '115.2167'" class="text-xs bg-blue-100 hover:bg-blue-200 px-2 py-1 rounded transition-colors">Bali</button>
+        </div>
       </div>
 
       <div class="flex justify-end gap-2">
@@ -261,7 +283,7 @@
           Cancel
         </button>
         <button
-          @click="setManualLocation"
+          @click="setManualLocation(fetchCafes, activeFilters)"
           :disabled="!isValidCoordinates"
           :class="{
             'bg-blue-500 text-white': isValidCoordinates,
