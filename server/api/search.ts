@@ -21,7 +21,7 @@ export default defineEventHandler(async (event) => {
   let query = client
     .from('cafes')
     .select(
-      'id, name, city, photo, slug_name, description, city_slug, rating, range, rating_num, site, latitude, longitude, cafe_features(cafe_id, feature_id)',
+      'id, name, city, photo, slug_name, description, city_slug, rating, range, rating_num, site, lat, long, cafe_features(cafe_id, feature_id)',
       { count: 'exact' }
     )
 
@@ -88,11 +88,12 @@ export default defineEventHandler(async (event) => {
     const lat = parseFloat(body.latitude)
     const lng = parseFloat(body.longitude)
     
-    // Calculate 5km bounds (approximately 0.045 degrees = 5km)
-    const latitudeNorth = lat + (5 / 111)  // 5km north
-    const latitudeSouth = lat - (5 / 111)  // 5km south
-    const longitudeEast = lng + (5 / (111 * Math.cos(lat * Math.PI / 180))) // 5km east
-    const longitudeWest = lng - (5 / (111 * Math.cos(lat * Math.PI / 180))) // 5km west
+    // Calculate 5km bounds 
+    const radiusKm = 5 // Back to 5km radius
+    const latitudeNorth = lat + (radiusKm / 111)  // km north
+    const latitudeSouth = lat - (radiusKm / 111)  // km south
+    const longitudeEast = lng + (radiusKm / (111 * Math.cos(lat * Math.PI / 180))) // km east
+    const longitudeWest = lng - (radiusKm / (111 * Math.cos(lat * Math.PI / 180))) // km west
 
     console.log('🗺️ Location bounds:', {
       userLat: lat,
@@ -105,25 +106,60 @@ export default defineEventHandler(async (event) => {
       }
     })
 
-    // Apply location filters - FIXED column names
-    query = query.not('latitude', 'is', null)
-    query = query.not('longitude', 'is', null)
-    query = query.gte('latitude', latitudeSouth.toString())
-    query = query.lte('latitude', latitudeNorth.toString())
-    query = query.gte('longitude', longitudeWest.toString())
-    query = query.lte('longitude', longitudeEast.toString())
+    // Special debug for Bandung area
+    if (Math.abs(lat - (-6.9175)) < 0.1 && Math.abs(lng - 107.6191) < 0.1) {
+      console.log('🏙️ Bandung search detected - checking for nearby cafes in Bandung area')
+      
+      // Check if there are ANY cafes in Bandung city
+      const { count: bandungCafes } = await client
+        .from('cafes')
+        .select('*', { count: 'exact', head: true })
+        .eq('is_published', true)
+        .ilike('city', '%bandung%')
+
+      console.log('🏙️ Bandung area cafes:', {
+        totalBandungCafes: bandungCafes,
+        searchingFor: 'cafes within 5km of Bandung center'
+      })
+    }
+
+    // Apply location filters - Using correct column names (lat/long)
+    query = query.not('lat', 'is', null)
+    query = query.not('long', 'is', null)
+    query = query.gte('lat', latitudeSouth.toString())
+    query = query.lte('lat', latitudeNorth.toString())
+    query = query.gte('long', longitudeWest.toString())
+    query = query.lte('long', longitudeEast.toString())
 
     // Debug: Count total cafes with location data
     const { count: totalWithLocation } = await client
       .from('cafes')
       .select('*', { count: 'exact', head: true })
-      .not('latitude', 'is', null)
-      .not('longitude', 'is', null)
+      .not('lat', 'is', null)
+      .not('long', 'is', null)
       .eq('is_published', true)
+
+    // Sample a few cafes to see their location data
+    const { data: sampleCafes } = await client
+      .from('cafes')
+      .select('name, city, lat, long')
+      .not('lat', 'is', null)
+      .not('long', 'is', null)
+      .eq('is_published', true)
+      .limit(5)
 
     console.log('📍 Database stats:', {
       totalCafesWithLocation: totalWithLocation,
-      searchRadius: '5km'
+      totalPublishedCafes: await client.from('cafes').select('*', { count: 'exact', head: true }).eq('is_published', true).then(r => r.count),
+      searchRadius: `${radiusKm}km`,
+      sampleCafes: sampleCafes?.map(cafe => ({
+        name: cafe.name,
+        city: cafe.city,
+        lat: cafe.lat,
+        lng: cafe.long,
+        latType: typeof cafe.lat,
+        lngType: typeof cafe.long
+      }))
     })
   }
 
@@ -145,7 +181,8 @@ export default defineEventHandler(async (event) => {
     sampleCafe: data?.[0] ? {
       name: data[0].name,
       city: data[0].city,
-      hasCoordinates: !!(data[0].latitude && data[0].longitude)
+      hasCoordinates: !!(data[0].lat && data[0].long),
+      coordinates: data[0].lat && data[0].long ? `${data[0].lat}, ${data[0].long}` : 'no coordinates'
     } : null
   })
 
