@@ -1,4 +1,4 @@
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 
 export function useNearbyFilter() {
   // State for user location and nearby filter
@@ -19,16 +19,42 @@ export function useNearbyFilter() {
   const showLocationPermissionModal = ref(false)
   const hasSeenLocationModal = ref(false)
 
-  // Initialize localStorage check
-  if (process.client && typeof localStorage !== 'undefined') {
+  // Initialize localStorage check - need to check hasSeenLocationModal synchronously
+  // but load userLocation asynchronously to avoid SSR issues
+  if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
     const hasSeenBefore = localStorage.getItem('hasSeenLocationModal')
     hasSeenLocationModal.value = hasSeenBefore === 'true'
-    
-    console.log('🔍 Location modal history:', {
-      hasSeenBefore,
-      hasSeenLocationModal: hasSeenLocationModal.value
-    })
   }
+
+  // Load saved location and nearby state on client side only
+  onMounted(() => {
+    if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
+      // Load saved location from localStorage
+      const savedLocation = localStorage.getItem('userLocation')
+      if (savedLocation) {
+        try {
+          userLocation.value = JSON.parse(savedLocation)
+          console.log('📍 Loaded saved location from localStorage:', userLocation.value)
+        } catch (error) {
+          console.error('Error parsing saved location:', error)
+          localStorage.removeItem('userLocation')
+        }
+      }
+
+      // Load saved nearby filter state
+      const savedNearbyActive = localStorage.getItem('isNearbyActive')
+      if (savedNearbyActive === 'true' && userLocation.value) {
+        isNearbyActive.value = true
+        console.log('🎯 Restored nearby filter state: active')
+      }
+      
+      console.log('🔍 Location state loaded:', {
+        hasSeenLocationModal: hasSeenLocationModal.value,
+        savedLocation: userLocation.value,
+        isNearbyActive: isNearbyActive.value
+      })
+    }
+  })
 
   // Computed property to validate coordinates
   const isValidCoordinates = computed(() => {
@@ -45,6 +71,14 @@ export function useNearbyFilter() {
     setTimeout(() => {
       showToast.value = false
     }, duration)
+  }
+
+  // Save nearby filter state to localStorage
+  function saveNearbyState() {
+    if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
+      localStorage.setItem('isNearbyActive', isNearbyActive.value.toString())
+      console.log('💾 Nearby filter state saved:', isNearbyActive.value)
+    }
   }
 
   // Get user's current location using browser geolocation
@@ -98,6 +132,12 @@ export function useNearbyFilter() {
         longitude: position.coords.longitude,
       }
 
+      // Save location to localStorage
+      if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
+        localStorage.setItem('userLocation', JSON.stringify(userLocation.value))
+        console.log('💾 Location saved to localStorage')
+      }
+
       console.log('📍 User location set:', userLocation.value)
       return userLocation.value
 
@@ -140,10 +180,17 @@ export function useNearbyFilter() {
       longitude: parseFloat(manualLongitude.value),
     }
 
+    // Save location to localStorage
+    if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
+      localStorage.setItem('userLocation', JSON.stringify(userLocation.value))
+      console.log('💾 Manual location saved to localStorage')
+    }
+
     console.log('📍 Manual location set:', userLocation.value)
     
     showLocationModal.value = false
     isNearbyActive.value = true
+    saveNearbyState()
 
     showToastNotification('Location set! Finding nearby cafes...', 'success')
 
@@ -163,18 +210,10 @@ export function useNearbyFilter() {
       hasUserLocation: !!userLocation.value
     })
 
-    // Show modal if user hasn't seen it, or if they've seen it but don't have location
-    if (!hasSeenLocationModal.value || (!userLocation.value && hasSeenLocationModal.value)) {
+    // Only show modal if user hasn't seen it before
+    if (!hasSeenLocationModal.value) {
       console.log('📱 Showing location permission modal')
       showLocationPermissionModal.value = true
-      
-      // Reset localStorage if they've seen it but don't have location
-      if (hasSeenLocationModal.value && !userLocation.value) {
-        hasSeenLocationModal.value = false
-        if (process.client) {
-          localStorage.removeItem('hasSeenLocationModal')
-        }
-      }
     }
   }
 
@@ -185,7 +224,7 @@ export function useNearbyFilter() {
     showLocationPermissionModal.value = false
     hasSeenLocationModal.value = true
     
-    if (process.client) {
+    if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
       localStorage.setItem('hasSeenLocationModal', 'true')
     }
 
@@ -194,6 +233,7 @@ export function useNearbyFilter() {
         await getUserLocation()
         if (userLocation.value) {
           isNearbyActive.value = true
+          saveNearbyState()
           
           // Trigger cafe fetching if callback provided
           if (fetchCafesCallback && activeFilters) {
@@ -225,6 +265,7 @@ export function useNearbyFilter() {
       if (isNearbyActive.value) {
         // If already active, deactivate it
         isNearbyActive.value = false
+        saveNearbyState()
         console.log('❌ Nearby filter deactivated')
         
         // Fetch all cafes without location filter
@@ -235,6 +276,7 @@ export function useNearbyFilter() {
       // If we have location, activate nearby filter
       if (userLocation.value) {
         isNearbyActive.value = true
+        saveNearbyState()
         console.log('✅ Nearby filter activated with existing location')
         await fetchCafesCallback(1, activeFilters)
         return
@@ -252,6 +294,7 @@ export function useNearbyFilter() {
           await getUserLocation()
           if (userLocation.value) {
             isNearbyActive.value = true
+            saveNearbyState()
             await fetchCafesCallback(1, activeFilters)
           }
         } catch (error) {
@@ -263,6 +306,7 @@ export function useNearbyFilter() {
     } catch (error) {
       console.error('🚨 Error in toggleNearbyFilter:', error)
       isNearbyActive.value = false
+      saveNearbyState()
       showToastNotification('An error occurred. Please try again.', 'error')
     }
   }
@@ -292,8 +336,10 @@ export function useNearbyFilter() {
     showLocationPermissionModal.value = false
     showLocationModal.value = false
     locationError.value = null
-    if (process.client) {
+    if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
       localStorage.removeItem('hasSeenLocationModal')
+      localStorage.removeItem('userLocation')
+      localStorage.removeItem('isNearbyActive')
     }
     console.log('🔄 Location state reset')
   }
