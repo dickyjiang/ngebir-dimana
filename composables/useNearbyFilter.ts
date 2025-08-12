@@ -144,14 +144,14 @@ export function useNearbyFilter() {
     } catch (error) {
       console.error('🚨 Location error:', error)
       
-      let errorMessage = 'Unable to get your location.'
+      let errorMessage = 'Tidak dapat mengakses lokasi Anda.'
       
       if (error.code === 1) {
-        errorMessage = 'Location access was denied. Please enable location services in your browser settings.'
+        errorMessage = 'Akses lokasi ditolak. Silakan aktifkan layanan lokasi di pengaturan browser Anda.'
       } else if (error.code === 2) {
-        errorMessage = 'Unable to determine your location. Please check your device settings and try again.'
+        errorMessage = 'Tidak dapat menentukan lokasi Anda. Silakan periksa pengaturan perangkat dan coba lagi.'
       } else if (error.code === 3) {
-        errorMessage = 'Location request timed out. Please try again.'
+        errorMessage = 'Permintaan lokasi habis waktu. Silakan coba lagi.'
       }
 
       locationError.value = errorMessage
@@ -171,7 +171,7 @@ export function useNearbyFilter() {
   // Set location manually
   async function setManualLocation(fetchCafesCallback = null, activeFilters = null) {
     if (!isValidCoordinates.value) {
-      showToastNotification('Please enter valid coordinates.', 'error')
+      showToastNotification('Silakan masukkan koordinat yang valid.', 'error')
       return
     }
 
@@ -192,7 +192,7 @@ export function useNearbyFilter() {
     isNearbyActive.value = true
     saveNearbyState()
 
-    showToastNotification('Location set! Finding nearby cafes...', 'success')
+    showToastNotification('Lokasi diatur! Mencari kafe terdekat...', 'success')
 
     // Trigger cafe fetching if callback provided
     if (fetchCafesCallback && activeFilters) {
@@ -241,7 +241,7 @@ export function useNearbyFilter() {
             await fetchCafesCallback(1, activeFilters)
           }
           
-          showToastNotification('Location access granted! Finding nearby cafes...', 'success')
+          showToastNotification('Akses lokasi diizinkan! Mencari kafe terdekat...', 'success')
         }
       } catch (error) {
         console.error('Location error after permission granted:', error)
@@ -288,7 +288,7 @@ export function useNearbyFilter() {
         showLocationPermissionModal.value = true
       } else {
         console.log('🌍 Attempting to get location directly')
-        showToastNotification('Getting your location...', 'success')
+        showToastNotification('Mengakses lokasi Anda...', 'success')
         
         try {
           await getUserLocation()
@@ -307,7 +307,7 @@ export function useNearbyFilter() {
       console.error('🚨 Error in toggleNearbyFilter:', error)
       isNearbyActive.value = false
       saveNearbyState()
-      showToastNotification('An error occurred. Please try again.', 'error')
+      showToastNotification('Terjadi kesalahan. Silakan coba lagi.', 'error')
     }
   }
 

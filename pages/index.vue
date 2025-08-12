@@ -237,43 +237,43 @@ onMounted(async () => {
     v-if="showLocationModal"
     class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
     <div class="bg-white rounded-lg shadow-xl p-6 max-w-md w-full">
-      <h3 class="text-lg font-semibold mb-4">Set Your Location Manually</h3>
+      <h3 class="text-lg font-semibold mb-4">Atur Lokasi Secara Manual</h3>
       <p class="text-sm text-gray-600 mb-4">
-        We couldn't access your device location. Please enter your coordinates manually:
+        Kami tidak dapat mengakses lokasi perangkat Anda. Silakan masukkan koordinat secara manual:
       </p>
 
       <div class="mb-4">
-        <label class="block text-sm font-medium text-gray-700 mb-1">Latitude</label>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Lintang (Latitude)</label>
         <input
           v-model="manualLatitude"
           type="number"
           step="0.000001"
-          placeholder="e.g. -6.9175"
+          placeholder="contoh: -6.9175"
           class="w-full px-3 py-2 border border-gray-300 rounded-md" />
       </div>
 
       <div class="mb-6">
-        <label class="block text-sm font-medium text-gray-700 mb-1">Longitude</label>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Bujur (Longitude)</label>
         <input
           v-model="manualLongitude"
           type="number"
           step="0.000001"
-          placeholder="e.g. 107.6191"
+          placeholder="contoh: 107.6191"
           class="w-full px-3 py-2 border border-gray-300 rounded-md" />
       </div>
 
       <div class="text-xs text-gray-500 mb-4">
         <p class="mb-2">
-          <strong>How to find your coordinates:</strong>
+          <strong>Cara menemukan koordinat Anda:</strong>
         </p>
         <ul class="list-disc list-inside space-y-1 mb-3">
-          <li>Open Google Maps and find your location</li>
-          <li>Right-click on your exact location</li>
-          <li>Select "What's here?" from the menu</li>
-          <li>Copy the coordinates that appear</li>
+          <li>Buka Google Maps dan temukan lokasi Anda</li>
+          <li>Klik kanan pada lokasi yang tepat</li>
+          <li>Pilih "What's here?" dari menu</li>
+          <li>Salin koordinat yang muncul</li>
         </ul>
         <p class="mt-2 mb-2">
-          <strong>Or quick-select a city:</strong>
+          <strong>Atau pilih kota cepat:</strong>
         </p>
         <div class="flex flex-wrap gap-1">
           <button @click="manualLatitude = '-6.2088'; manualLongitude = '106.8456'" class="text-xs bg-blue-100 hover:bg-blue-200 px-2 py-1 rounded transition-colors">Jakarta</button>
@@ -287,7 +287,7 @@ onMounted(async () => {
         <button
           @click="showLocationModal = false"
           class="px-4 py-2 border border-gray-300 rounded-md text-gray-700">
-          Cancel
+          Batal
         </button>
         <button
           @click="setManualLocation(fetchCafes, activeFilters)"
@@ -297,7 +297,7 @@ onMounted(async () => {
             'bg-gray-300 text-gray-500': !isValidCoordinates,
           }"
           class="px-4 py-2 rounded-md">
-          Use Location
+          Gunakan Lokasi
         </button>
       </div>
     </div>
@@ -312,26 +312,26 @@ onMounted(async () => {
         <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 mb-4">
           <i class="fas fa-map-marker-alt text-blue-600 text-xl"></i>
         </div>
-        <h3 class="text-lg font-semibold mb-2">Find Cafes Near You</h3>
+        <h3 class="text-lg font-semibold mb-2">Temukan Kafe Terdekat</h3>
         <p class="text-sm text-gray-600 mb-6">
-          We'd like to use your location to show you the nearest cafes. This helps you discover great coffee spots in your area.
+          Kami ingin menggunakan lokasi Anda untuk menampilkan kafe-kafe terdekat. Ini membantu Anda menemukan tempat ngopi terbaik di sekitar Anda.
         </p>
         
         <div class="flex flex-col gap-3">
           <button
             @click="handleLocationPermissionResponse(true, fetchCafes, activeFilters)"
             class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-lg font-medium transition-colors">
-            Allow Location Access
+            Izinkan Akses Lokasi
           </button>
           <button
             @click="handleLocationPermissionResponse(false, fetchCafes, activeFilters)"
             class="w-full bg-gray-200 hover:bg-gray-300 text-gray-800 py-3 px-4 rounded-lg font-medium transition-colors">
-            Maybe Later
+            Nanti Saja
           </button>
         </div>
         
         <p class="text-xs text-gray-500 mt-4">
-          You can always enable location access later from your browser settings.
+          Anda dapat mengaktifkan akses lokasi kapan saja melalui pengaturan browser.
         </p>
       </div>
     </div>
