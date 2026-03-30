@@ -108,6 +108,11 @@
       <div
         class="flex flex-col sm:flex-row items-center gap-4 sm:gap-2 mt-12 sm:mt-0"
       >
+        <!-- Blog navigation link -->
+        <NuxtLink
+          to="/blog"
+          class="text-sm font-semibold flex border px-3 py-2 rounded-lg border-none transition-colors hover:bg-black hover:text-yellow-500"
+        >Blog</NuxtLink>
         <div
           class="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-2"
         >
