@@ -3,12 +3,12 @@
       <div class="max-w-7xl w-full mx-auto flex flex-col gap-4 sm:flex-row items-center justify-between">
         <div>
           <a href="https://ngopi.di-mana.com/">
-            <img src="/src/assets/img/logo_ndm_gray.svg" alt="logo" class="h-6" />
+            <img src="/src/assets/img/logo_ndm_gray.svg" alt="Ngopi di Mana - Direktori Cafe Indonesia" class="h-6" />
           </a>
         </div>
         <div>
           <p class="text-gray-500 px-7 text-sm text-center sm:text-left">
-            ©2025 ISUKJADI All rights reserved | email: <span><a href="mailto:info-ngopi@di-mana.com">info-ngopi@di-mana.com</a></span> 
+            ©2026 ISUKJADI All rights reserved | email: <span><a href="mailto:info-ngopi@di-mana.com">info-ngopi@di-mana.com</a></span> 
           </p>
         </div>
         <div class="flex gap-4">

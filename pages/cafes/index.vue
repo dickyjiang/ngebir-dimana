@@ -1,6 +1,31 @@
 <script setup lang="ts">
   const route = useRoute();
   import { ref, computed, onMounted, watch } from 'vue';
+
+  // Dynamic meta: use city from query param if present, else generic
+  const cityParam = computed(() => route.query.city as string | undefined)
+  const pageTitle = computed(() =>
+    cityParam.value
+      ? `Cafe di ${cityParam.value.charAt(0).toUpperCase() + cityParam.value.slice(1)} | Ngopi di Mana?`
+      : 'Direktori Cafe Indonesia | Ngopi di Mana?'
+  )
+  const pageDescription = computed(() =>
+    cityParam.value
+      ? `Daftar cafe terbaik di ${cityParam.value} — WFC, specialty coffee, roastery, dan pet friendly.`
+      : 'Temukan ribuan cafe di seluruh Indonesia — WFC, specialty coffee, roastery, pet friendly, dan banyak lagi.'
+  )
+  const canonicalUrl = computed(() => 'https://ngopi.di-mana.com/cafes')
+
+  useSeoMeta({
+    title: () => pageTitle.value,
+    description: () => pageDescription.value,
+    ogTitle: () => pageTitle.value,
+    ogDescription: () => pageDescription.value,
+    ogImage: 'https://ngopi.di-mana.com/img/OG-img.png',
+    ogType: 'website',
+    ogUrl: () => canonicalUrl.value,
+  })
+  useHead({ link: [{ rel: 'canonical', href: () => canonicalUrl.value }] })
   import Sidebar from '~/components/Sidebar.vue';
   import CafeList from '~/components/cafe/CafeList.vue';
   import NewCafesList from '~/components/cafe/NewCafesList.vue';

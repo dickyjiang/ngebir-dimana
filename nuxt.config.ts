@@ -6,7 +6,27 @@ export default defineNuxtConfig({
     '@nuxtjs/supabase',
     '@nuxtjs/leaflet',
     'nuxt-gtag',
+    '@nuxtjs/sitemap',
   ],
+
+  // Site URL used by @nuxtjs/sitemap for absolute URLs
+  site: {
+    url: 'https://ngopi.di-mana.com',
+  },
+
+  sitemap: {
+    // Static pages: Nuxt auto-discovers /about-us, /privacy-policy, /disclaimer, /cafes
+    // Dynamic cafe pages are served from the endpoint below
+    sources: ['/__sitemap__/urls'],
+    urls: [
+      { loc: '/', priority: 1.0, changefreq: 'daily' },
+      { loc: '/about-us', priority: 0.5, changefreq: 'monthly' },
+      { loc: '/privacy-policy', priority: 0.3, changefreq: 'monthly' },
+      { loc: '/disclaimer', priority: 0.3, changefreq: 'monthly' },
+    ],
+    // Exclude auth/dashboard pages
+    exclude: ['/login', '/dashboard', '/profile', '/cafe/owner/**', '/cafes/new'],
+  },
 
   gtag: {
     id: 'G-BNWTEJPQY2',

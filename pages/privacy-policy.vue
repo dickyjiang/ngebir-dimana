@@ -60,9 +60,10 @@ import { useSeo } from '../composables/useSeo'
 
 // Set SEO metadata
 useSeo({
-  title: 'Privacy Policy - ngopi.di-mana.com',
-  description: 'Our privacy policy explains how we collect, use, and protect your personal information when you use our website.',
-  type: 'website'
+  title: 'Kebijakan Privasi | Ngopi di Mana?',
+  description: 'Kebijakan privasi Ngopi di Mana — cara kami mengumpulkan, menggunakan, dan melindungi informasi pengguna.',
+  type: 'website',
+  url: 'https://ngopi.di-mana.com/privacy-policy',
 })
 </script>
 

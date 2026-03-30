@@ -100,10 +100,10 @@ import { useSeo } from "../composables/useSeo";
 // Set SEO metadata
 
 useSeo({
-  title: "About Us - ngopi.di-mana.com",
-  description:
-    "Learn more about ngopi.di-mana.com and our mission to help people discover great cafes.",
-  type: "website",
+  title: 'Tentang Kami | Ngopi di Mana?',
+  description: 'Ngopi di Mana adalah direktori cafe Indonesia terlengkap. Temukan cafe, roastery, dan kedai kopi terbaik di seluruh Indonesia.',
+  type: 'website',
+  url: 'https://ngopi.di-mana.com/about-us',
 });
 </script>
 
