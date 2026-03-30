@@ -4,5 +4,4 @@ Disallow: /login
 Disallow: /dashboard
 Disallow: /profile
 Disallow: /cafe/owner/
-
 Sitemap: https://ngopi.di-mana.com/sitemap.xml
