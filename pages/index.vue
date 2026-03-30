@@ -12,6 +12,7 @@ import { useFilterToggle } from '~/composables/useFilterToggle'
 import { useFetchCafes } from '~/composables/useFetchCafes'
 import { useNearbyFilter } from '~/composables/useNearbyFilter'
 import { useHead } from '#imports'
+import { useAnalytics } from '~/composables/useAnalytics'
 
 useHead({
   script: [
@@ -84,9 +85,15 @@ const isSidebarOpen = ref(false)
 // Get filter toggle functions from composable
 const { toggleFeature } = useFilterToggle()
 
+const { trackSearch, setupScrollTracking } = useAnalytics()
+
 // Debounced search function
 const debouncedFetchBySearch = debounce((query, filters) => {
   currentPage.value = 1
+  // Track search once per 1s pause in typing — fires after user has settled on a term
+  if (query?.query?.trim()) {
+    trackSearch(query.query.trim())
+  }
   fetchCafes(1, filters)
 }, 1000) // 500ms delay
 
@@ -214,6 +221,9 @@ onMounted(async () => {
 
   // Show location permission modal on first visit
   showLocationPermissionPrompt()
+
+  // Set up scroll depth tracking — fires listing_scroll at 25/50/75/100% milestones
+  setupScrollTracking()
 })
 </script>
 

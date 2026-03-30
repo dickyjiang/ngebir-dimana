@@ -62,6 +62,7 @@
   import { useFilterToggle } from '~/composables/useFilterToggle';
 
   const { toggleFilter, resetFiltersCity } = useFilterToggle();
+  const { trackLocationFilter } = useAnalytics();
 
   const props = defineProps({
     activeFilters: Object,
@@ -78,6 +79,10 @@
   });
 
   async function handleFilterToggle(type, value) {
+    // Track city/location filter selection to measure which regions drive traffic
+    if (type === 'city') {
+      trackLocationFilter(value)
+    }
     await toggleFilter(props.activeFilters, type, value);
   }
 
