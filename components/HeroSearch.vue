@@ -186,7 +186,7 @@ onBeforeUnmount(() => {
       <img
         class="absolute object-cover object-center w-full h-full"
         src="/src/assets/img/hero.webp"
-        alt="hero image" />
+        alt="Ngopi di Mana - Direktori Cafe Indonesia" />
       <div class="absolute inset-0 bg-black opacity-60 z-[1]"></div>
       <div
         class="z-[2] flex flex-col items-center justify-center w-[90%] sm:w-[90%] mx-auto h-full">
@@ -195,7 +195,7 @@ onBeforeUnmount(() => {
           Ngopi di mana?
         </h1>
         <h2 class="text-sm md:text-xl tracking-wide text-white mb-2 sm:mb-4 text-center">
-          {{ totalCafes }} Cafe's Directory
+          {{ totalCafes }} Cafes Directory
         </h2>
         <div
           class="mt-2 sm:mt-4 w-full md:w-3/4 flex flex-col gap-2 sm:gap-4 items-center justify-center px-4">

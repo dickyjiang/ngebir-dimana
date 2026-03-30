@@ -14,7 +14,18 @@ import { useNearbyFilter } from '~/composables/useNearbyFilter'
 import { useHead } from '#imports'
 import { useAnalytics } from '~/composables/useAnalytics'
 
+useSeoMeta({
+  title: 'Ngopi di Mana? | Direktori Cafe Indonesia Terlengkap',
+  description: 'Temukan ribuan cafe di Indonesia — dari roastery, WFC, pet friendly, hingga specialty coffee. Satu klik, ribuan pilihan.',
+  ogTitle: 'Ngopi di Mana? | Direktori Cafe Indonesia Terlengkap',
+  ogDescription: 'Temukan ribuan cafe di Indonesia — dari roastery, WFC, pet friendly, hingga specialty coffee. Satu klik, ribuan pilihan.',
+  ogImage: 'https://ngopi.di-mana.com/img/OG-img.png',
+  ogType: 'website',
+  ogUrl: 'https://ngopi.di-mana.com',
+})
+
 useHead({
+  link: [{ rel: 'canonical', href: 'https://ngopi.di-mana.com' }],
   script: [
     {
       type: 'application/ld+json',

@@ -100,7 +100,7 @@
               @click="handleCafeClick(cafe)"
             >
               <NuxtImg
-                alt="Cafe Image"
+                :alt="`${cafe.name} - cafe di ${cafe.city}`"
                 class="w-full h-48 object-cover mb-4"
                 :src="cafe.photo"
                 placeholder="/img/noimg.webp"
