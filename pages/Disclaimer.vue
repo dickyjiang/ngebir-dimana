@@ -49,9 +49,10 @@ import { useSeo } from '../composables/useSeo'
 
 // Set SEO metadata
 useSeo({
-  title: 'Disclaimer - ngopi.di-mana.com',
-  description: 'Our disclaimer outlines the limitations and responsibilities regarding the information presented on our website.',
-  type: 'website'
+  title: 'Disclaimer | Ngopi di Mana?',
+  description: 'Disclaimer Ngopi di Mana — batasan tanggung jawab atas informasi yang tersedia di direktori cafe Indonesia ini.',
+  type: 'website',
+  url: 'https://ngopi.di-mana.com/disclaimer',
 })
 </script>
 

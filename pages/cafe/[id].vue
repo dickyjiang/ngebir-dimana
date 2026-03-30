@@ -13,7 +13,7 @@
           <div class="rounded-lg overflow-hidden max-h-96 mb-2">
             <NuxtImg
               :src="cafe.data.photo"
-              alt="Cafe Image"
+              :alt="`${cafe.data.name} - cafe di ${cafe.data.city}`"
               class="object-cover mb-4 rounded-lg w-full h-full"
               placeholder="/img/noimg.webp" />
           </div>
@@ -367,42 +367,62 @@ function previousImage() {
   }
 }
 
-// Watch for changes in cafe data and update meta
+// Watch for changes in cafe data and update meta tags + structured data
 watch(() => cafe.value, (newCafe) => {
   if (newCafe && newCafe.data) {
     const cafeData = newCafe.data
-    const features = newCafe.features?.map(f => f.name).join(', ') || ''
-    
+    const slug = route.params.id
+    const canonicalUrl = `https://ngopi.di-mana.com/cafe/${slug}`
+    const metaDescription = `${cafeData.name} berlokasi di ${cafeData.street || cafeData.city}. ${cafeData.business_type || 'Cafe'} di ${cafeData.city}.`
+    const ogImage = cafeData.photo || 'https://ngopi.di-mana.com/img/OG-img.png'
+
+    // Build opening hours array for schema if available
+    const openingHoursSpec: string[] = []
+    if (cafeData.working_hours && isValidJson(cafeData.working_hours)) {
+      const hours = JSON.parse(cafeData.working_hours)
+      for (const [day, time] of Object.entries(hours)) {
+        if (time) openingHoursSpec.push(`${day} ${time}`)
+      }
+    }
+
+    // Schema.org CafeOrCoffeeShop structured data for rich results
+    const jsonLd: Record<string, unknown> = {
+      "@context": "https://schema.org",
+      "@type": "CafeOrCoffeeShop",
+      "name": cafeData.name,
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": cafeData.street || '',
+        "addressLocality": cafeData.city || '',
+        "addressCountry": "ID"
+      },
+      "url": canonicalUrl,
+    }
+    if (cafeData.lat && cafeData.long) {
+      jsonLd["geo"] = {
+        "@type": "GeoCoordinates",
+        "latitude": cafeData.lat,
+        "longitude": cafeData.long,
+      }
+    }
+    if (openingHoursSpec.length > 0) {
+      jsonLd["openingHours"] = openingHoursSpec
+    }
+
+    useSeoMeta({
+      title: `${cafeData.name} – Tempat Ngopi di ${cafeData.city} | Ngopi di Mana?`,
+      description: metaDescription,
+      ogTitle: `${cafeData.name} – Tempat Ngopi di ${cafeData.city} | Ngopi di Mana?`,
+      ogDescription: metaDescription,
+      ogImage: ogImage,
+      ogType: 'website',
+      ogUrl: canonicalUrl,
+      twitterCard: 'summary_large_image',
+    })
+
     useHead({
-      title: `${cafeData.name} – Tempat Ngopi di ${cafeData.city}`,
-      meta: [
-        {
-          name: 'description',
-          content: `${cafeData.description?.substring(0, 155)}...` || 
-                  `Temukan ${cafeData.name} di ${cafeData.city}. ${features}`
-        },
-        {
-          property: 'og:title',
-          content: `${cafeData.name} – Tempat Ngopi di ${cafeData.city}`
-        },
-        {
-          property: 'og:description',
-          content: cafeData.description || 
-                  `Nikmati kopi dan suasana di ${cafeData.name}, ${cafeData.city}. ${features}`
-        },
-        {
-          property: 'og:image',
-          content: cafeData.photo || '/img/OG-img.png'
-        },
-        {
-          property: 'og:url',
-          content: `https://ngopi.di-mana.com/cafe/${route.params.id}`
-        },
-        {
-          name: 'twitter:card',
-          content: 'summary_large_image'
-        }
-      ]
+      link: [{ rel: 'canonical', href: canonicalUrl }],
+      script: [{ type: 'application/ld+json', children: JSON.stringify(jsonLd) }],
     })
   }
 }, { immediate: true })
