@@ -13,6 +13,9 @@ import { useFetchCafes } from '~/composables/useFetchCafes'
 import { useNearbyFilter } from '~/composables/useNearbyFilter'
 import { useHead } from '#imports'
 import { useAnalytics } from '~/composables/useAnalytics'
+import { useBlog } from '~/composables/useBlog'
+import BlogCard from '~/components/blog/BlogCard.vue'
+import type { BlogPost } from '~/composables/useBlog'
 
 useSeoMeta({
   title: 'Ngopi di Mana? | Direktori Cafe Indonesia Terlengkap',
@@ -97,6 +100,9 @@ const isSidebarOpen = ref(false)
 const { toggleFeature } = useFilterToggle()
 
 const { trackSearch, setupScrollTracking } = useAnalytics()
+
+const latestBlogPosts = ref<BlogPost[]>([])
+const { fetchLatestPosts } = useBlog()
 
 // Debounced search function
 const debouncedFetchBySearch = debounce((query, filters) => {
@@ -235,6 +241,9 @@ onMounted(async () => {
 
   // Set up scroll depth tracking — fires listing_scroll at 25/50/75/100% milestones
   setupScrollTracking()
+
+  // Fetch 3 latest blog posts for the homepage preview section
+  latestBlogPosts.value = await fetchLatestPosts()
 })
 </script>
 
@@ -378,6 +387,20 @@ onMounted(async () => {
   <section id="new-cafes" class="my-4">
     <NewCafesList :cafes="newCafes" :loading="loadingNewCafes" />
   </section>
+
+  <!-- Artikel & Tips — 3 latest blog posts -->
+  <section id="blog-preview" class="my-4 sm:px-4 sm:max-w-[98%] mx-auto">
+    <div class="flex items-center justify-between mb-4 px-4 sm:px-0">
+      <h2 class="text-xl font-semibold text-gray-800">Artikel &amp; Tips</h2>
+      <NuxtLink to="/blog" class="text-sm text-gray-500 hover:text-gray-800 hover:underline">
+        Lihat Semua →
+      </NuxtLink>
+    </div>
+    <ul class="grid grid-cols-1 md:grid-cols-3 gap-4 px-4 sm:px-0">
+      <BlogCard v-for="post in latestBlogPosts" :key="post.id" :post="post" />
+    </ul>
+  </section>
+
   <!-- Add ref to the main-content section -->
   <section id="main-content" ref="mainContent" class="flex sm:px-4 sm:max-w-[98%] mx-auto">
     <!-- Mobile Toggle Button -->
