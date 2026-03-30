@@ -121,6 +121,7 @@
             <NuxtLink
               to="/login"
               class="text-sm font-semibold flex border px-3 py-2 rounded-lg border-none transition-colors hover:bg-black hover:text-yellow-500"
+              @click="trackRegistrationIntent('navbar')"
               >Registrasi</NuxtLink
             >
             <div class="flex flex-col sm:flex-row items-center gap-1 w-full">
@@ -128,6 +129,7 @@
               <NuxtLink
                 to="/login"
                 class="text-sm font-semibold flex border px-3 py-2 rounded-lg border-none transition-colors hover:bg-black hover:text-yellow-500"
+                @click="trackLoginClick()"
               >
                 Login
               </NuxtLink>
@@ -168,6 +170,7 @@ const router = useRouter();
 const supabase = useSupabaseClient();
 let anim = null;
 const { data } = await supabase.auth.getSession();
+const { trackRegistrationIntent, trackLoginClick } = useAnalytics()
 
 const isMenuOpen = ref(false);
 

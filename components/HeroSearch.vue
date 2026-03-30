@@ -9,6 +9,7 @@ import terdekatAnimationData from '../public/animations/terdekat.json'
 import wheelchairAnimationData from '../public/animations/wheelchair.json'
 
 const { resetFiltersFeature } = useFilterToggle()
+const { trackCategoryTab, trackFilter, trackSearch } = useAnalytics()
 
 const props = defineProps({
   totalCafes: {
@@ -63,11 +64,23 @@ function handleSearchButton() {
 }
 
 function toggleNearbyFilter() {
+  // Track nearby filter toggle — new state is opposite of current isNearbyActive prop
+  trackFilter('cafe-terdekat', props.isNearbyActive ? 'off' : 'on')
   emit('toggle-nearby')
 }
 
-function handleFeatureToggle(feature_id) {
+function handleFeatureToggle(feature_id: string) {
+  // Determine new state: if feature is active it will be turned off, and vice versa
+  const isCurrentlyActive = props.activeFilters.features.includes(feature_id)
+  // Track feature filter chip toggle with its resulting state
+  trackFilter(feature_id, isCurrentlyActive ? 'off' : 'on')
   emit('toggle-feature', feature_id)
+}
+
+function handleFilterTypeChange() {
+  // Track category filter type switch (All / Cafes / Roastery / Supplies)
+  trackCategoryTab(filterType.value)
+  handleSearch()
 }
 
 async function resetFeatureFilter() {
@@ -201,7 +214,7 @@ onBeforeUnmount(() => {
                 <select
                   v-model="filterType"
                   class="h-full bg-transparent text-gray-600 focus:outline-none text-sm sm:text-base pl-2 border-l border-gray-300"
-                  @change="handleSearch">
+                  @change="handleFilterTypeChange">
                   <option value="all">All</option>
                   <option value="cafe">Cafes</option>
                   <option value="roastery">Roastery</option>

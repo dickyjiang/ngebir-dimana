@@ -51,6 +51,12 @@
   });
 
   const listContainer = ref(null);
+  const { trackCafeClick } = useAnalytics()
+
+  function handleCafeClick(cafe: any) {
+    // Track cafe card click to measure discovery patterns and listing engagement
+    trackCafeClick(cafe.name, cafe.id, cafe.category ?? cafe.type ?? '')
+  }
 
   function changePage(page) {
     if (page >= 1 && page <= props.totalPages) {
@@ -91,6 +97,7 @@
             <NuxtLink
               :to="`/cafe/${cafe.slug_name}`"
               class="flex flex-col h-full"
+              @click="handleCafeClick(cafe)"
             >
               <NuxtImg
                 alt="Cafe Image"
