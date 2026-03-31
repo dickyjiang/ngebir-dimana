@@ -1,8 +1,10 @@
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 
 export function useFilterToggle() {
 
   const router = useRouter();
+  const route = useRoute();
+
   const toggleFilter = async (filters, type, value, isReset = false) => {
     if (isReset) {
       filters[type] = [];
@@ -15,7 +17,7 @@ export function useFilterToggle() {
       filters[type].push(value);
     }
     await router.push({
-      path: '/cafes',
+      path: route.path,
       query: {
         city: filters.city.join(','),
         features: filters.features.join(','),
@@ -32,7 +34,7 @@ export function useFilterToggle() {
     }
 
     await router.push({
-      path: '/cafes',
+      path: route.path,
       query: {
         city: activeFilters.city.join(','),
         features: activeFilters['features'].join(','),
@@ -45,7 +47,7 @@ export function useFilterToggle() {
     await toggleFilter(filters, 'city', null, true);
 
     await router.push({
-      path: '/cafes',
+      path: route.path,
       query: {
         city: filters.city.join(','),
         features: filters['features'].join(','),
@@ -57,7 +59,7 @@ export function useFilterToggle() {
     await toggleFilter(filters, 'features', null, true);
 
     await router.push({
-      path: '/cafes',
+      path: route.path,
       query: {
         city: filters.city.join(','),
         features: filters['features'].join(','),
