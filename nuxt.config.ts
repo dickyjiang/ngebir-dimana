@@ -37,6 +37,10 @@ export default defineNuxtConfig({
   },
 
 
+  image: {
+    domains: ['storage.di-mana.com'],
+  },
+
   compatibilityDate: '2025-04-30',
   devtools: { enabled: true },
   sourcemap: {
