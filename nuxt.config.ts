@@ -57,7 +57,10 @@ export default defineNuxtConfig({
       hmr: {
         protocol: 'ws',
         host: 'localhost'
-      }
+      },
+      watch: {
+        ignored: ['**/node_modules/**', '**/.git/**'],
+      },
     }
   },
   tailwindcss: {
