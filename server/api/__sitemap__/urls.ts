@@ -21,7 +21,7 @@ export default defineEventHandler(async (event) => {
 
   // Fetch all published blog slugs
   const { data: blogData, error: blogError } = await client
-    .from('blog_posts')
+    .from('blogs')
     .select('slug, published_at')
     .eq('is_published', true)
 
