@@ -26,7 +26,7 @@ export function useBlog() {
     const from = (page - 1) * limit
     const to = from + limit - 1
     const { data, count } = await supabase
-      .from('blog_posts')
+      .from('blogs')
       .select('id, title, slug, description, cover_image_url, category, published_at', { count: 'exact' })
       .eq('is_published', true)
       .order('published_at', { ascending: false })
@@ -40,7 +40,7 @@ export function useBlog() {
   async function fetchPostBySlug(slug: string) {
     loading.value = true
     const { data } = await supabase
-      .from('blog_posts')
+      .from('blogs')
       .select('*')
       .eq('slug', slug)
       .eq('is_published', true)
@@ -52,7 +52,7 @@ export function useBlog() {
   // 3 related posts (same category, exclude current) — used by pages/blog/[slug].vue
   async function fetchRelatedPosts(currentSlug: string, category: string): Promise<BlogPost[]> {
     const { data } = await supabase
-      .from('blog_posts')
+      .from('blogs')
       .select('id, title, slug, description, cover_image_url, category, published_at')
       .eq('is_published', true)
       .eq('category', category)
@@ -65,7 +65,7 @@ export function useBlog() {
   // 3 latest posts — used by homepage "Artikel & Tips" preview section
   async function fetchLatestPosts(): Promise<BlogPost[]> {
     const { data } = await supabase
-      .from('blog_posts')
+      .from('blogs')
       .select('id, title, slug, description, cover_image_url, category, published_at')
       .eq('is_published', true)
       .order('published_at', { ascending: false })

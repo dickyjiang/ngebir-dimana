@@ -7,7 +7,7 @@
   },
   "scripts": {
     "build": "nuxt build",
-    "dev": "nuxt dev",
+    "dev": "CHOKIDAR_USEPOLLING=true nuxt dev",
     "dev:watch": "nuxt dev --watch",
     "generate": "nuxt generate",
     "preview": "nuxt preview",

@@ -396,7 +396,7 @@ onMounted(async () => {
         Lihat Semua →
       </NuxtLink>
     </div>
-    <ul class="grid grid-cols-1 md:grid-cols-3 gap-4 px-4 sm:px-0">
+    <ul class="grid grid-cols-3 gap-2 px-4 sm:px-0 sm:gap-4">
       <BlogCard v-for="post in latestBlogPosts" :key="post.id" :post="post" />
     </ul>
   </section>
