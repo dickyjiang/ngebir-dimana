@@ -107,12 +107,11 @@ const { fetchLatestPosts } = useBlog()
 // Debounced search function
 const debouncedFetchBySearch = debounce((query, filters) => {
   currentPage.value = 1
-  // Track search once per 1s pause in typing — fires after user has settled on a term
-  if (query?.query?.trim()) {
-    trackSearch(query.query.trim())
+  if (query?.trim()) {
+    trackSearch(query.trim())
   }
   fetchCafes(1, filters)
-}, 1000) // 500ms delay
+}, 500)
 
 async function fetchNewCafes() {
   loadingNewCafes.value = true
@@ -156,7 +155,7 @@ async function fetchCafes(page, filters = null) {
   )
 }
 
-// Update the watch functionality to apply filters
+// Watch filters — pass current searchQuery so typed search is not lost when a filter toggles
 watch(
   () => [JSON.stringify(activeFilters.value.city), JSON.stringify(activeFilters.value.features)],
   () => {
@@ -165,7 +164,7 @@ watch(
   }
 )
 
-// Also watch search query to trigger filtering
+// Watch search query — debounced to avoid firing on every keystroke
 watch(searchQuery, (newQuery) => {
   debouncedFetchBySearch(newQuery, activeFilters.value)
 })
@@ -202,9 +201,9 @@ async function handleFeatureToggle(feature_id) {
 }
 
 // Function to handle search from HeroSearch component
-function handleSearch(query) {
-  searchQuery.value = query
-  console.log('Search query:', searchQuery.value)
+// HeroSearch emits { query, filter } — unpack correctly
+function handleSearch(payload) {
+  searchQuery.value = typeof payload === 'object' ? (payload.query ?? '') : (payload ?? '')
 }
 
 // Function to toggle sidebar
