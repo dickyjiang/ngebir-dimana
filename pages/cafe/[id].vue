@@ -377,7 +377,7 @@ watch(() => cafe.value, (newCafe) => {
     const ogImage = cafeData.photo || 'https://ngopi.di-mana.com/img/OG-img.png'
 
     // Build opening hours array for schema if available
-    const openingHoursSpec: string[] = []
+    const openingHoursSpec = []
     if (cafeData.working_hours && isValidJson(cafeData.working_hours)) {
       const hours = JSON.parse(cafeData.working_hours)
       for (const [day, time] of Object.entries(hours)) {
@@ -386,7 +386,7 @@ watch(() => cafe.value, (newCafe) => {
     }
 
     // Schema.org CafeOrCoffeeShop structured data for rich results
-    const jsonLd: Record<string, unknown> = {
+    const jsonLd = {
       "@context": "https://schema.org",
       "@type": "CafeOrCoffeeShop",
       "name": cafeData.name,
