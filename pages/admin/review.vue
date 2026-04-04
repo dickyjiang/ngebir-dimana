@@ -12,7 +12,6 @@ interface Cafe {
   description: string | null
   working_hours: string | null
   source: string
-  created_at: string
 }
 
 // ── Auth gate ──────────────────────────────────────────────────────────────
