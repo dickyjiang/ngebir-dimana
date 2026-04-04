@@ -98,17 +98,9 @@ async function runDiscovery() {
   discovering.value = true
   discoveryResult.value = null
   try {
-    const config = useRuntimeConfig()
-    const anonKey = config.public.supabase?.key ?? ''
-
-    const res = await fetch(
-      'https://iblcxviqmqiutjzxnblx.supabase.co/functions/v1/discover-cafes',
-      {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${anonKey}` },
-      }
-    )
-    const json = await res.json()
+    const json = await $fetch<{ inserted_count: number }>('/api/admin/run-discovery', {
+      method: 'POST',
+    })
     if (json.inserted_count > 0) {
       discoveryResult.value = `${json.inserted_count} cafe baru ditemukan`
       await loadCafes()
