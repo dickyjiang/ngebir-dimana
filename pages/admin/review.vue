@@ -2,8 +2,6 @@
 import { ref, computed, onMounted } from 'vue'
 import { useSupabaseClient } from '#imports'
 
-definePageMeta({ layout: false })
-
 // ── Types ──────────────────────────────────────────────────────────────────
 interface Cafe {
   id: number
