@@ -1,8 +1,14 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { AwsClient } from 'https://esm.sh/aws4fetch@1'
 
 const CITIES = ['Bandung', 'Jakarta', 'Surabaya']
 const MAX_NEW_PER_CITY = 3
+const MAX_PHOTOS = 3
 const PLACES_API_BASE = 'https://places.googleapis.com/v1/places:searchText'
+
+interface PlacePhoto {
+  name: string // e.g. "places/ChIJ.../photos/AXCi2Q..."
+}
 
 interface PlaceResult {
   id: string
@@ -13,7 +19,7 @@ interface PlaceResult {
   regularOpeningHours?: { weekdayDescriptions?: string[] }
   editorialSummary?: { text: string }
   types?: string[]
-  photos?: unknown[]
+  photos?: PlacePhoto[]
 }
 
 interface InsertedCafe {
@@ -21,6 +27,7 @@ interface InsertedCafe {
   city: string
   google_place_id: string
   rating: number | null
+  photos_saved: number
 }
 
 function slugify(text: string): string {
@@ -64,12 +71,76 @@ async function getUniqueSlug(
   }
 }
 
+function buildWorkingHoursJson(weekdayDescriptions: string[]): string {
+  if (!weekdayDescriptions.length) return ''
+  const obj: Record<string, string> = {}
+  for (const entry of weekdayDescriptions) {
+    const idx = entry.indexOf(':')
+    if (idx > -1) {
+      obj[entry.substring(0, idx).trim()] = entry.substring(idx + 1).trim()
+    }
+  }
+  return JSON.stringify(obj)
+}
+
+async function fetchAndUploadPhoto(
+  aws: InstanceType<typeof AwsClient>,
+  googleApiKey: string,
+  r2Endpoint: string,
+  r2Bucket: string,
+  r2PublicUrl: string,
+  photoName: string,
+  r2Key: string
+): Promise<string | null> {
+  try {
+    // Fetch photo bytes from Google Places (follows redirect to CDN)
+    const photoUrl = `https://places.googleapis.com/v1/${photoName}/media?key=${googleApiKey}&maxHeightPx=1200`
+    const imgRes = await fetch(photoUrl)
+    if (!imgRes.ok) {
+      console.warn(`[discover-cafes] Photo fetch failed: HTTP ${imgRes.status}`)
+      return null
+    }
+
+    const imgBytes = await imgRes.arrayBuffer()
+    const contentType = imgRes.headers.get('content-type') ?? 'image/jpeg'
+
+    // Upload to Cloudflare R2
+    const uploadUrl = `${r2Endpoint}/${r2Bucket}/${r2Key}`
+    const uploadRes = await aws.fetch(uploadUrl, {
+      method: 'PUT',
+      body: imgBytes,
+      headers: { 'Content-Type': contentType },
+    })
+
+    if (!uploadRes.ok) {
+      const body = await uploadRes.text()
+      console.warn(`[discover-cafes] R2 upload failed: ${uploadRes.status} ${body}`)
+      return null
+    }
+
+    return `${r2PublicUrl}/${r2Key}`
+  } catch (err) {
+    console.warn(`[discover-cafes] Photo error: ${err instanceof Error ? err.message : err}`)
+    return null
+  }
+}
+
 Deno.serve(async (_req: Request): Promise<Response> => {
   const supabaseUrl = Deno.env.get('SUPABASE_URL')!
   const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
   const googleApiKey = Deno.env.get('GOOGLE_PLACES_API_KEY')!
+  const r2AccessKey = Deno.env.get('CLOUDFLARE_R2_ACCESS_KEY_ID')!
+  const r2SecretKey = Deno.env.get('CLOUDFLARE_R2_SECRET_ACCESS_KEY')!
+  const r2Bucket = Deno.env.get('CLOUDFLARE_R2_BUCKET')!
+  const r2Endpoint = Deno.env.get('CLOUDFLARE_R2_ENDPOINT')!
+  const r2PublicUrl = Deno.env.get('CLOUDFLARE_R2_PUBLIC_URL')!
 
   const supabase = createClient(supabaseUrl, supabaseServiceKey)
+  const aws = new AwsClient({
+    accessKeyId: r2AccessKey,
+    secretAccessKey: r2SecretKey,
+    service: 's3',
+  })
 
   const inserted: InsertedCafe[] = []
   const errors: string[] = []
@@ -77,7 +148,6 @@ Deno.serve(async (_req: Request): Promise<Response> => {
   for (const city of CITIES) {
     console.log(`[discover-cafes] Processing city: ${city}`)
 
-    // Fetch existing google_place_ids for this city
     const { data: existing, error: fetchError } = await supabase
       .from('cafes')
       .select('google_place_id')
@@ -93,7 +163,6 @@ Deno.serve(async (_req: Request): Promise<Response> => {
       (existing ?? []).map((r: { google_place_id: string }) => r.google_place_id)
     )
 
-    // Call Google Places Text Search API (New)
     let places: PlaceResult[] = []
     try {
       const response = await fetch(PLACES_API_BASE, {
@@ -135,7 +204,6 @@ Deno.serve(async (_req: Request): Promise<Response> => {
       continue
     }
 
-    // Filter out already-known places
     const newPlaces = places.filter((p) => p.id && !existingIds.has(p.id))
     console.log(`[discover-cafes] ${city}: ${newPlaces.length} new places after dedup`)
 
@@ -144,46 +212,79 @@ Deno.serve(async (_req: Request): Promise<Response> => {
     for (const place of toInsert) {
       const name = place.displayName?.text ?? 'Unknown Cafe'
       const slug = await getUniqueSlug(supabase, name, city)
+      const placeId = place.id
 
+      // ── Upload photos to R2 ────────────────────────────────────────────
+      const photoUrls: string[] = []
+      const photosToFetch = (place.photos ?? []).slice(0, MAX_PHOTOS)
+
+      for (let i = 0; i < photosToFetch.length; i++) {
+        const r2Key = `cafes/${placeId}/${i}.jpg`
+        const url = await fetchAndUploadPhoto(
+          aws, googleApiKey, r2Endpoint, r2Bucket, r2PublicUrl,
+          photosToFetch[i].name, r2Key
+        )
+        if (url) {
+          photoUrls.push(url)
+          console.log(`[discover-cafes] Photo ${i + 1}/${photosToFetch.length} uploaded: ${url}`)
+        }
+      }
+
+      const mainPhoto = photoUrls[0] ?? null
+
+      // ── Insert cafe row ────────────────────────────────────────────────
       const row = {
         name,
         full_address: place.formattedAddress ?? '',
         city,
         slug_name: slug,
-        google_place_id: place.id,
+        google_place_id: placeId,
         rating: place.rating ?? null,
         reviews: place.userRatingCount ?? null,
         description: place.editorialSummary?.text ?? '',
-        working_hours: (() => {
-          const desc = place.regularOpeningHours?.weekdayDescriptions ?? []
-          if (!desc.length) return ''
-          const obj: Record<string, string> = {}
-          for (const entry of desc) {
-            const idx = entry.indexOf(':')
-            if (idx > -1) {
-              obj[entry.substring(0, idx).trim()] = entry.substring(idx + 1).trim()
-            }
-          }
-          return JSON.stringify(obj)
-        })(),
+        working_hours: buildWorkingHoursJson(
+          place.regularOpeningHours?.weekdayDescriptions ?? []
+        ),
+        photo: mainPhoto,
         source: 'auto-discovered',
         is_published: false,
       }
 
-      const { error: insertError } = await supabase.from('cafes').insert(row)
+      const { data: insertedRow, error: insertError } = await supabase
+        .from('cafes')
+        .insert(row)
+        .select('id')
+        .single()
 
       if (insertError) {
         console.error(`[discover-cafes] Insert failed for "${name}": ${insertError.message}`)
         errors.push(`${city}/${name}: insert error — ${insertError.message}`)
-      } else {
-        console.log(`[discover-cafes] Inserted: "${name}" (${city}) slug="${slug}"`)
-        inserted.push({
-          name,
-          city,
-          google_place_id: place.id,
-          rating: place.rating ?? null,
-        })
+        continue
       }
+
+      // ── Insert additional photos into cafe_pics ────────────────────────
+      const extraPhotos = photoUrls.slice(1)
+      if (extraPhotos.length > 0 && insertedRow?.id) {
+        const picRows = extraPhotos.map((url) => ({
+          cafe_id: insertedRow.id,
+          url,
+        }))
+        const { error: picsError } = await supabase.from('cafe_pics').insert(picRows)
+        if (picsError) {
+          console.warn(`[discover-cafes] cafe_pics insert error: ${picsError.message}`)
+        }
+      }
+
+      console.log(
+        `[discover-cafes] Inserted: "${name}" (${city}) slug="${slug}" photos=${photoUrls.length}`
+      )
+      inserted.push({
+        name,
+        city,
+        google_place_id: placeId,
+        rating: place.rating ?? null,
+        photos_saved: photoUrls.length,
+      })
     }
   }
 

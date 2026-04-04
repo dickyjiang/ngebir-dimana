@@ -5,10 +5,15 @@ into the `cafes` table with `is_published = false` for manual review.
 
 ---
 
-## 1. Set the secret
+## 1. Set secrets
 
 ```bash
 supabase secrets set GOOGLE_PLACES_API_KEY=your_key_here
+supabase secrets set CLOUDFLARE_R2_ACCESS_KEY_ID=your_r2_access_key
+supabase secrets set CLOUDFLARE_R2_SECRET_ACCESS_KEY=your_r2_secret_key
+supabase secrets set CLOUDFLARE_R2_BUCKET=ngopi-prod
+supabase secrets set CLOUDFLARE_R2_ENDPOINT=https://your-account.r2.cloudflarestorage.com
+supabase secrets set CLOUDFLARE_R2_PUBLIC_URL=https://storage.di-mana.com
 ```
 
 `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` are injected automatically by
