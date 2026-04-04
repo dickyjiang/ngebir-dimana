@@ -9,6 +9,7 @@ into the `cafes` table with `is_published = false` for manual review.
 
 ```bash
 supabase secrets set GOOGLE_PLACES_API_KEY=your_key_here
+supabase secrets set ANTHROPIC_API_KEY=your_anthropic_key_here
 supabase secrets set CLOUDFLARE_R2_ACCESS_KEY_ID=your_r2_access_key
 supabase secrets set CLOUDFLARE_R2_SECRET_ACCESS_KEY=your_r2_secret_key
 supabase secrets set CLOUDFLARE_R2_BUCKET=ngopi-prod

@@ -125,10 +125,64 @@ async function fetchAndUploadPhoto(
   }
 }
 
+async function generateDescription(
+  anthropicKey: string,
+  name: string,
+  city: string,
+  editorialSummary: string,
+  types: string[],
+  rating: number | undefined,
+  reviews: number | undefined
+): Promise<string> {
+  try {
+    const typeLabels = (types ?? [])
+      .filter((t) => !['establishment', 'point_of_interest', 'food'].includes(t))
+      .map((t) => t.replace(/_/g, ' '))
+      .slice(0, 3)
+      .join(', ')
+
+    const prompt = [
+      `Buatkan deskripsi singkat (2–3 kalimat) dalam Bahasa Indonesia yang menarik dan kasual untuk sebuah kafe bernama "${name}" yang berlokasi di ${city}.`,
+      editorialSummary ? `Deskripsi dari Google: "${editorialSummary}".` : '',
+      typeLabels ? `Tipe tempat: ${typeLabels}.` : '',
+      rating ? `Rating: ${rating}/5 dari ${reviews?.toLocaleString() ?? '?'} ulasan.` : '',
+      `Gaya penulisan: hangat, mengundang, seperti rekomendasi teman — bukan iklan. Jangan mulai dengan kata "Kafe ini". Tidak perlu menyebut nama kafe lagi di kalimat pertama.`,
+    ]
+      .filter(Boolean)
+      .join(' ')
+
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'x-api-key': anthropicKey,
+        'anthropic-version': '2023-06-01',
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'claude-haiku-4-5',
+        max_tokens: 256,
+        messages: [{ role: 'user', content: prompt }],
+      }),
+    })
+
+    if (!res.ok) {
+      console.warn(`[discover-cafes] Anthropic API error: ${res.status}`)
+      return editorialSummary
+    }
+
+    const json = await res.json()
+    return json.content?.[0]?.text?.trim() ?? editorialSummary
+  } catch (err) {
+    console.warn(`[discover-cafes] generateDescription error: ${err instanceof Error ? err.message : err}`)
+    return editorialSummary
+  }
+}
+
 Deno.serve(async (_req: Request): Promise<Response> => {
   const supabaseUrl = Deno.env.get('SUPABASE_URL')!
   const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
   const googleApiKey = Deno.env.get('GOOGLE_PLACES_API_KEY')!
+  const anthropicKey = Deno.env.get('ANTHROPIC_API_KEY') ?? ''
   const r2AccessKey = Deno.env.get('CLOUDFLARE_R2_ACCESS_KEY_ID')!
   const r2SecretKey = Deno.env.get('CLOUDFLARE_R2_SECRET_ACCESS_KEY')!
   const r2Bucket = Deno.env.get('CLOUDFLARE_R2_BUCKET')!
@@ -241,7 +295,15 @@ Deno.serve(async (_req: Request): Promise<Response> => {
         google_place_id: placeId,
         rating: place.rating ?? null,
         reviews: place.userRatingCount ?? null,
-        description: place.editorialSummary?.text ?? '',
+        description: await generateDescription(
+          anthropicKey,
+          name,
+          city,
+          place.editorialSummary?.text ?? '',
+          place.types ?? [],
+          place.rating,
+          place.userRatingCount
+        ),
         working_hours: buildWorkingHoursJson(
           place.regularOpeningHours?.weekdayDescriptions ?? []
         ),
