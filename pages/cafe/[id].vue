@@ -515,7 +515,7 @@ const parsedWorkingHours = computed(() => {
   // JSON format: {"Monday": "8am-10pm", ...}
   if (isValidJson(raw)) return JSON.parse(raw)
   // Plain text format: "Senin: 08.00–22.00\nSelasa: 08.00–22.00\n..."
-  const result: Record<string, string> = {}
+  const result = {}
   for (const line of raw.split('\n')) {
     const idx = line.indexOf(':')
     if (idx > -1) {
