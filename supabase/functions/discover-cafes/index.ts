@@ -154,7 +154,18 @@ Deno.serve(async (_req: Request): Promise<Response> => {
         rating: place.rating ?? null,
         reviews: place.userRatingCount ?? null,
         description: place.editorialSummary?.text ?? '',
-        working_hours: place.regularOpeningHours?.weekdayDescriptions?.join('\n') ?? '',
+        working_hours: (() => {
+          const desc = place.regularOpeningHours?.weekdayDescriptions ?? []
+          if (!desc.length) return ''
+          const obj: Record<string, string> = {}
+          for (const entry of desc) {
+            const idx = entry.indexOf(':')
+            if (idx > -1) {
+              obj[entry.substring(0, idx).trim()] = entry.substring(idx + 1).trim()
+            }
+          }
+          return JSON.stringify(obj)
+        })(),
         source: 'auto-discovered',
         is_published: false,
       }

@@ -84,7 +84,7 @@
                     </div>
                 </div>
                 <div class="md:w-3/4">
-                  <p class="text-sm text-gray-500">{{ cafe.data.street }}</p>
+                  <p class="text-sm text-gray-500">{{ cafe.data.street || cafe.data.full_address }}</p>
                 </div>
               </div>
             </div>
@@ -107,7 +107,7 @@
           <div
             class="flex flex-col sm:flex-row gap-2 items-center justify-center mb-4 pb-4 border-b border-gray-500">
             <button
-              v-if="(cafe.data.lat && cafe.data.long) || cafe.data.location_link"
+              v-if="(cafe.data.lat && cafe.data.long) || cafe.data.location_link || cafe.data.google_place_id"
               @click="openInGoogleMaps"
               class="mt-4 md:w-1/2 bg-gray-800 hover:bg-gray-600 text-white py-2 px-4 rounded-lg flex items-center justify-center gap-2 max-w-1/2">
               <i class="fas fa-map-marker-alt"></i>
@@ -140,7 +140,7 @@
         </div>
         <div
           class="flex flex-col mt-4"
-          v-if="cafe.data.working_hours && isValidJson(cafe.data.working_hours)">
+          v-if="cafe.data.working_hours">
           <h2 class="text-lg font-semibold">Working Hours</h2>
           <table class="min-w-full border-collapse border border-gray-300 text-sm mt-2">
             <thead>
@@ -150,11 +150,9 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="(hours, day) in JSON.parse(cafe.data.working_hours)" :key="day">
+              <tr v-for="(hours, day) in parsedWorkingHours" :key="day">
                 <td class="border border-gray-300 px-4 py-2">{{ day }}</td>
-                <td class="border border-gray-300 px-4 py-2">
-                  {{ hours }}
-                </td>
+                <td class="border border-gray-300 px-4 py-2">{{ hours }}</td>
               </tr>
             </tbody>
           </table>
@@ -435,12 +433,12 @@ function openInGoogleMaps() {
     return
   }
 
-  // // Second priority: use place_id
-  // if (cafe.value?.place_id) {
-  //   const url = `https://www.google.com/maps/place/?q=place_id:${cafe.value.place_id}`;
-  //   window.open(url, '_blank');
-  //   return;
-  // }
+  // Second priority: use google_place_id
+  if (cafe.value?.data.google_place_id) {
+    const url = `https://www.google.com/maps/place/?q=place_id:${cafe.value.data.google_place_id}`
+    window.open(url, '_blank')
+    return
+  }
 
   // // Third priority: use google_id
   // if (cafe.value?.google_id) {
@@ -506,9 +504,25 @@ async function sharePage() {
 }
 
 const sanitizedDescription = computed(() => {
-  return cafe.value?.data.description 
+  return cafe.value?.data.description
     ? DOMPurify.sanitize(cafe.value.data.description)
     : ''
+})
+
+const parsedWorkingHours = computed(() => {
+  const raw = cafe.value?.data.working_hours
+  if (!raw) return {}
+  // JSON format: {"Monday": "8am-10pm", ...}
+  if (isValidJson(raw)) return JSON.parse(raw)
+  // Plain text format: "Senin: 08.00–22.00\nSelasa: 08.00–22.00\n..."
+  const result: Record<string, string> = {}
+  for (const line of raw.split('\n')) {
+    const idx = line.indexOf(':')
+    if (idx > -1) {
+      result[line.substring(0, idx).trim()] = line.substring(idx + 1).trim()
+    }
+  }
+  return result
 })
 </script>
 
