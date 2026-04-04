@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { useSupabaseClient } from '#imports'
 
 // ── Types ──────────────────────────────────────────────────────────────────
 interface Cafe {
@@ -37,21 +36,20 @@ function checkPassword() {
 }
 
 // ── Data ───────────────────────────────────────────────────────────────────
-const supabase = useSupabaseClient()
 const cafes = ref<Cafe[]>([])
 const loading = ref(false)
 
 async function loadCafes() {
   loading.value = true
-  const { data, error } = await supabase
-    .from('cafes')
-    .select('id, name, city, rating, reviews, google_place_id, description, working_hours, source, created_at')
-    .eq('is_published', false)
-    .eq('source', 'auto-discovered')
-    .order('created_at', { ascending: false })
-
-  if (!error) cafes.value = (data as Cafe[]) ?? []
-  loading.value = false
+  try {
+    const data = await $fetch<Cafe[]>('/api/admin/pending-cafes')
+    cafes.value = data ?? []
+  } catch (err) {
+    console.error('[admin/review] loadCafes error:', err)
+    cafes.value = []
+  } finally {
+    loading.value = false
+  }
 }
 
 // ── Stats ──────────────────────────────────────────────────────────────────
@@ -68,12 +66,12 @@ const byCity = computed(() => {
 // ── Single actions ─────────────────────────────────────────────────────────
 async function publish(cafe: Cafe) {
   cafes.value = cafes.value.filter((c) => c.id !== cafe.id)
-  await supabase.from('cafes').update({ is_published: true }).eq('id', cafe.id)
+  await $fetch('/api/admin/pending-cafes', { method: 'PATCH', body: { ids: [cafe.id], action: 'publish' } })
 }
 
 async function reject(cafe: Cafe) {
   cafes.value = cafes.value.filter((c) => c.id !== cafe.id)
-  await supabase.from('cafes').delete().eq('id', cafe.id)
+  await $fetch('/api/admin/pending-cafes', { method: 'PATCH', body: { ids: [cafe.id], action: 'reject' } })
 }
 
 // ── Bulk actions ───────────────────────────────────────────────────────────
@@ -83,14 +81,14 @@ async function bulkPublish() {
   const ids = cafes.value.map((c) => c.id)
   cafes.value = []
   bulkConfirm.value = null
-  await supabase.from('cafes').update({ is_published: true }).in('id', ids)
+  await $fetch('/api/admin/pending-cafes', { method: 'PATCH', body: { ids, action: 'publish' } })
 }
 
 async function bulkReject() {
   const ids = cafes.value.map((c) => c.id)
   cafes.value = []
   bulkConfirm.value = null
-  await supabase.from('cafes').delete().in('id', ids)
+  await $fetch('/api/admin/pending-cafes', { method: 'PATCH', body: { ids, action: 'reject' } })
 }
 
 // ── Discovery trigger ──────────────────────────────────────────────────────
@@ -377,13 +375,13 @@ onMounted(() => {
           <!-- Actions -->
           <div class="flex sm:flex-col gap-2 shrink-0">
             <button
-              @click="publish(cafe); showToast(`"${cafe.name}" dipublish`, 'success')"
+              @click="publish(cafe); showToast(cafe.name + ' dipublish', 'success')"
               class="flex items-center gap-1.5 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-md text-sm font-medium transition-colors">
               <i class="fas fa-check"></i>
               Publish
             </button>
             <button
-              @click="reject(cafe); showToast(`"${cafe.name}" dihapus`, 'error')"
+              @click="reject(cafe); showToast(cafe.name + ' dihapus', 'error')"
               class="flex items-center gap-1.5 px-4 py-2 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 rounded-md text-sm font-medium transition-colors">
               <i class="fas fa-times"></i>
               Reject
