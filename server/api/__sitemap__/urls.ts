@@ -3,13 +3,24 @@
  * Called by the sitemap module at /__sitemap__/urls to get all cafe and blog page URLs.
  * Cafe pages: weekly changefreq, priority 0.8.
  * Blog posts: weekly changefreq, priority 0.6.
+ *
+ * Note: We use createClient directly (not serverSupabaseServiceRole) because the
+ * sitemap module invokes this handler with a synthetic event that lacks the Nitro
+ * context required by serverSupabaseServiceRole. Using useRuntimeConfig() + createClient
+ * works reliably in all invocation contexts (direct HTTP, internal module fetch, prerender).
  */
-import { serverSupabaseServiceRole } from '#supabase/server'
+import { createClient } from '@supabase/supabase-js'
 
-export default defineEventHandler(async (event) => {
-  const adminClient = serverSupabaseServiceRole(event)
+export default defineEventHandler(async () => {
+  const config = useRuntimeConfig()
+  const supabaseUrl = config.public.supabase.url as string
+  const serviceKey = config.supabase.serviceKey as string
 
-  // Fetch all published cafe slugs — use service role for consistent auth in all contexts
+  const adminClient = createClient(supabaseUrl, serviceKey, {
+    auth: { detectSessionInUrl: false, persistSession: false, autoRefreshToken: false },
+  })
+
+  // Fetch all published cafe slugs
   const { data: cafeData, error: cafeError } = await adminClient
     .from('cafes')
     .select('slug_name, updated_at')
@@ -19,7 +30,7 @@ export default defineEventHandler(async (event) => {
     console.error('Sitemap cafe URL generation error:', cafeError.message)
   }
 
-  // Fetch all published blog slugs — use service role to bypass RLS
+  // Fetch all published blog slugs
   const { data: blogData, error: blogError } = await adminClient
     .from('blogs')
     .select('slug, published_at')
