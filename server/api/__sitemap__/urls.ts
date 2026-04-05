@@ -4,14 +4,13 @@
  * Cafe pages: weekly changefreq, priority 0.8.
  * Blog posts: weekly changefreq, priority 0.6.
  */
-import { serverSupabaseClient, serverSupabaseServiceRole } from '#supabase/server'
+import { serverSupabaseServiceRole } from '#supabase/server'
 
 export default defineEventHandler(async (event) => {
-  const client = await serverSupabaseClient(event)
   const adminClient = serverSupabaseServiceRole(event)
 
-  // Fetch all published cafe slugs
-  const { data: cafeData, error: cafeError } = await client
+  // Fetch all published cafe slugs — use service role for consistent auth in all contexts
+  const { data: cafeData, error: cafeError } = await adminClient
     .from('cafes')
     .select('slug_name, updated_at')
     .not('slug_name', 'is', null)
