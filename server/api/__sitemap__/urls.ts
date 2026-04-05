@@ -4,12 +4,13 @@
  * Cafe pages: weekly changefreq, priority 0.8.
  * Blog posts: weekly changefreq, priority 0.6.
  */
-import { serverSupabaseClient } from '#supabase/server'
+import { serverSupabaseClient, serverSupabaseServiceRole } from '#supabase/server'
 
 export default defineEventHandler(async (event) => {
   const client = await serverSupabaseClient(event)
+  const adminClient = serverSupabaseServiceRole(event)
 
-  // Fetch all cafe slugs
+  // Fetch all published cafe slugs
   const { data: cafeData, error: cafeError } = await client
     .from('cafes')
     .select('slug_name, updated_at')
@@ -19,8 +20,8 @@ export default defineEventHandler(async (event) => {
     console.error('Sitemap cafe URL generation error:', cafeError.message)
   }
 
-  // Fetch all published blog slugs
-  const { data: blogData, error: blogError } = await client
+  // Fetch all published blog slugs — use service role to bypass RLS
+  const { data: blogData, error: blogError } = await adminClient
     .from('blogs')
     .select('slug, published_at')
     .eq('is_published', true)
@@ -28,6 +29,13 @@ export default defineEventHandler(async (event) => {
   if (blogError) {
     console.error('Sitemap blog URL generation error:', blogError.message)
   }
+
+  const staticUrls = [
+    { loc: '/blog', changefreq: 'weekly', priority: 0.7 },
+    { loc: '/about-us', changefreq: 'monthly', priority: 0.5 },
+    { loc: '/privacy-policy', changefreq: 'monthly', priority: 0.3 },
+    { loc: '/disclaimer', changefreq: 'monthly', priority: 0.3 },
+  ]
 
   const cafeUrls = (cafeData || []).map((cafe) => ({
     loc: `/cafe/${cafe.slug_name}`,
@@ -43,5 +51,5 @@ export default defineEventHandler(async (event) => {
     lastmod: post.published_at ?? undefined,
   }))
 
-  return [...cafeUrls, ...blogUrls]
+  return [...staticUrls, ...cafeUrls, ...blogUrls]
 })
