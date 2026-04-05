@@ -4,24 +4,16 @@
  * Cafe pages: weekly changefreq, priority 0.8.
  * Blog posts: weekly changefreq, priority 0.6.
  *
- * Note: We use createClient directly (not serverSupabaseServiceRole) because the
- * sitemap module invokes this handler with a synthetic event that lacks the Nitro
- * context required by serverSupabaseServiceRole. Using useRuntimeConfig() + createClient
- * works reliably in all invocation contexts (direct HTTP, internal module fetch, prerender).
+ * Uses serverSupabaseClient (anon key) for both queries. Both tables have public
+ * SELECT policies for their published/visible rows, so anon access works correctly.
  */
-import { createClient } from '@supabase/supabase-js'
+import { serverSupabaseClient } from '#supabase/server'
 
-export default defineEventHandler(async () => {
-  const config = useRuntimeConfig()
-  const supabaseUrl = config.public.supabase.url as string
-  const serviceKey = config.supabase.serviceKey as string
-
-  const adminClient = createClient(supabaseUrl, serviceKey, {
-    auth: { detectSessionInUrl: false, persistSession: false, autoRefreshToken: false },
-  })
+export default defineEventHandler(async (event) => {
+  const client = await serverSupabaseClient(event)
 
   // Fetch all published cafe slugs
-  const { data: cafeData, error: cafeError } = await adminClient
+  const { data: cafeData, error: cafeError } = await client
     .from('cafes')
     .select('slug_name, updated_at')
     .not('slug_name', 'is', null)
@@ -30,8 +22,8 @@ export default defineEventHandler(async () => {
     console.error('Sitemap cafe URL generation error:', cafeError.message)
   }
 
-  // Fetch all published blog slugs
-  const { data: blogData, error: blogError } = await adminClient
+  // Fetch all published blog slugs — readable via anon due to public RLS policy
+  const { data: blogData, error: blogError } = await client
     .from('blogs')
     .select('slug, published_at')
     .eq('is_published', true)
