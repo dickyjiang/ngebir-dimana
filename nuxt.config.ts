@@ -15,9 +15,16 @@ export default defineNuxtConfig({
   },
 
   routeRules: {
-    // Prevent sitemap from being prerendered as a static file so the
-    // Nitro plugin can inject blog URLs dynamically at request time
     '/sitemap.xml': { prerender: false },
+  },
+
+  nitro: {
+    prerender: {
+      // Force sitemap out of prerender — routeRules alone doesn't override
+      // @nuxtjs/sitemap's internal addPrerenderRoutes('/sitemap.xml') call.
+      // Without this, Cloudflare Pages serves the stale static file forever.
+      ignore: ['/sitemap.xml'],
+    },
   },
 
   sitemap: {

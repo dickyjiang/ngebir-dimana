@@ -12,21 +12,30 @@
 export default defineEventHandler(async () => {
   const config = useRuntimeConfig()
   const supabaseUrl = config.public.supabase.url as string
-  const supabaseKey = config.public.supabase.key as string
+  const anonKey = config.public.supabase.key as string
+  // Service role key: set via SUPABASE_SERVICE_KEY env var, accessible as private config.
+  // Falls back to anon key for local dev where service key may not be set.
+  const serviceKey = (config as any).supabase?.serviceKey as string || anonKey
 
-  const headers = {
-    'apikey': supabaseKey,
-    'Authorization': `Bearer ${supabaseKey}`,
+  const serviceHeaders = {
+    'apikey': serviceKey,
+    'Authorization': `Bearer ${serviceKey}`,
+  }
+  const anonHeaders = {
+    'apikey': anonKey,
+    'Authorization': `Bearer ${anonKey}`,
   }
 
   const [cafeRes, blogRes] = await Promise.allSettled([
+    // Cafes require service role — the anon key hits RLS and returns very few rows.
     $fetch<{ slug_name: string; updated_at: string | null }[]>(
-      `${supabaseUrl}/rest/v1/cafes?select=slug_name,updated_at&slug_name=not.is.null`,
-      { headers }
+      `${supabaseUrl}/rest/v1/cafes?select=slug_name,updated_at&slug_name=not.is.null&is_published=eq.true`,
+      { headers: serviceHeaders }
     ),
+    // Blogs are publicly readable via anon key (published only).
     $fetch<{ slug: string; published_at: string | null }[]>(
       `${supabaseUrl}/rest/v1/blogs?select=slug,published_at&is_published=eq.true`,
-      { headers }
+      { headers: anonHeaders }
     ),
   ])
 
