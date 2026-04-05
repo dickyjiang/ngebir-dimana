@@ -17,7 +17,7 @@ export default defineNuxtConfig({
   sitemap: {
     // Static pages: Nuxt auto-discovers /about-us, /privacy-policy, /disclaimer, /cafes
     // Dynamic cafe pages are served from the endpoint below
-    sources: ['/__sitemap__/urls'],
+    sources: ['/api/__sitemap__/urls'],
     urls: [
       { loc: '/', priority: 1.0, changefreq: 'daily' },
       { loc: '/blog', priority: 0.7, changefreq: 'weekly' },
