@@ -14,6 +14,12 @@ export default defineNuxtConfig({
     url: 'https://ngopi.di-mana.com',
   },
 
+  routeRules: {
+    // Prevent sitemap from being prerendered as a static file so the
+    // Nitro plugin can inject blog URLs dynamically at request time
+    '/sitemap.xml': { prerender: false },
+  },
+
   sitemap: {
     // Static pages: Nuxt auto-discovers /about-us, /privacy-policy, /disclaimer, /cafes
     // Dynamic cafe and blog pages are injected via server/plugins/sitemap-blogs.ts
