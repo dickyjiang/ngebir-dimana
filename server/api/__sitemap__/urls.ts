@@ -1,35 +1,43 @@
 /**
  * Dynamic sitemap URL source for @nuxtjs/sitemap.
- * Called by the sitemap module at /__sitemap__/urls to get all cafe and blog page URLs.
+ * Called by the sitemap module to get all cafe and blog page URLs.
  * Cafe pages: weekly changefreq, priority 0.8.
  * Blog posts: weekly changefreq, priority 0.6.
  *
- * Uses serverSupabaseClient (anon key) for both queries. Both tables have public
- * SELECT policies for their published/visible rows, so anon access works correctly.
+ * Uses direct Supabase REST API calls with the anon key instead of
+ * serverSupabaseClient, so it works reliably in all contexts including
+ * prerender (where the event object is synthetic and client helpers may fail).
+ * Both tables have public SELECT RLS policies for their visible rows.
  */
-import { serverSupabaseClient } from '#supabase/server'
+export default defineEventHandler(async () => {
+  const config = useRuntimeConfig()
+  const supabaseUrl = config.public.supabase.url as string
+  const supabaseKey = config.public.supabase.key as string
 
-export default defineEventHandler(async (event) => {
-  const client = await serverSupabaseClient(event)
-
-  // Fetch all published cafe slugs
-  const { data: cafeData, error: cafeError } = await client
-    .from('cafes')
-    .select('slug_name, updated_at')
-    .not('slug_name', 'is', null)
-
-  if (cafeError) {
-    console.error('Sitemap cafe URL generation error:', cafeError.message)
+  const headers = {
+    'apikey': supabaseKey,
+    'Authorization': `Bearer ${supabaseKey}`,
   }
 
-  // Fetch all published blog slugs — readable via anon due to public RLS policy
-  const { data: blogData, error: blogError } = await client
-    .from('blogs')
-    .select('slug, published_at')
-    .eq('is_published', true)
+  const [cafeRes, blogRes] = await Promise.allSettled([
+    $fetch<{ slug_name: string; updated_at: string | null }[]>(
+      `${supabaseUrl}/rest/v1/cafes?select=slug_name,updated_at&slug_name=not.is.null`,
+      { headers }
+    ),
+    $fetch<{ slug: string; published_at: string | null }[]>(
+      `${supabaseUrl}/rest/v1/blogs?select=slug,published_at&is_published=eq.true`,
+      { headers }
+    ),
+  ])
 
-  if (blogError) {
-    console.error('Sitemap blog URL generation error:', blogError.message)
+  const cafeData = cafeRes.status === 'fulfilled' ? cafeRes.value : []
+  const blogData = blogRes.status === 'fulfilled' ? blogRes.value : []
+
+  if (cafeRes.status === 'rejected') {
+    console.error('Sitemap cafe URL generation error:', cafeRes.reason)
+  }
+  if (blogRes.status === 'rejected') {
+    console.error('Sitemap blog URL generation error:', blogRes.reason)
   }
 
   const staticUrls = [
@@ -39,14 +47,14 @@ export default defineEventHandler(async (event) => {
     { loc: '/disclaimer', changefreq: 'monthly', priority: 0.3 },
   ]
 
-  const cafeUrls = (cafeData || []).map((cafe) => ({
+  const cafeUrls = cafeData.map((cafe) => ({
     loc: `/cafe/${cafe.slug_name}`,
     changefreq: 'weekly',
     priority: 0.8,
     lastmod: cafe.updated_at ?? undefined,
   }))
 
-  const blogUrls = (blogData || []).map((post) => ({
+  const blogUrls = blogData.map((post) => ({
     loc: `/blog/${post.slug}`,
     changefreq: 'weekly',
     priority: 0.6,
