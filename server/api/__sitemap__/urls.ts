@@ -2,7 +2,7 @@
  * Dynamic sitemap URL source for @nuxtjs/sitemap.
  * Called by the sitemap module at /__sitemap__/urls to get all cafe and blog page URLs.
  * Cafe pages: weekly changefreq, priority 0.8.
- * Blog posts: monthly changefreq, priority 0.6.
+ * Blog posts: weekly changefreq, priority 0.6.
  */
 import { serverSupabaseClient } from '#supabase/server'
 
@@ -38,7 +38,7 @@ export default defineEventHandler(async (event) => {
 
   const blogUrls = (blogData || []).map((post) => ({
     loc: `/blog/${post.slug}`,
-    changefreq: 'monthly',
+    changefreq: 'weekly',
     priority: 0.6,
     lastmod: post.published_at ?? undefined,
   }))
