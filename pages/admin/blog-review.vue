@@ -13,7 +13,7 @@ interface BlogDraft {
 }
 
 // ── Auth gate (same password as cafe review) ───────────────────────────────
-const ADMIN_PASSWORD = 'ndm-admin-2026'
+const ADMIN_PASSWORD = 'NDM'
 const SESSION_KEY = 'ndm_admin_auth'
 
 const authed = ref(false)
