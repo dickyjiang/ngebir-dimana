@@ -6,6 +6,7 @@ interface BlogDraft {
   title: string
   slug: string
   description: string | null
+  content: string | null
   cover_image_url: string | null
   category: string | null
   published_at: string
