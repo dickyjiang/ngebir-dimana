@@ -325,7 +325,28 @@ async function generateArticle(keyword, cafes, anthropic) {
     messages: [{ role: 'user', content: buildUserPrompt(keyword, cafes) }],
   })
 
-  return parseDelimitedOutput(msg.content[0].text)
+  const article = parseDelimitedOutput(msg.content[0].text)
+
+  // If model didn't inject backlinks, append a cafe recommendation section
+  if (cafes.length > 0 && !article.content.includes(`${SITE_URL}/cafe/`)) {
+    console.log('  Model skipped backlinks — injecting cafe section programmatically')
+    const cafeLinks = cafes
+      .filter(c => c.slug)
+      .map(c => `<li><a href="${SITE_URL}/cafe/${c.slug}">${c.name}</a> — ${c.location_area}${c.rating ? ` (⭐ ${c.rating})` : ''}</li>`)
+      .join('\n')
+
+    const cafeSection = `
+<h2>Rekomendasi Cafe di Bandung</h2>
+<p>Ingin mencicipi specialty coffee langsung di cafe terbaik Bandung? Berikut beberapa pilihan yang bisa kamu kunjungi:</p>
+<ul>
+${cafeLinks}
+</ul>
+<div class="cta-box"><strong>Temukan lebih banyak cafe specialty di Bandung!</strong><br><a href="${SITE_URL}/cafes?city=bandung">Lihat Semua Cafe di Direktori →</a></div>`
+
+    article.content = article.content + cafeSection
+  }
+
+  return article
 }
 
 // ─── Step 5: Quality Checks ───────────────────────────────────────────────────
