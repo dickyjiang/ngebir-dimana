@@ -1,0 +1,73 @@
+# NDM Blog Generator
+#
+# Runs every 3 days at 08:00 WIB (01:00 UTC).
+# Picks a keyword from blog-queue.json, generates an article via Anthropic,
+# saves it as a draft in Supabase, sends an email notification, then commits
+# the updated blog-queue.json back to the repo.
+#
+# Required GitHub Secrets (Settings → Secrets → Actions):
+#   ANTHROPIC_API_KEY         — Anthropic API key
+#   SUPABASE_URL              — https://iblcxviqmqiutjzxnblx.supabase.co
+#   SUPABASE_SERVICE_ROLE_KEY — NDM Supabase service role key
+#   GMAIL_USER                — Gmail address for notifications
+#   GMAIL_APP_PASSWORD        — Gmail App Password (16-char)
+#
+# Optional:
+#   DRY_RUN                   — set to "true" to skip API calls (for testing)
+
+name: NDM Blog Generator
+
+on:
+  schedule:
+    - cron: '0 1 */3 * *'   # Every 3 days at 08:00 WIB (01:00 UTC)
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run (skip API calls)'
+        required: false
+        default: 'false'
+        type: choice
+        options:
+          - 'false'
+          - 'true'
+
+jobs:
+  generate-blog:
+    name: Generate Blog Article
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install @supabase/supabase-js @anthropic-ai/sdk nodemailer
+
+      - name: Run blog generator
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          GMAIL_USER: ${{ secrets.GMAIL_USER }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          DRY_RUN: ${{ github.event.inputs.dry_run || 'false' }}
+        run: node scripts/generate-blog.mjs
+
+      - name: Commit updated queue
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add blog-queue.json
+          if git diff --staged --quiet; then
+            echo "No queue changes to commit."
+          else
+            git commit -m "chore: update blog-queue.json [skip ci]"
+            git push
+          fi
