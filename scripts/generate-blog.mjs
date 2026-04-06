@@ -209,23 +209,31 @@ async function getRelevantCafes(keyword, supabase) {
     }
   }
 
-  // Base cafe query
-  let q = supabase
-    .from('cafes')
-    .select('name, slug_name, borough, city, rating_num, about, photo')
-    .ilike('city', '%bandung%')
-    .eq('is_published', true)
-    .order('rating_num', { ascending: false })
-    .limit(8)
+  // Base cafe query — use neq(false) to include rows where is_published is null
+  const baseQuery = () =>
+    supabase
+      .from('cafes')
+      .select('name, slug_name, borough, city, rating_num, about, photo')
+      .ilike('city', '%bandung%')
+      .neq('is_published', false)
+      .order('rating_num', { ascending: false })
+      .limit(8)
+
+  let q = baseQuery()
 
   if (cafeIds && cafeIds.length > 0) {
     q = q.in('id', cafeIds)
   } else if (aboutFilter) {
-    // Filter on subtypes or description text
     q = q.ilike('subtypes', `%${aboutFilter}%`)
   }
 
-  const { data, error } = await q
+  let { data, error } = await q
+
+  // Fallback: if filtered query returned nothing, just grab top cafes by rating
+  if ((!data || data.length === 0) && (cafeIds || aboutFilter)) {
+    console.log('  Filtered query returned 0 cafes — falling back to top rated')
+    ;({ data, error } = await baseQuery())
+  }
 
   if (error) {
     console.warn('  Cafe query failed:', error.message)
