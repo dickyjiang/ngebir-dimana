@@ -1,5 +1,6 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { AwsClient } from 'https://esm.sh/aws4fetch@1'
+import { SmtpClient } from 'https://deno.land/x/smtp@v0.7.0/mod.ts'
 
 const CITIES = ['Bandung', 'Jakarta', 'Surabaya']
 const MAX_NEW_PER_CITY = 3
@@ -175,6 +176,57 @@ async function generateDescription(
   } catch (err) {
     console.warn(`[discover-cafes] generateDescription error: ${err instanceof Error ? err.message : err}`)
     return editorialSummary
+  }
+}
+
+async function sendSummaryEmail(
+  gmailPassword: string,
+  inserted: InsertedCafe[],
+  errors: string[]
+): Promise<void> {
+  if (!gmailPassword) return
+
+  const date = new Date().toLocaleDateString('id-ID', {
+    weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
+    timeZone: 'Asia/Jakarta',
+  })
+
+  const cafeList = inserted.length > 0
+    ? inserted.map((c) => `- ${c.name} (${c.city}) ★${c.rating ?? '?'} · ${c.photos_saved} foto`).join('\n')
+    : 'Tidak ada cafe baru ditemukan.'
+
+  const errorSection = errors.length > 0
+    ? `\n\nErrors:\n${errors.join('\n')}`
+    : ''
+
+  const body = [
+    `☕ NDM Daily Discovery — ${date}`,
+    ``,
+    `${inserted.length} cafe baru menunggu review:`,
+    `https://ngopi.di-mana.com/admin/review`,
+    ``,
+    cafeList,
+    errorSection,
+  ].join('\n')
+
+  try {
+    const client = new SmtpClient()
+    await client.connectTLS({
+      hostname: 'smtp.gmail.com',
+      port: 465,
+      username: 'dickyjuwono@gmail.com',
+      password: gmailPassword,
+    })
+    await client.send({
+      from: 'dickyjuwono@gmail.com',
+      to: 'dickyjuwono@gmail.com',
+      subject: `☕ NDM: ${inserted.length} cafe baru ditemukan — ${date}`,
+      content: body,
+    })
+    await client.close()
+    console.log('[discover-cafes] Summary email sent')
+  } catch (err) {
+    console.warn(`[discover-cafes] Email error: ${err instanceof Error ? err.message : err}`)
   }
 }
 
@@ -358,6 +410,9 @@ Deno.serve(async (_req: Request): Promise<Response> => {
   }
 
   console.log(`[discover-cafes] Done. Inserted ${inserted.length} cafe(s).`)
+
+  const gmailPassword = Deno.env.get('GMAIL_APP_PASSWORD') ?? ''
+  await sendSummaryEmail(gmailPassword, inserted, errors)
 
   return new Response(JSON.stringify(body), {
     status: 200,
