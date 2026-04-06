@@ -33,7 +33,7 @@ const GMAIL_APP_PASSWORD = process.env.GMAIL_APP_PASSWORD
 const DRY_RUN = process.env.DRY_RUN === 'true'
 
 const SITE_URL = 'https://ngopi.di-mana.com'
-const ADMIN_REVIEW_URL = `${SITE_URL}/admin/review`
+const ADMIN_REVIEW_URL = `${SITE_URL}/admin/blog-review`
 const MIN_WORD_COUNT = 800
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
