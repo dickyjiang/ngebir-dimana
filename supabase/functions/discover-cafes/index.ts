@@ -1,6 +1,6 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { AwsClient } from 'https://esm.sh/aws4fetch@1'
-import { SmtpClient } from 'https://deno.land/x/smtp@v0.7.0/mod.ts'
+import { SMTPClient } from 'https://deno.land/x/denomailer@1.6.0/mod.ts'
 
 const CITIES = ['Bandung', 'Jakarta', 'Surabaya']
 const MAX_NEW_PER_CITY = 3
@@ -210,12 +210,16 @@ async function sendSummaryEmail(
   ].join('\n')
 
   try {
-    const client = new SmtpClient()
-    await client.connectTLS({
-      hostname: 'smtp.gmail.com',
-      port: 465,
-      username: 'dickyjuwono@gmail.com',
-      password: gmailPassword,
+    const client = new SMTPClient({
+      connection: {
+        hostname: 'smtp.gmail.com',
+        port: 465,
+        tls: true,
+        auth: {
+          username: 'dickyjuwono@gmail.com',
+          password: gmailPassword,
+        },
+      },
     })
     await client.send({
       from: 'dickyjuwono@gmail.com',
