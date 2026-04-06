@@ -275,12 +275,6 @@ onMounted(() => {
               <div class="flex flex-wrap gap-3 text-xs text-gray-400">
                 <span>ID: {{ draft.id }}</span>
                 <span>Dibuat: {{ draft.created_at?.split('T')[0] }}</span>
-                <a
-                  :href="`/blog/${draft.slug}`"
-                  target="_blank"
-                  class="text-blue-500 hover:underline">
-                  Preview →
-                </a>
               </div>
             </div>
 
