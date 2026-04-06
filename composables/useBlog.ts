@@ -62,14 +62,14 @@ export function useBlog() {
     return (data as BlogPost[]) || []
   }
 
-  // 3 latest posts — used by homepage "Artikel & Tips" preview section
+  // 4 latest posts — used by homepage "Artikel & Tips" preview section
   async function fetchLatestPosts(): Promise<BlogPost[]> {
     const { data } = await supabase
       .from('blogs')
       .select('id, title, slug, description, cover_image_url, category, published_at')
       .eq('is_published', true)
       .order('published_at', { ascending: false })
-      .limit(3)
+      .limit(4)
     return (data as BlogPost[]) || []
   }
 
