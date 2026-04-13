@@ -395,7 +395,7 @@ onMounted(async () => {
         Lihat Semua →
       </NuxtLink>
     </div>
-    <ul class="grid grid-cols-3 lg:grid-cols-4 gap-2 px-4 sm:px-0 sm:gap-4">
+    <ul class="flex gap-2 sm:gap-4 overflow-x-auto sm:overflow-x-visible px-4 sm:px-0 pb-2 scrollbar-hide">
       <BlogCard v-for="post in latestBlogPosts" :key="post.id" :post="post" />
     </ul>
   </section>

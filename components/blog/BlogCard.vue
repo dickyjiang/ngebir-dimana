@@ -13,7 +13,7 @@ function formatDate(dateStr: string): string {
 </script>
 
 <template>
-  <li class="rounded-md flex flex-col h-full pb-4 border overflow-hidden bg-white">
+  <li class="rounded-md flex flex-col h-full pb-4 border overflow-hidden bg-white flex-shrink-0 w-[calc((100vw-3.5rem)/3)] sm:flex-1 sm:min-w-0 sm:w-auto transition-shadow hover:shadow-md hover:border-gray-300 cursor-pointer">
     <NuxtLink :to="`/blog/${post.slug}`" class="flex flex-col h-full">
       <NuxtImg
         :src="post.cover_image_url || ''"
@@ -32,7 +32,7 @@ function formatDate(dateStr: string): string {
         <h2 class="text-xs sm:text-base text-gray-800 font-semibold leading-tight line-clamp-2 mt-1">
           {{ post.title }}
         </h2>
-        <p class="hidden sm:block text-sm text-gray-500 line-clamp-2 mt-2 flex-1">
+        <p class="hidden sm:block text-sm text-gray-500 overflow-hidden mt-2" style="-webkit-line-clamp:2;line-clamp:2;display:-webkit-box;-webkit-box-orient:vertical;overflow:hidden">
           {{ post.description }}
         </p>
       </div>
