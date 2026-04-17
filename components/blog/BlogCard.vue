@@ -13,7 +13,7 @@ function formatDate(dateStr: string): string {
 </script>
 
 <template>
-  <li class="rounded-md flex flex-col h-full pb-4 border overflow-hidden bg-white flex-shrink-0 w-[calc((100vw-3.5rem)/3)] sm:flex-1 sm:min-w-0 sm:w-auto transition-shadow hover:shadow-md hover:border-gray-300 cursor-pointer">
+  <li class="rounded-md flex flex-col h-full pb-4 border overflow-hidden bg-white transition-shadow hover:shadow-md hover:border-gray-300 cursor-pointer">
     <NuxtLink :to="`/blog/${post.slug}`" class="flex flex-col h-full">
       <NuxtImg
         :src="post.cover_image_url || ''"

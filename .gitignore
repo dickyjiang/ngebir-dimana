@@ -24,3 +24,12 @@ logs
 !.env.example
 *.dncnb
 *.sql
+
+# Claude Code local config
+.claude/
+
+# Supabase temp files
+supabase/.temp/
+
+# Vim swap files
+*.swp

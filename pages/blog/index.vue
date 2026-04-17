@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import BlogCard from '~/components/blog/BlogCard.vue'
 import { useBlog } from '~/composables/useBlog'
 
@@ -14,12 +14,13 @@ useSeoMeta({
 })
 useHead({ link: [{ rel: 'canonical', href: 'https://ngopi.di-mana.com/blog' }] })
 
-const ITEMS_PER_PAGE = 9
+const MD_BREAKPOINT = 768
+const itemsPerPage = ref(9)
 const currentPage = ref(1)
 
 const { posts, loading, total, fetchPosts } = useBlog()
 
-const totalPages = computed(() => Math.ceil(total.value / ITEMS_PER_PAGE))
+const totalPages = computed(() => Math.ceil(total.value / itemsPerPage.value))
 
 const visiblePages = computed(() => {
   const pages: number[] = []
@@ -33,11 +34,32 @@ const visiblePages = computed(() => {
 async function changePage(page: number) {
   if (page < 1 || page > totalPages.value) return
   currentPage.value = page
-  await fetchPosts(page, ITEMS_PER_PAGE)
+  await fetchPosts(page, itemsPerPage.value)
   window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
-onMounted(() => fetchPosts(1, ITEMS_PER_PAGE))
+function getItemsPerPage() {
+  return window.innerWidth < MD_BREAKPOINT ? 8 : 9
+}
+
+async function onResize() {
+  const next = getItemsPerPage()
+  if (next !== itemsPerPage.value) {
+    itemsPerPage.value = next
+    currentPage.value = 1
+    await fetchPosts(1, next)
+  }
+}
+
+onMounted(() => {
+  itemsPerPage.value = getItemsPerPage()
+  fetchPosts(1, itemsPerPage.value)
+  window.addEventListener('resize', onResize)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', onResize)
+})
 </script>
 
 <template>
@@ -48,9 +70,9 @@ onMounted(() => fetchPosts(1, ITEMS_PER_PAGE))
     </div>
 
     <!-- Skeleton loading -->
-    <div v-if="loading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div v-if="loading" class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4">
       <div
-        v-for="n in ITEMS_PER_PAGE"
+        v-for="n in itemsPerPage"
         :key="n"
         class="rounded-md flex flex-col h-full pb-4 border overflow-hidden"
       >
@@ -69,7 +91,7 @@ onMounted(() => fetchPosts(1, ITEMS_PER_PAGE))
     </div>
 
     <!-- Posts grid -->
-    <ul v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    <ul v-else class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4">
       <BlogCard v-for="post in posts" :key="post.id" :post="post" />
     </ul>
 
