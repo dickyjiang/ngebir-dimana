@@ -396,7 +396,12 @@ onMounted(async () => {
       </NuxtLink>
     </div>
     <ul class="flex gap-2 sm:gap-4 overflow-x-auto sm:overflow-x-visible px-4 sm:px-0 pb-2 scrollbar-hide">
-      <BlogCard v-for="post in latestBlogPosts" :key="post.id" :post="post" />
+      <BlogCard
+        v-for="post in latestBlogPosts"
+        :key="post.id"
+        :post="post"
+        class="flex-shrink-0 w-[calc((100vw-3.5rem)/2.8)] sm:flex-1 sm:min-w-0 sm:w-auto"
+      />
     </ul>
   </section>
 
