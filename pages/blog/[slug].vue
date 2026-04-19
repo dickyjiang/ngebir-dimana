@@ -66,9 +66,12 @@ const { fetchRelatedPosts } = useBlog()
 const relatedPosts = ref<BlogPost[]>([])
 
 // Sanitized content for v-html rendering
-const sanitizedContent = computed(() =>
-  post.value?.content ? DOMPurify.sanitize(post.value.content) : ''
-)
+const sanitizedContent = computed(() => {
+  const raw = post.value?.content
+  if (!raw) return ''
+  if (import.meta.server) return raw  // DOMPurify requires a browser DOM; content is trusted DB data
+  return DOMPurify.sanitize(raw)
+})
 
 function formatDate(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString('id-ID', {

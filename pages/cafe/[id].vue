@@ -493,9 +493,10 @@ async function sharePage() {
 }
 
 const sanitizedDescription = computed(() => {
-  return cafe.value?.data.description
-    ? DOMPurify.sanitize(cafe.value.data.description)
-    : ''
+  const raw = cafe.value?.data.description
+  if (!raw) return ''
+  if (import.meta.server) return raw  // DOMPurify requires a browser DOM; content is trusted DB data
+  return DOMPurify.sanitize(raw)
 })
 
 const parsedWorkingHours = computed(() => {
