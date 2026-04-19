@@ -6,13 +6,66 @@ import { useBlog } from '~/composables/useBlog'
 import type { BlogPost } from '~/composables/useBlog'
 
 const route = useRoute()
-const { post, loading, fetchPostBySlug, fetchRelatedPosts } = useBlog()
-const relatedPosts = ref<BlogPost[]>([])
-
 const slug = route.params.slug as string
 const canonicalUrl = `https://ngopi.di-mana.com/blog/${slug}`
 
-// Sanitized content for v-html rendering — same pattern as cafe/[id].vue
+const supabase = useSupabaseClient()
+
+const { data: post, pending: loading } = await useAsyncData(
+  `blog-post-${slug}`,
+  async () => {
+    const { data } = await supabase
+      .from('blogs')
+      .select('*')
+      .eq('slug', slug)
+      .eq('is_published', true)
+      .single()
+    return (data as BlogPost) ?? null
+  }
+)
+
+if (!post.value) {
+  throw createError({ statusCode: 404, statusMessage: 'Artikel tidak ditemukan', fatal: true })
+}
+
+// SEO — synchronous so tags are in the initial SSR HTML
+const ogImage = post.value.cover_image_url || 'https://ngopi.di-mana.com/img/OG-img.png'
+
+useSeoMeta({
+  title: `${post.value.title} | Ngopi di Mana?`,
+  description: post.value.description || post.value.title,
+  ogTitle: `${post.value.title} | Ngopi di Mana?`,
+  ogDescription: post.value.description || post.value.title,
+  ogImage: ogImage,
+  ogType: 'article',
+  ogUrl: canonicalUrl,
+  twitterCard: 'summary_large_image',
+})
+
+useHead({
+  link: [{ rel: 'canonical', href: canonicalUrl }],
+  script: [{
+    type: 'application/ld+json',
+    children: JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'Article',
+      headline: post.value.title,
+      description: post.value.description || '',
+      image: ogImage,
+      datePublished: post.value.published_at,
+      dateModified: post.value.published_at,
+      url: canonicalUrl,
+      author: { '@type': 'Organization', name: 'Ngopi di Mana', url: 'https://ngopi.di-mana.com' },
+      publisher: { '@type': 'Organization', name: 'Ngopi di Mana', url: 'https://ngopi.di-mana.com' },
+    }),
+  }],
+})
+
+// Related posts — not SEO-critical, fetched client-side
+const { fetchRelatedPosts } = useBlog()
+const relatedPosts = ref<BlogPost[]>([])
+
+// Sanitized content for v-html rendering
 const sanitizedContent = computed(() =>
   post.value?.content ? DOMPurify.sanitize(post.value.content) : ''
 )
@@ -25,45 +78,7 @@ function formatDate(dateStr: string): string {
   })
 }
 
-// Update meta and JSON-LD once post data is available
-watch(post, (newPost) => {
-  if (!newPost) return
-  const ogImage = newPost.cover_image_url || 'https://ngopi.di-mana.com/img/OG-img.png'
-
-  useSeoMeta({
-    title: `${newPost.title} | Ngopi di Mana?`,
-    description: newPost.description || newPost.title,
-    ogTitle: `${newPost.title} | Ngopi di Mana?`,
-    ogDescription: newPost.description || newPost.title,
-    ogImage: ogImage,
-    ogType: 'article',
-    ogUrl: canonicalUrl,
-    twitterCard: 'summary_large_image',
-  })
-
-  // Article structured data for Google rich results
-  useHead({
-    link: [{ rel: 'canonical', href: canonicalUrl }],
-    script: [{
-      type: 'application/ld+json',
-      children: JSON.stringify({
-        '@context': 'https://schema.org',
-        '@type': 'Article',
-        headline: newPost.title,
-        description: newPost.description || '',
-        image: ogImage,
-        datePublished: newPost.published_at,
-        dateModified: newPost.published_at,
-        url: canonicalUrl,
-        author: { '@type': 'Organization', name: 'Ngopi di Mana', url: 'https://ngopi.di-mana.com' },
-        publisher: { '@type': 'Organization', name: 'Ngopi di Mana', url: 'https://ngopi.di-mana.com' },
-      }),
-    }],
-  })
-}, { immediate: true })
-
 onMounted(async () => {
-  await fetchPostBySlug(slug)
   if (post.value?.category) {
     relatedPosts.value = await fetchRelatedPosts(slug, post.value.category)
   }

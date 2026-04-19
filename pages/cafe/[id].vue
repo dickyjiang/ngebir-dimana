@@ -284,14 +284,78 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch, computed } from 'vue'
-import { useRoute, useNuxtApp } from '#app'
+import { ref, onMounted, computed } from 'vue'
+import { useRoute } from '#app'
 import { useHead } from '#imports'
 import DOMPurify from 'dompurify'
 
 const route = useRoute()
-const cafe = ref(null)
-const loading = ref(true)
+
+const { data: cafe, pending: loading } = await useAsyncData(
+  `cafe-${route.params.id}`,
+  () => $fetch(`/api/cafe/${route.params.id}`, {
+    headers: useRequestHeaders(['cookie']),
+  })
+)
+
+if (!cafe.value || !cafe.value.data) {
+  throw createError({ statusCode: 404, statusMessage: 'Cafe not found', fatal: true })
+}
+
+// SEO — synchronous so tags are in the initial SSR HTML
+const cafeData = cafe.value.data
+const slug = route.params.id
+const canonicalUrl = `https://ngopi.di-mana.com/cafe/${slug}`
+const metaDescription = `${cafeData.name} berlokasi di ${cafeData.street || cafeData.city}. ${cafeData.business_type || 'Cafe'} di ${cafeData.city}.`
+const ogImage = cafeData.photo || 'https://ngopi.di-mana.com/img/OG-img.png'
+
+const openingHoursSpec = []
+if (cafeData.working_hours && isValidJson(cafeData.working_hours)) {
+  const hours = JSON.parse(cafeData.working_hours)
+  for (const [day, time] of Object.entries(hours)) {
+    if (time) openingHoursSpec.push(`${day} ${time}`)
+  }
+}
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "CafeOrCoffeeShop",
+  "name": cafeData.name,
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": cafeData.street || '',
+    "addressLocality": cafeData.city || '',
+    "addressCountry": "ID"
+  },
+  "url": canonicalUrl,
+}
+if (cafeData.lat && cafeData.long) {
+  jsonLd["geo"] = {
+    "@type": "GeoCoordinates",
+    "latitude": cafeData.lat,
+    "longitude": cafeData.long,
+  }
+}
+if (openingHoursSpec.length > 0) {
+  jsonLd["openingHours"] = openingHoursSpec
+}
+
+useSeoMeta({
+  title: `${cafeData.name} – Tempat Ngopi di ${cafeData.city} | Ngopi di Mana?`,
+  description: metaDescription,
+  ogTitle: `${cafeData.name} – Tempat Ngopi di ${cafeData.city} | Ngopi di Mana?`,
+  ogDescription: metaDescription,
+  ogImage: ogImage,
+  ogType: 'website',
+  ogUrl: canonicalUrl,
+  twitterCard: 'summary_large_image',
+})
+
+useHead({
+  link: [{ rel: 'canonical', href: canonicalUrl }],
+  script: [{ type: 'application/ld+json', children: JSON.stringify(jsonLd) }],
+})
+
 const about = ref({})
 const showModal = ref(false)
 const selectedImage = ref('')
@@ -365,66 +429,6 @@ function previousImage() {
   }
 }
 
-// Watch for changes in cafe data and update meta tags + structured data
-watch(() => cafe.value, (newCafe) => {
-  if (newCafe && newCafe.data) {
-    const cafeData = newCafe.data
-    const slug = route.params.id
-    const canonicalUrl = `https://ngopi.di-mana.com/cafe/${slug}`
-    const metaDescription = `${cafeData.name} berlokasi di ${cafeData.street || cafeData.city}. ${cafeData.business_type || 'Cafe'} di ${cafeData.city}.`
-    const ogImage = cafeData.photo || 'https://ngopi.di-mana.com/img/OG-img.png'
-
-    // Build opening hours array for schema if available
-    const openingHoursSpec = []
-    if (cafeData.working_hours && isValidJson(cafeData.working_hours)) {
-      const hours = JSON.parse(cafeData.working_hours)
-      for (const [day, time] of Object.entries(hours)) {
-        if (time) openingHoursSpec.push(`${day} ${time}`)
-      }
-    }
-
-    // Schema.org CafeOrCoffeeShop structured data for rich results
-    const jsonLd = {
-      "@context": "https://schema.org",
-      "@type": "CafeOrCoffeeShop",
-      "name": cafeData.name,
-      "address": {
-        "@type": "PostalAddress",
-        "streetAddress": cafeData.street || '',
-        "addressLocality": cafeData.city || '',
-        "addressCountry": "ID"
-      },
-      "url": canonicalUrl,
-    }
-    if (cafeData.lat && cafeData.long) {
-      jsonLd["geo"] = {
-        "@type": "GeoCoordinates",
-        "latitude": cafeData.lat,
-        "longitude": cafeData.long,
-      }
-    }
-    if (openingHoursSpec.length > 0) {
-      jsonLd["openingHours"] = openingHoursSpec
-    }
-
-    useSeoMeta({
-      title: `${cafeData.name} – Tempat Ngopi di ${cafeData.city} | Ngopi di Mana?`,
-      description: metaDescription,
-      ogTitle: `${cafeData.name} – Tempat Ngopi di ${cafeData.city} | Ngopi di Mana?`,
-      ogDescription: metaDescription,
-      ogImage: ogImage,
-      ogType: 'website',
-      ogUrl: canonicalUrl,
-      twitterCard: 'summary_large_image',
-    })
-
-    useHead({
-      link: [{ rel: 'canonical', href: canonicalUrl }],
-      script: [{ type: 'application/ld+json', children: JSON.stringify(jsonLd) }],
-    })
-  }
-}, { immediate: true })
-
 function openInGoogleMaps() {
   // encan
   // First priority: use location_link if available
@@ -468,27 +472,12 @@ function openWebsite() {
   }
 }
 
-onMounted(async () => {
+onMounted(() => {
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && showModal.value) {
       closeModal()
     }
   })
-  try {
-    const cafeData = await $fetch(`/api/cafe/${route.params.id}`, {
-      headers: useRequestHeaders(['cookie']),
-      onResponseError({ response }) {
-        console.error(`Server error: ${response.status} ${response.statusText}`)
-        loading.value = false
-      },
-    })
-
-    cafe.value = cafeData
-  } catch (err) {
-    console.error('Fetch error:', err)
-  } finally {
-    loading.value = false
-  }
 })
 async function sharePage() {
   try {
