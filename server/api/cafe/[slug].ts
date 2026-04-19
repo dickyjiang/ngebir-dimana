@@ -6,7 +6,7 @@ export default defineEventHandler(async (event) => {
     const client = await serverSupabaseClient<Database>(event);
     let query = client.from("cafes").select("id,name,city, photo, city, slug_name, description, city_slug,rating, range, rating_num, logo, lat, long, street, full_address, google_place_id, state, phone, site, working_hours, location_link, uuid, business_type, cafe_features(cafe_id, feature_id)", { count: "exact" });
     query = query.eq('slug_name', slug)
-    query = query.single();
+    query = query.maybeSingle();
 
     // const user = await serverSupabaseUser(event);
     let is_admin = false;
@@ -16,6 +16,7 @@ export default defineEventHandler(async (event) => {
 
     const { data, error, count } = await query
     if (error) throw createError({ statusMessage: error.message });
+    if (!data) throw createError({ statusCode: 404, statusMessage: 'Cafe not found' });
 
     const featureIds = [];
 
