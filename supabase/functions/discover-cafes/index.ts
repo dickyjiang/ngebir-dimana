@@ -297,7 +297,6 @@ Deno.serve(async (_req: Request): Promise<Response> => {
           textQuery: `cafe in ${city}`,
           languageCode: 'id',
           maxResultCount: 20,
-          rankPreference: 'POPULARITY',
         }),
       })
 
