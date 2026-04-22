@@ -293,7 +293,7 @@ Deno.serve(async (_req: Request): Promise<Response> => {
           ].join(','),
         },
         body: JSON.stringify({
-          textQuery: `cafe in ${city}`,
+          textQuery: `coffee roastery in ${city}`,
           languageCode: 'id',
           maxResultCount: 20,
         }),
