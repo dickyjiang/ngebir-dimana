@@ -262,6 +262,7 @@ Deno.serve(async (_req: Request): Promise<Response> => {
       .from('cafes')
       .select('google_place_id')
       .not('google_place_id', 'is', null)
+      .eq('city', city)
 
     if (fetchError) {
       console.error(`[discover-cafes] Failed to fetch existing cafes: ${fetchError.message}`)
@@ -296,6 +297,7 @@ Deno.serve(async (_req: Request): Promise<Response> => {
           textQuery: `cafe in ${city}`,
           languageCode: 'id',
           maxResultCount: 20,
+          rankPreference: 'POPULARITY',
         }),
       })
 
