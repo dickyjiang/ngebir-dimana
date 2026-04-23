@@ -9,6 +9,10 @@ export default defineNuxtConfig({
     '@nuxtjs/sitemap',
   ],
 
+  runtimeConfig: {
+    supabaseServiceKey: process.env.SUPABASE_SERVICE_KEY || '',
+  },
+
   // Site URL used by @nuxtjs/sitemap for absolute URLs
   site: {
     url: 'https://ngopi.di-mana.com',
@@ -28,19 +32,9 @@ export default defineNuxtConfig({
   },
 
   sitemap: {
-    // Static pages: Nuxt auto-discovers /about-us, /privacy-policy, /disclaimer, /cafes
-    // Dynamic cafe and blog pages are injected via server/plugins/sitemap-blogs.ts
     sources: ['/api/__sitemap__/urls'],
-    urls: [
-      { loc: '/', priority: 1.0, changefreq: 'daily' },
-      { loc: '/about-us', priority: 0.5, changefreq: 'monthly' },
-      { loc: '/privacy-policy', priority: 0.3, changefreq: 'monthly' },
-      { loc: '/disclaimer', priority: 0.3, changefreq: 'monthly' },
-    ],
-    // Disable cache to prevent stale sitemaps persisting across deployments
     cacheMaxAgeSeconds: 0,
     runtimeCacheStorage: false,
-    // Exclude auth/dashboard pages
     exclude: ['/login', '/dashboard', '/profile', '/cafe/owner/**', '/cafes/new'],
   },
 
