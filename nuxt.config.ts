@@ -16,6 +16,7 @@ export default defineNuxtConfig({
   // Site URL used by @nuxtjs/sitemap for absolute URLs
   site: {
     url: 'https://ngopi.di-mana.com',
+    name: 'Ngopi di Mana',
   },
 
   routeRules: {

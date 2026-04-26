@@ -40,7 +40,7 @@ export default defineEventHandler(async () => {
     'Authorization': `Bearer ${anonKey}`,
   }
 
-  const [cafeRes, blogRes, cityRes, featureRes] = await Promise.allSettled([
+  const [cafeRes, blogRes] = await Promise.allSettled([
     fetchAll<{ slug_name: string }>(
       `${supabaseUrl}/rest/v1/cafes?select=slug_name&slug_name=not.is.null&is_published=eq.true`,
       serviceHeaders
@@ -49,25 +49,13 @@ export default defineEventHandler(async () => {
       `${supabaseUrl}/rest/v1/blogs?select=slug,published_at&is_published=eq.true`,
       anonHeaders
     ),
-    fetchAll<{ city_slug: string }>(
-      `${supabaseUrl}/rest/v1/city?select=city_slug`,
-      anonHeaders
-    ),
-    fetchAll<{ feature_slug: string }>(
-      `${supabaseUrl}/rest/v1/features?select=feature_slug&feature_slug=not.is.null`,
-      anonHeaders
-    ),
   ])
 
   const cafeData = cafeRes.status === 'fulfilled' ? cafeRes.value : []
   const blogData = blogRes.status === 'fulfilled' ? blogRes.value : []
-  const cityData = cityRes.status === 'fulfilled' ? cityRes.value : []
-  const featureData = featureRes.status === 'fulfilled' ? featureRes.value : []
 
   if (cafeRes.status === 'rejected') console.error('Sitemap cafe error:', cafeRes.reason)
   if (blogRes.status === 'rejected') console.error('Sitemap blog error:', blogRes.reason)
-  if (cityRes.status === 'rejected') console.error('Sitemap city error:', cityRes.reason)
-  if (featureRes.status === 'rejected') console.error('Sitemap feature error:', featureRes.reason)
 
   const staticUrls = [
     { loc: '/', changefreq: 'daily', priority: 1.0 },
@@ -91,19 +79,5 @@ export default defineEventHandler(async () => {
     lastmod: post.published_at ?? undefined,
   }))
 
-  // Deduplicate city slugs (child cities may share slugs with parents)
-  const uniqueCitySlugs = [...new Set(cityData.map((c) => c.city_slug))]
-  const cityUrls = uniqueCitySlugs.map((slug) => ({
-    loc: `/cafes?city=${slug}`,
-    changefreq: 'weekly',
-    priority: 0.7,
-  }))
-
-  const featureUrls = featureData.map((f) => ({
-    loc: `/cafes?features=${f.feature_slug}`,
-    changefreq: 'weekly',
-    priority: 0.7,
-  }))
-
-  return [...staticUrls, ...cafeUrls, ...blogUrls, ...cityUrls, ...featureUrls]
+  return [...staticUrls, ...cafeUrls, ...blogUrls]
 })
