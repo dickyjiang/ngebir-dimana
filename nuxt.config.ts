@@ -11,6 +11,8 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     supabaseServiceKey: process.env.SUPABASE_SERVICE_KEY || '',
+    anthropicApiKey: process.env.ANTHROPIC_API_KEY || '',
+    cronSecret: process.env.CRON_SECRET || '',
   },
 
   // Site URL used by @nuxtjs/sitemap for absolute URLs
@@ -25,9 +27,6 @@ export default defineNuxtConfig({
 
   nitro: {
     prerender: {
-      // Force sitemap out of prerender — routeRules alone doesn't override
-      // @nuxtjs/sitemap's internal addPrerenderRoutes('/sitemap.xml') call.
-      // Without this, Cloudflare Pages serves the stale static file forever.
       ignore: ['/sitemap.xml'],
     },
   },
@@ -46,7 +45,6 @@ export default defineNuxtConfig({
     }
   },
 
-
   image: {
     domains: ['storage.di-mana.com'],
   },
@@ -62,7 +60,6 @@ export default defineNuxtConfig({
       login: '/login',
       callback: '/confirm',
       cookieRedirect: true,
-      // exclude: ['/'],
       include: ['/account/*', '/account', '/cafe/owner/*'],
     }
   },
