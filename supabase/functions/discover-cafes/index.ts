@@ -2,8 +2,8 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { AwsClient } from 'https://esm.sh/aws4fetch@1'
 import { SMTPClient } from 'https://deno.land/x/denomailer@1.6.0/mod.ts'
 
-const CITIES = ['Bandung', 'Jakarta', 'Tangerang', 'Surabaya', 'Medan', 'Bali', 'Magelang', 'Solo', 'Cimahi']
-const MAX_NEW_PER_CITY = 3
+const CITIES = ['Bandung', 'Jakarta', 'Tangerang', 'Surabaya', 'Medan', 'Bali', 'Magelang', 'Solo']
+const MAX_NEW_PER_CITY = 1
 const MAX_PHOTOS = 3
 const PLACES_API_BASE = 'https://places.googleapis.com/v1/places:searchText'
 
