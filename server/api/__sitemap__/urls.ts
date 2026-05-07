@@ -41,12 +41,12 @@ export default defineEventHandler(async () => {
   }
 
   const [cafeRes, blogRes] = await Promise.allSettled([
-    fetchAll<{ slug_name: string }>(
-      `${supabaseUrl}/rest/v1/cafes?select=slug_name&slug_name=not.is.null&is_published=eq.true`,
+    fetchAll<{ slug_name: string; updated_at: string | null; created_at: string | null }>(
+      `${supabaseUrl}/rest/v1/cafes?select=slug_name,updated_at,created_at&slug_name=not.is.null&is_published=eq.true`,
       serviceHeaders
     ),
-    fetchAll<{ slug: string; published_at: string | null }>(
-      `${supabaseUrl}/rest/v1/blogs?select=slug,published_at&is_published=eq.true`,
+    fetchAll<{ slug: string; published_at: string | null; updated_at: string | null }>(
+      `${supabaseUrl}/rest/v1/blogs?select=slug,published_at,updated_at&is_published=eq.true`,
       anonHeaders
     ),
   ])
@@ -70,13 +70,14 @@ export default defineEventHandler(async () => {
     loc: `/cafe/${cafe.slug_name}`,
     changefreq: 'weekly',
     priority: 0.8,
+    lastmod: cafe.updated_at || cafe.created_at || new Date().toISOString(),
   }))
 
   const blogUrls = blogData.map((post) => ({
     loc: `/blog/${post.slug}`,
     changefreq: 'weekly',
     priority: 0.6,
-    lastmod: post.published_at ?? undefined,
+    lastmod: post.updated_at || post.published_at || new Date().toISOString(),
   }))
 
   return [...staticUrls, ...cafeUrls, ...blogUrls]

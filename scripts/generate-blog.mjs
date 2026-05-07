@@ -262,7 +262,7 @@ Setiap artikel harus:
 - Minimum 1000 kata
 - HTML formatting: <h2>, <h3>, <p>, <ul>, <strong>
 - Sertakan minimal 1 FAQ section dengan format <h2>FAQ</h2> dan <h3>pertanyaan</h3><p>jawaban</p> untuk AEO optimization
-- Sertakan backlink ke cafe relevan dari data yang diberikan, format: <a href="${SITE_URL}/cafe/[slug]">[name]</a>
+- Sertakan backlink ke cafe relevan dari data yang diberikan, format: <a href="${SITE_URL}/cafe/[slug]" class="cafe-backlink"><img src="[foto]" alt="[name]" class="cafe-thumb" />[name]</a>
 - Sertakan CTA box di tengah dan akhir artikel:
   <div class="cta-box"><strong>[ajakan]</strong><br><a href="${SITE_URL}/cafes?[filter]">Temukan Cafe di Direktori →</a></div>
 - JANGAN sertakan <html>, <head>, <body>, <style>
@@ -287,20 +287,23 @@ Format output pakai delimiter (BUKAN JSON):
 function buildUserPrompt(keyword, cafes) {
   const cafeContext =
     cafes.length > 0
-      ? `\n\nData cafe relevan untuk backlink:\n${cafes
+      ? `\n\nData cafe relevan untuk backlink (gunakan link HTML persis seperti di bawah):\n${cafes
           .map(
             c =>
-              `- ${c.name} | slug: ${c.slug} | area: ${c.location_area} | rating: ${c.rating} | foto: ${c.photo}\n  tentang: ${c.about.slice(0, 200)}`
+              `- <a href="${SITE_URL}/cafe/${c.slug}">${c.name}</a> | area: ${c.location_area} | rating: ${c.rating} | foto: ${c.photo}\n  tentang: ${c.about.slice(0, 200)}`
           )
           .join('\n')}`
-      : '\n\n(Tidak ada data cafe spesifik — gunakan referensi umum ke direktori)'
+      : '\n\n(Tidak ada data cafe spesifik — gunakan referensi umum ke direktori saja, tidak perlu backlink ke cafe individual)'
+
+  const backlinkInstruction = cafes.length > 0
+    ? '2. Sertakan semua backlink cafe di atas — copy-paste tag <a> persis seperti yang diberikan\n3. Gunakan foto cafe (kolom photo) yang paling relevan untuk %%COVER_IMAGE_URL%%'
+    : '2. Tidak ada backlink cafe — fokus pada konten informatif dan CTA ke direktori\n3. Gunakan URL gambar placeholder kosong untuk %%COVER_IMAGE_URL%%'
 
   return `Tulis artikel SEO/AEO lengkap untuk keyword: "${keyword}"${cafeContext}
 
 Pastikan:
 1. Artikel sangat berguna dan informatif untuk pembaca yang mencari ${keyword}
-2. Sertakan semua backlink cafe di atas dengan format yang benar
-3. Gunakan foto cafe (kolom photo) yang paling relevan untuk %%COVER_IMAGE_URL%%
+${backlinkInstruction}
 4. Tambahkan FAQ section yang menjawab pertanyaan umum tentang topik ini`
 }
 
@@ -351,8 +354,9 @@ ${cafeLinks}
 
 // ─── Step 5: Quality Checks ───────────────────────────────────────────────────
 
-function qualityCheck(article, keyword) {
+function qualityCheck(article, keyword, hasCafes) {
   const errors = []
+  const warnings = []
   const wc = wordCount(article.content)
 
   if (wc < MIN_WORD_COUNT) errors.push(`Word count too low: ${wc} (min ${MIN_WORD_COUNT})`)
@@ -363,14 +367,18 @@ function qualityCheck(article, keyword) {
   if (kwOccurrences < 3) errors.push(`Keyword "${kwLower.split(' ')[0]}" appears only ${kwOccurrences}× (min 3)`)
 
   if (!article.content.includes(`${SITE_URL}/cafe/`)) {
-    errors.push('Missing backlink to /cafe/')
+    if (hasCafes) {
+      errors.push('Missing backlink to /cafe/')
+    } else {
+      warnings.push('No backlinks to /cafe/ (no cafe data was available)')
+    }
   }
 
   if (!article.content.includes('cta-box')) {
     errors.push('Missing cta-box element')
   }
 
-  return { wc, errors }
+  return { wc, errors, warnings }
 }
 
 // ─── Step 6: Save to Supabase ─────────────────────────────────────────────────
@@ -508,6 +516,8 @@ async function main() {
   console.log(`  Found ${cafes.length} cafes`)
   if (cafes.length > 0) {
     cafes.forEach(c => console.log(`    • ${c.name} (${c.location_area})`))
+  } else {
+    console.warn('  ⚠️ No backlinks found for this article, continuing without them')
   }
 
   // Step 4 — Generate article
@@ -517,8 +527,11 @@ async function main() {
 
   // Step 5 — Quality checks
   console.log('\n[5/7] Running quality checks…')
-  const { wc, errors } = qualityCheck(article, keyword)
+  const { wc, errors, warnings } = qualityCheck(article, keyword, cafes.length > 0)
   console.log(`  Word count: ${wc}`)
+  if (warnings.length > 0) {
+    warnings.forEach(w => console.warn(`    ⚠️  ${w}`))
+  }
   if (errors.length > 0) {
     console.warn('  Quality issues:')
     errors.forEach(e => console.warn(`    ⚠  ${e}`))

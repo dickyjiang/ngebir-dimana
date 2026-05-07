@@ -65,12 +65,41 @@ useHead({
 const { fetchRelatedPosts } = useBlog()
 const relatedPosts = ref<BlogPost[]>([])
 
+// Fetch cafe photos for backlinks in blog content
+const cafePhotos = ref<Record<string, string>>({})
+
+function extractCafeSlugs(html: string): string[] {
+  const regex = /href=["'](?:https?:\/\/ngopi\.di-mana\.com)?\/cafe\/([^"'#?]+)["']/g
+  const slugs: string[] = []
+  let match
+  while ((match = regex.exec(html)) !== null) {
+    if (!slugs.includes(match[1])) slugs.push(match[1])
+  }
+  return slugs
+}
+
+function injectCafeImages(html: string, photos: Record<string, string>): string {
+  // Match cafe links that do NOT already contain an <img> tag
+  return html.replace(
+    /<a\s+([^>]*href=["'](?:https?:\/\/ngopi\.di-mana\.com)?\/cafe\/([^"'#?]+)["'][^>]*)>(?!.*?<img)(.*?)<\/a>/gi,
+    (full, attrs, slug, text) => {
+      const photo = photos[slug]
+      if (!photo) return full
+      return `<a ${attrs} class="cafe-backlink"><img src="${photo}" alt="${text.replace(/<[^>]*>/g, '')}" class="cafe-thumb" />${text}</a>`
+    }
+  )
+}
+
 // Sanitized content for v-html rendering
 const sanitizedContent = computed(() => {
   const raw = post.value?.content
   if (!raw) return ''
   if (import.meta.server) return raw  // DOMPurify requires a browser DOM; content is trusted DB data
-  return DOMPurify.sanitize(raw)
+  let html = DOMPurify.sanitize(raw)
+  if (Object.keys(cafePhotos.value).length > 0) {
+    html = injectCafeImages(html, cafePhotos.value)
+  }
+  return html
 })
 
 function formatDate(dateStr: string): string {
@@ -84,6 +113,25 @@ function formatDate(dateStr: string): string {
 onMounted(async () => {
   if (post.value?.category) {
     relatedPosts.value = await fetchRelatedPosts(slug, post.value.category)
+  }
+
+  // Fetch cafe photos for inline thumbnails
+  const content = post.value?.content
+  if (content) {
+    const slugs = extractCafeSlugs(content)
+    if (slugs.length > 0) {
+      const { data } = await supabase
+        .from('cafes')
+        .select('slug_name, photo')
+        .in('slug_name', slugs)
+      if (data) {
+        const map: Record<string, string> = {}
+        for (const c of data) {
+          if (c.photo) map[c.slug_name] = c.photo
+        }
+        cafePhotos.value = map
+      }
+    }
   }
 })
 </script>
@@ -194,4 +242,8 @@ onMounted(async () => {
 .blog-content :deep(li) { margin-bottom: 0.25rem; }
 .blog-content :deep(img) { max-width: 100%; border-radius: 0.5rem; margin: 1rem 0; }
 .blog-content :deep(blockquote) { border-left: 3px solid #d1d5db; padding-left: 1rem; color: #6b7280; font-style: italic; margin: 1rem 0; }
+
+/* Cafe backlink with inline thumbnail */
+.blog-content :deep(.cafe-backlink) { display: flex; flex-direction: column; gap: 0.25rem; margin-bottom: 0.5rem; }
+.blog-content :deep(.cafe-thumb) { width: 100%; height: auto;border-radius: 0.375rem; object-fit: cover; margin: 0; }
 </style>
