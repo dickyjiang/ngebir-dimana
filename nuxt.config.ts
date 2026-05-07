@@ -35,7 +35,17 @@ export default defineNuxtConfig({
     sources: ['/api/__sitemap__/urls'],
     cacheMaxAgeSeconds: 0,
     runtimeCacheStorage: false,
-    exclude: ['/login', '/dashboard', '/profile', '/cafe/owner/**', '/cafes/new'],
+    exclude: [
+      '/login',
+      '/dashboard',
+      '/profile',
+      '/cafe/owner/**',
+      '/cafes/new',
+      '/admin/**',
+      '/confirm',
+      '/Disclaimer',
+      '/cafes',
+    ],
   },
 
   gtag: {
