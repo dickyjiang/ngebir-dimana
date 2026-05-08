@@ -1,6 +1,6 @@
-# Ngopi di Mana - Cafe Directory
+# Ngebir Dimana - Bar Directory
 
-Indonesian cafe directory website at https://ngopi.di-mana.com
+Indonesian bar directory website at https://ngebir-dimana.com
 
 ## Tech Stack
 

@@ -4,15 +4,15 @@ import BlogCard from '~/components/blog/BlogCard.vue'
 import { useBlog } from '~/composables/useBlog'
 
 useSeoMeta({
-  title: 'Blog | Ngopi di Mana?',
-  description: 'Tips, panduan, dan artikel seputar cafe dan kopi di Indonesia. Temukan rekomendasi terbaik dari Ngopi di Mana.',
-  ogTitle: 'Blog | Ngopi di Mana?',
-  ogDescription: 'Tips, panduan, dan artikel seputar cafe dan kopi di Indonesia.',
-  ogImage: 'https://ngopi.di-mana.com/img/OG-img.png',
+  title: 'Blog | Ngebir Dimana?',
+  description: 'Tips, panduan, dan artikel seputar bar dan bir di Indonesia. Temukan rekomendasi terbaik dari Ngebir Dimana.',
+  ogTitle: 'Blog | Ngebir Dimana?',
+  ogDescription: 'Tips, panduan, dan artikel seputar bar dan bir di Indonesia.',
+  ogImage: 'https://ngebir-dimana.com/img/OG-img.png',
   ogType: 'website',
-  ogUrl: 'https://ngopi.di-mana.com/blog',
+  ogUrl: 'https://ngebir-dimana.com/blog',
 })
-useHead({ link: [{ rel: 'canonical', href: 'https://ngopi.di-mana.com/blog' }] })
+useHead({ link: [{ rel: 'canonical', href: 'https://ngebir-dimana.com/blog' }] })
 
 const MD_BREAKPOINT = 768
 const itemsPerPage = ref(9)
@@ -66,7 +66,7 @@ onUnmounted(() => {
   <div class="sm:max-w-[98%] mx-auto px-4 py-8">
     <div class="mb-6">
       <h1 class="text-3xl font-bold text-gray-800">Blog</h1>
-      <p class="text-gray-500 mt-1 text-sm">Tips, panduan, dan artikel seputar cafe dan kopi di Indonesia.</p>
+      <p class="text-gray-500 mt-1 text-sm">Tips, panduan, dan artikel seputar bar dan bir di Indonesia.</p>
     </div>
 
     <!-- Skeleton loading -->

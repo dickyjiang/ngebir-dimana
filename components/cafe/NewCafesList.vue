@@ -31,7 +31,7 @@
         >
           <NuxtLink :to="`/cafe/${cafe.slug_name}`">
             <NuxtImg
-              alt="Cafe Image"
+              alt="Bar Image"
               class="w-full h-48 object-cover mb-4"
               :src="cafe.photo"
               placeholder="/img/noimg.webp"

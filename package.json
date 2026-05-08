@@ -1,5 +1,6 @@
 {
-  "name": "nuxt-app",
+  "name": "ngebir-dimana",
+  "description": "Bar & beer discovery directory for Indonesia",
   "private": true,
   "type": "module",
   "engines": {

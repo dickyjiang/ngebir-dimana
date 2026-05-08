@@ -23,7 +23,15 @@
           :key="parentCity.city_slug"
           class="mb-8"
         >
-          <h3 class="font-medium mb-3">{{ parentCity.city_name }}</h3>
+          <button
+            @click="handleFilterToggle('city', parentCity.city_slug)"
+            :class="{
+              'text-yellow-500': selectedCities.has(parentCity.city_slug),
+            }"
+            class="font-medium mb-3 cursor-pointer hover:text-yellow-500 transition-colors"
+          >
+            {{ parentCity.city_name }}
+          </button>
           <div class="flex flex-wrap gap-2 text-sm">
             <!-- Child cities belonging to this parent -->
             <button
@@ -31,25 +39,13 @@
               :key="childCity.city_slug"
               @click="handleFilterToggle('city', childCity.city_slug)"
               :class="{
-                'bg-gray-800 text-white': activeFilters.city.includes(
-                  childCity.city_slug
-                ),
-                'bg-gray-100': !activeFilters.city.includes(
-                  childCity.city_slug
-                ),
+                'bg-black text-yellow-500 border-yellow-500 font-medium': selectedCities.has(childCity.city_slug),
+                'bg-gray-100 text-gray-700 border-transparent': !selectedCities.has(childCity.city_slug),
               }"
-              class="px-3 py-1 text-xs rounded-full"
+              class="px-3 py-1 text-xs rounded-full border transition-colors"
             >
               {{ childCity.city_name }}
             </button>
-
-            <!-- If no child cities, show a disabled indicator -->
-            <span
-              v-if="getChildCities(parentCity.city_slug).length === 0"
-              class="text-gray-400 italic px-3 py-1"
-            >
-              No sub-locations
-            </span>
           </div>
         </div>
       </div>
@@ -58,10 +54,8 @@
 </template>
 
 <script setup>
-  import { ref, computed, onMounted } from 'vue';
-  import { useFilterToggle } from '~/composables/useFilterToggle';
+  import { computed } from 'vue';
 
-  const { toggleFilter, resetFiltersCity } = useFilterToggle();
   const { trackLocationFilter } = useAnalytics();
 
   const props = defineProps({
@@ -72,29 +66,12 @@
     locationLoading: Boolean,
   });
 
-  const uniqueRanges = computed(() => {
-    return props.ranges && props.ranges.length > 0
-      ? props.ranges
-      : ['$', '$$', '$$$', '$$$$']; // Fallback to defaults
-  });
+  const emit = defineEmits(['toggle-city', 'reset-cities']);
 
-  async function handleFilterToggle(type, value) {
-    // Track city/location filter selection to measure which regions drive traffic
-    if (type === 'city') {
-      trackLocationFilter(value)
-    }
-    await toggleFilter(props.activeFilters, type, value);
-  }
-
-  // Keep this function for compatibility but it won't be used in the sidebar
-  function toggleNearbyFilter() {
-    if (props.onNearbyToggle) {
-      props.onNearbyToggle();
-    }
-  }
+  const selectedCities = computed(() => new Set(props.activeFilters?.city || []));
 
   const uniqueCities = computed(() => {
-    return props.cities || { parentCities: [], childCities: [] }; // Add a default value
+    return props.cities || { parentCities: [], childCities: [] };
   });
 
   function getChildCities(parentSlug) {
@@ -104,8 +81,15 @@
     );
   }
 
-  async function resetCityFilters() {
-    await resetFiltersCity(props.activeFilters);
+  function handleFilterToggle(type, value) {
+    if (type === 'city') {
+      trackLocationFilter(value);
+      emit('toggle-city', value);
+    }
+  }
+
+  function resetCityFilters() {
+    emit('reset-cities');
   }
 </script>
 

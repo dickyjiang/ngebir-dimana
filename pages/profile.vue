@@ -101,7 +101,7 @@
                 <NuxtLink
                   to="/cafe/owner/form?business_type=cafe"
                   class="border w-full border-gray-600 text-gray-600 py-2 px-3 rounded-md text-sm text-center font-medium hover:bg-gray-800 hover:text-yellow-500 transition-colors">
-                  Cafe</NuxtLink
+                  Bar</NuxtLink
                 >
               </div>
               <div
@@ -121,7 +121,7 @@
                   class="border w-full border-gray-600 text-gray-600 py-2 px-3 rounded-md text-sm text-center font-medium">
                   Tools & Supplies
                 </NuxtLink>
-                <p class="text-gray-500 text-sm">Contoh: Alat Manual Brew, biji kopi (Green bean), Alat Cafe dll.</p>
+                <p class="text-gray-500 text-sm">Contoh: Alat Bar, bir craft, perlengkapan bar dll.</p>
               </div>
             </div>
           </div>
@@ -160,7 +160,7 @@
                       }">
                       {{
                         type.trim() === 'cafe'
-                          ? 'Cafe'
+                          ? 'Bar'
                           : type.trim() === 'roastery'
                             ? 'Roastery'
                             : type.trim() === 'supplier'

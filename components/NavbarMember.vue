@@ -30,7 +30,7 @@
         <a href="/">
           <!-- <img src="/src/assets/img/logo_ndm.svg" alt="logo" class="h-6"> -->
           <div class="flex items-center">
-            <h2 class="mt-3">Ngopi</h2>
+            <h2 class="mt-3">Ngebir</h2>
             <div id="logo-animate" class="w-10">
               <!-- Lottie animation will be rendered here -->
             </div>
@@ -38,7 +38,7 @@
           </div>
         </a>
         <p class="hidden sm:flex font-semibold text-sm mb-1">
-          Satu Klik, Ribuan Cafe! Temukan yang Pas untuk Kamu.
+          Satu Klik, Ribuan Bar! Temukan yang Pas untuk Kamu.
         </p>
       </div>
     </div>

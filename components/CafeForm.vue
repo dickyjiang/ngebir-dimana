@@ -52,7 +52,7 @@
                             :checked="includesBusinessType('cafe')"
                             @change="toggleBusinessType('cafe')"
                             class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500" />
-                          <span>Cafe</span>
+                          <span>Bar</span>
                         </label>
                         <label class="flex items-center space-x-2">
                           <input
@@ -414,7 +414,7 @@
                   </div>
 
                   <div class="mb-10" v-if="includesBusinessType('cafe')">
-                    <label for="features">Fitur Cafe:</label>
+                    <label for="features">Fitur Bar:</label>
                     <div class="relative mt-2">
                       <div class="hs-dropdown relative w-full">
                         <div
@@ -816,7 +816,7 @@ const props = defineProps({
   },
   formTitle: {
     type: String,
-    default: 'Cafe Information',
+    default: 'Bar Information',
   },
   submitButtonText: {
     type: String,
@@ -1025,8 +1025,8 @@ const submitForm = async () => {
     await handleSubmit()
     // Show success toast
     toastMessage.value = isEditMode.value
-      ? 'Cafe updated successfully!'
-      : 'Cafe created successfully!'
+      ? 'Bar updated successfully!'
+      : 'Bar created successfully!'
     toastType.value = 'success'
     showToast.value = true
   } catch (error) {

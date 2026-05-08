@@ -38,10 +38,10 @@
 
       if (error) throw error;
       if (data) {
-        cafeName.value = data.name || 'Unnamed Cafe';
+        cafeName.value = data.name || 'Unnamed Bar';
       }
     } catch (error: any) {
-      errorMsg.value = error.message || 'Failed to fetch cafe details';
+      errorMsg.value = error.message || 'Failed to fetch bar details';
     }
   };
 
@@ -80,7 +80,7 @@
         selectedFeatures.value = data.map((item) => item.feature_id);
       }
     } catch (error: any) {
-      errorMsg.value = error.message || 'Failed to fetch cafe features';
+      errorMsg.value = error.message || 'Failed to fetch bar features';
     }
   };
 
@@ -129,7 +129,7 @@
 
   const saveFeatures = async () => {
     if (!cafeId.value) {
-      errorMsg.value = 'Cafe ID is required';
+      errorMsg.value = 'Bar ID is required';
       return;
     }
 
@@ -159,7 +159,7 @@
         if (insertError) throw insertError;
       }
 
-      successMsg.value = 'Cafe features saved successfully!';
+      successMsg.value = 'Bar features saved successfully!';
 
       // Navigate back to cafe details after a short delay
       setTimeout(() => {
@@ -177,12 +177,12 @@
   <div class="max-w-4xl mx-auto p-4">
     <div v-if="cafeId" class="mb-6">
       <h1 class="text-2xl font-bold">Add Features for {{ cafeName }}</h1>
-      <p class="text-gray-600">Select all features that apply to this cafe</p>
+      <p class="text-gray-600">Select all features that apply to this bar</p>
     </div>
     <div v-else class="mb-6">
-      <h1 class="text-2xl font-bold">Add Cafe Features</h1>
+      <h1 class="text-2xl font-bold">Add Bar Features</h1>
       <p class="text-gray-600 text-red-500">
-        No cafe selected. Please specify a cafe ID in the URL.
+        No bar selected. Please specify a bar ID in the URL.
       </p>
     </div>
 

@@ -15,8 +15,8 @@ export default defineEventHandler(async (event) => {
     if (error) throw createError({ statusMessage: error.message });
 
     // Use JavaScript to separate parent and child cities
-    const parentCities = allCities?.filter(city => city.city_slug === city.city_parent) || [];
-    const childCities = allCities?.filter(city => city.city_slug !== city.city_parent) || [];
+    const parentCities = allCities?.filter(city => city.city_parent == null) || [];
+    const childCities = allCities?.filter(city => city.city_parent != null) || [];
 
     // Sort child cities by city_parent, then by city_name
     childCities.sort((a, b) => {

@@ -9,10 +9,10 @@ export function useSeo(options: {
   fbAppId?: string
 }) {
   const defaults = {
-    title: 'Website Paling Lengkap buat Cari Tempat Ngopi!',
-    description: 'Satu Klik, Ribuan Cafe! Temukan yang Pas untuk Kamu.',
+    title: 'Website Paling Lengkap buat Cari Tempat Ngebir!',
+    description: 'Satu Klik, Ribuan Bar! Temukan yang Pas untuk Kamu.',
     image: '/img/og-img.png',
-    url: 'https://ngopi.di-mana.com',
+    url: 'https://ngebir-dimana.com',
     type: 'website',
     fbAppId: '2385267795184767' // Replace with your actual Facebook App ID
   }
@@ -28,7 +28,7 @@ export function useSeo(options: {
   const absoluteImageUrl = image.startsWith('http')
     ? image
     : `${process.env.NODE_ENV === 'production'
-      ? 'https://ngopi.di-mana.com'
+      ? 'https://ngebir-dimana.com'
       : 'http://localhost:3000'}${image}`
 
   useHead({

@@ -1,15 +1,15 @@
 {
-  "lastCategory": "kopi",
-  "cafe": [
-    "cafe murah bandung dekat kampus",
-    "cafe rooftop bandung",
-    "cafe untuk meeting bandung",
-    "cafe breakfast bandung"
+  "lastCategory": "bir",
+  "bar": [
+    "bar murah bandung dekat kampus",
+    "bar rooftop bandung",
+    "bar untuk meeting bandung",
+    "bar live music bandung"
   ],
-  "kopi": [
-    "tips memilih kopi specialty",
-    "apa itu anaerobic fermentation kopi",
-    "sejarah kopi di indonesia",
-    "kopi gayo vs kopi toraja perbedaan"
+  "bir": [
+    "tips memilih bir craft",
+    "apa itu IPA beer",
+    "sejarah bir di indonesia",
+    "bir lokal vs bir impor perbedaan"
   ]
 }

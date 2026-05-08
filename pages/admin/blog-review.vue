@@ -166,7 +166,7 @@ onMounted(() => {
           <span class="text-2xl">📝</span>
         </div>
         <h1 class="text-xl font-bold text-gray-800">Blog Review</h1>
-        <p class="text-sm text-gray-500 mt-1">ngopi.di-mana.com</p>
+        <p class="text-sm text-gray-500 mt-1">ngebir-dimana.com</p>
       </div>
       <form @submit.prevent="checkPassword" class="space-y-4">
         <div>
@@ -197,12 +197,12 @@ onMounted(() => {
       <div class="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
         <div>
           <h1 class="text-lg font-bold text-gray-800">Blog Review</h1>
-          <p class="text-xs text-gray-500">ngopi.di-mana.com · Draft Artikel</p>
+          <p class="text-xs text-gray-500">ngebir-dimana.com · Draft Artikel</p>
         </div>
         <a
           href="/admin/review"
           class="text-sm text-gray-500 hover:text-gray-700 flex items-center gap-1">
-          → Cafe Review
+          → Bar Review
         </a>
       </div>
     </div>

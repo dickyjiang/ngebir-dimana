@@ -16,7 +16,7 @@ export default defineEventHandler(async (event) => {
 
     const { data, error, count } = await query
     if (error) throw createError({ statusMessage: error.message });
-    if (!data) throw createError({ statusCode: 404, statusMessage: 'Cafe not found' });
+    if (!data) throw createError({ statusCode: 404, statusMessage: 'Bar not found' });
 
     const featureIds = [];
 

@@ -3,9 +3,9 @@
   <CafeForm
     :is-edit-mode="false"
     :cafe-id="null"
-    form-title="Add New Cafe"
+    form-title="Add New Bar"
     :business-types="businessTypesArray"
-    submit-button-text="Add Cafe" />
+    submit-button-text="Add Bar" />
 </template>
 
 <script setup lang="ts">

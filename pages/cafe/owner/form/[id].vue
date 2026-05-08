@@ -3,8 +3,8 @@
   <CafeForm
     :is-edit-mode="true"
     :cafe-id="cafeId"
-    form-title="Edit Cafe"
-    submit-button-text="Update Cafe"
+    form-title="Edit Bar"
+    submit-button-text="Update Bar"
   />
 </template>
 

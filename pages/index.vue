@@ -18,28 +18,28 @@ import BlogCard from '~/components/blog/BlogCard.vue'
 import type { BlogPost } from '~/composables/useBlog'
 
 useSeoMeta({
-  title: 'Ngopi di Mana? | Direktori Cafe Indonesia Terlengkap',
-  description: 'Temukan ribuan cafe di Indonesia — dari roastery, WFC, pet friendly, hingga specialty coffee. Satu klik, ribuan pilihan.',
-  ogTitle: 'Ngopi di Mana? | Direktori Cafe Indonesia Terlengkap',
-  ogDescription: 'Temukan ribuan cafe di Indonesia — dari roastery, WFC, pet friendly, hingga specialty coffee. Satu klik, ribuan pilihan.',
-  ogImage: 'https://ngopi.di-mana.com/img/OG-img.png',
+  title: 'Ngebir Dimana? | Direktori Bar Indonesia Terlengkap',
+  description: 'Temukan ribuan bar di Indonesia — dari craft beer, rooftop bar, sports bar, hingga brewery. Satu klik, ribuan pilihan.',
+  ogTitle: 'Ngebir Dimana? | Direktori Bar Indonesia Terlengkap',
+  ogDescription: 'Temukan ribuan bar di Indonesia — dari craft beer, rooftop bar, sports bar, hingga brewery. Satu klik, ribuan pilihan.',
+  ogImage: 'https://ngebir-dimana.com/img/OG-img.png',
   ogType: 'website',
-  ogUrl: 'https://ngopi.di-mana.com',
+  ogUrl: 'https://ngebir-dimana.com',
 })
 
 useHead({
-  link: [{ rel: 'canonical', href: 'https://ngopi.di-mana.com' }],
+  link: [{ rel: 'canonical', href: 'https://ngebir-dimana.com' }],
   script: [
     {
       type: 'application/ld+json',
       children: JSON.stringify({
         "@context": "https://schema.org/",
         "@type": "WebSite",
-        "name": "ngopi.di-mana",
-        "url": "https://ngopi.di-mana.com/",
+        "name": "ngebir-dimana",
+        "url": "https://ngebir-dimana.com/",
         "potentialAction": {
           "@type": "SearchAction",
-          "target": "https://ngopi.di-mana.com/cafes?city=bandung&features={search_term_string}/cafes?city=bandung&features=",
+          "target": "https://ngebir-dimana.com/cafes?city=bandung&features={search_term_string}/cafes?city=bandung&features=",
           "query-input": "required name=search_term_string"
         }
       })
@@ -82,8 +82,8 @@ const itemsPerPage = 24
 const searchQuery = ref('')
 const filterType = ref('all') // Add this new ref
 
-// Initialize filter options with empty arrays
-const uniqueCities = ref([])
+// Initialize filter options with correct structure
+const uniqueCities = ref({ parentCities: [], childCities: [] })
 const zoom = ref(6)
 
 // Initialize activeFilters with all expected properties
@@ -97,7 +97,7 @@ const activeFilters = ref({
 const isSidebarOpen = ref(false)
 
 // Get filter toggle functions from composable
-const { toggleFeature } = useFilterToggle()
+const { toggleFilter, toggleFeature, resetFiltersCity } = useFilterToggle()
 
 const { trackSearch, setupScrollTracking } = useAnalytics()
 
@@ -200,6 +200,14 @@ async function handleFeatureToggle(feature_id) {
   await toggleFeature(activeFilters.value, feature_id)
 }
 
+async function handleCityToggle(citySlug) {
+  await toggleFilter(activeFilters.value, 'city', citySlug)
+}
+
+async function handleCityReset() {
+  await resetFiltersCity(activeFilters.value)
+}
+
 // Function to handle search from HeroSearch component
 // HeroSearch emits { query, filter } — unpack correctly
 function handleSearch(payload) {
@@ -215,6 +223,7 @@ onMounted(async () => {
   // Fetch city options for filters first
   try {
     uniqueCities.value = await useFetchFilterOptions()
+    console.log('uniqueCities after fetch:', JSON.stringify(uniqueCities.value, null, 2))
 
     // Parse URL parameters to set initial filters
     if (route.query) {
@@ -341,9 +350,9 @@ onMounted(async () => {
         <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 mb-4">
           <i class="fas fa-map-marker-alt text-blue-600 text-xl"></i>
         </div>
-        <h3 class="text-lg font-semibold mb-2">Temukan Kafe Terdekat</h3>
+        <h3 class="text-lg font-semibold mb-2">Temukan Bar Terdekat</h3>
         <p class="text-sm text-gray-600 mb-6">
-          Kami ingin menggunakan lokasi Anda untuk menampilkan kafe-kafe terdekat. Ini membantu Anda menemukan tempat ngopi terbaik di sekitar Anda.
+          Kami ingin menggunakan lokasi Anda untuk menampilkan bar-bar terdekat. Ini membantu Anda menemukan tempat ngebir terbaik di sekitar Anda.
         </p>
         
         <div class="flex flex-col gap-3">
@@ -439,7 +448,9 @@ onMounted(async () => {
         :cities="uniqueCities"
         :onNearbyToggle="toggleNearbyFilter"
         :isNearbyActive="isNearbyActive"
-        :locationLoading="locationLoading" />
+        :locationLoading="locationLoading"
+        @toggle-city="handleCityToggle"
+        @reset-cities="handleCityReset" />
     </div>
 
     <div class="px-4 flex-1">

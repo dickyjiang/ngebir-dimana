@@ -192,7 +192,7 @@ export function useNearbyFilter() {
     isNearbyActive.value = true
     saveNearbyState()
 
-    showToastNotification('Lokasi diatur! Mencari kafe terdekat...', 'success')
+    showToastNotification('Lokasi diatur! Mencari bar terdekat...', 'success')
 
     // Trigger cafe fetching if callback provided
     if (fetchCafesCallback && activeFilters) {
@@ -241,7 +241,7 @@ export function useNearbyFilter() {
             await fetchCafesCallback(1, activeFilters)
           }
           
-          showToastNotification('Akses lokasi diizinkan! Mencari kafe terdekat...', 'success')
+          showToastNotification('Akses lokasi diizinkan! Mencari bar terdekat...', 'success')
         }
       } catch (error) {
         console.error('Location error after permission granted:', error)

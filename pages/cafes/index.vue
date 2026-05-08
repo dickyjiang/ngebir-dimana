@@ -6,22 +6,22 @@
   const cityParam = computed(() => route.query.city as string | undefined)
   const pageTitle = computed(() =>
     cityParam.value
-      ? `Cafe di ${cityParam.value.charAt(0).toUpperCase() + cityParam.value.slice(1)} | Ngopi di Mana?`
-      : 'Direktori Cafe Indonesia | Ngopi di Mana?'
+      ? `Bar di ${cityParam.value.charAt(0).toUpperCase() + cityParam.value.slice(1)} | Ngebir Dimana?`
+      : 'Direktori Bar Indonesia | Ngebir Dimana?'
   )
   const pageDescription = computed(() =>
     cityParam.value
-      ? `Daftar cafe terbaik di ${cityParam.value} — WFC, specialty coffee, roastery, dan pet friendly.`
-      : 'Temukan ribuan cafe di seluruh Indonesia — WFC, specialty coffee, roastery, pet friendly, dan banyak lagi.'
+      ? `Daftar bar terbaik di ${cityParam.value} — craft beer, rooftop bar, sports bar, dan pet friendly.`
+      : 'Temukan ribuan bar di seluruh Indonesia — craft beer, rooftop bar, sports bar, pet friendly, dan banyak lagi.'
   )
-  const canonicalUrl = computed(() => 'https://ngopi.di-mana.com/cafes')
+  const canonicalUrl = computed(() => 'https://ngebir-dimana.com/cafes')
 
   useSeoMeta({
     title: () => pageTitle.value,
     description: () => pageDescription.value,
     ogTitle: () => pageTitle.value,
     ogDescription: () => pageDescription.value,
-    ogImage: 'https://ngopi.di-mana.com/img/OG-img.png',
+    ogImage: 'https://ngebir-dimana.com/img/OG-img.png',
     ogType: 'website',
     ogUrl: () => canonicalUrl.value,
   })
@@ -88,7 +88,7 @@
   const isSidebarOpen = ref(false);
 
   // Get filter toggle functions from composable
-  const { toggleFeature } = useFilterToggle();
+  const { toggleFilter, toggleFeature, resetFiltersCity } = useFilterToggle();
 
   // Debounced search function
   const debouncedFetchBySearch = debounce((query, filters) => {
@@ -182,6 +182,14 @@
   // Use the toggleFeature from the composable
   async function handleFeatureToggle(feature_id) {
     await toggleFeature(activeFilters.value, feature_id);
+  }
+
+  async function handleCityToggle(citySlug) {
+    await toggleFilter(activeFilters.value, 'city', citySlug);
+  }
+
+  async function handleCityReset() {
+    await resetFiltersCity(activeFilters.value);
   }
 
   // Function to handle search from HeroSearch component
@@ -415,6 +423,8 @@
         :onNearbyToggle="toggleNearbyFilter"
         :isNearbyActive="isNearbyActive"
         :locationLoading="locationLoading"
+        @toggle-city="handleCityToggle"
+        @reset-cities="handleCityReset"
       />
     </div>
 

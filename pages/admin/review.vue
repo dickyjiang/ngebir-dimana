@@ -203,7 +203,7 @@ onMounted(() => {
           <i class="fas fa-lock text-gray-600 text-lg"></i>
         </div>
         <h1 class="text-xl font-bold text-gray-800">Admin Review</h1>
-        <p class="text-sm text-gray-500 mt-1">ngopi.di-mana.com</p>
+        <p class="text-sm text-gray-500 mt-1">ngebir-dimana.com</p>
       </div>
 
       <form @submit.prevent="checkPassword" class="space-y-4">
@@ -237,7 +237,7 @@ onMounted(() => {
       <div class="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
         <div>
           <h1 class="text-lg font-bold text-gray-800">Admin Review</h1>
-          <p class="text-xs text-gray-500">ngopi.di-mana.com · Cafe Discovery</p>
+          <p class="text-xs text-gray-500">ngebir-dimana.com · Bar Discovery</p>
         </div>
 
         <!-- Discovery trigger -->

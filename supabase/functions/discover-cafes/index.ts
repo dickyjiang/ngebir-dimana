@@ -143,11 +143,11 @@ async function generateDescription(
       .join(', ')
 
     const prompt = [
-      `Buatkan deskripsi singkat (2–3 kalimat) dalam Bahasa Indonesia yang menarik dan kasual untuk sebuah kafe bernama "${name}" yang berlokasi di ${city}.`,
+      `Buatkan deskripsi singkat (2–3 kalimat) dalam Bahasa Indonesia yang menarik dan kasual untuk sebuah bar bernama "${name}" yang berlokasi di ${city}.`,
       editorialSummary ? `Deskripsi dari Google: "${editorialSummary}".` : '',
       typeLabels ? `Tipe tempat: ${typeLabels}.` : '',
       rating ? `Rating: ${rating}/5 dari ${reviews?.toLocaleString() ?? '?'} ulasan.` : '',
-      `Gaya penulisan: hangat, mengundang, seperti rekomendasi teman — bukan iklan. Jangan mulai dengan kata "Kafe ini". Tidak perlu menyebut nama kafe lagi di kalimat pertama.`,
+      `Gaya penulisan: hangat, mengundang, seperti rekomendasi teman — bukan iklan. Jangan mulai dengan kata "Bar ini". Tidak perlu menyebut nama bar lagi di kalimat pertama.`,
     ]
       .filter(Boolean)
       .join(' ')
@@ -202,8 +202,8 @@ async function sendSummaryEmail(
   const body = [
     `☕ NDM Daily Discovery — ${date}`,
     ``,
-    `${inserted.length} cafe baru menunggu review:`,
-    `https://ngopi.di-mana.com/admin/review`,
+    `${inserted.length} bar baru menunggu review:`,
+    `https://ngebir-dimana.com/admin/review`,
     ``,
     cafeList,
     errorSection,
@@ -321,7 +321,7 @@ Deno.serve(async (_req: Request): Promise<Response> => {
     const toInsert = newPlaces.slice(0, MAX_NEW_PER_CITY)
 
     for (const place of toInsert) {
-      const name = place.displayName?.text ?? 'Unknown Cafe'
+      const name = place.displayName?.text ?? 'Unknown Bar'
       const slug = await getUniqueSlug(supabase, name, city)
       const placeId = place.id
 

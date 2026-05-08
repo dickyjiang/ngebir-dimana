@@ -1,6 +1,6 @@
 /**
  * NDM Blog Generator
- * Generates SEO/AEO articles for ngopi.di-mana.com using Anthropic + Supabase.
+ * Generates SEO/AEO articles for ngebir-dimana.com using Anthropic + Supabase.
  *
  * Required GitHub Secrets (Settings → Secrets → Actions):
  *   ANTHROPIC_API_KEY         — Anthropic API key
@@ -32,7 +32,7 @@ const GMAIL_USER = process.env.GMAIL_USER
 const GMAIL_APP_PASSWORD = process.env.GMAIL_APP_PASSWORD
 const DRY_RUN = process.env.DRY_RUN === 'true'
 
-const SITE_URL = 'https://ngopi.di-mana.com'
+const SITE_URL = 'https://ngebir-dimana.com'
 const ADMIN_REVIEW_URL = `${SITE_URL}/admin/blog-review`
 const MIN_WORD_COUNT = 800
 
@@ -104,9 +104,9 @@ async function refillCategory(category, anthropic) {
     return Array.from({ length: 10 }, (_, i) => `${category} dummy keyword ${i + 1}`)
   }
   const prompt =
-    category === 'cafe'
-      ? 'Generate 10 unique Indonesian-language SEO keyword phrases for a cafe directory website (ngopi.di-mana.com) about cafes in Bandung. Focus on: WFC cafes, pet-friendly cafes, outdoor cafes, rooftop cafes, cafes for meetings, instagrammable cafes, cheap cafes near campus, breakfast cafes, live music cafes, cafe recommendations. Return ONLY a JSON array of strings, no explanation.'
-      : 'Generate 10 unique Indonesian-language SEO/AEO keyword phrases for a cafe directory website about coffee knowledge and education. Focus on: specialty coffee, pour over, cold brew, single origin, coffee fermentation, Indonesian coffee regions, coffee brewing guides, FAQ-style questions starting with "apa itu" or "cara". Return ONLY a JSON array of strings, no explanation.'
+    category === 'bar'
+      ? 'Generate 10 unique Indonesian-language SEO keyword phrases for a bar directory website (ngebir-dimana.com) about bars in Bandung. Focus on: rooftop bars, sports bars, craft beer bars, live music bars, bars for hangout, instagrammable bars, cheap bars near campus, bars with food, cocktail bars, bar recommendations. Return ONLY a JSON array of strings, no explanation.'
+      : 'Generate 10 unique Indonesian-language SEO/AEO keyword phrases for a bar directory website about beer knowledge and education. Focus on: craft beer, IPA, stout, lager, beer brewing, Indonesian beer brands, beer tasting guides, FAQ-style questions starting with "apa itu" or "cara". Return ONLY a JSON array of strings, no explanation.'
 
   const msg = await anthropic.messages.create({
     model: 'claude-haiku-4-5-20251001',
@@ -124,7 +124,7 @@ async function refillCategory(category, anthropic) {
 
 async function pickKeyword(queue, anthropic) {
   // Alternate categories
-  const nextCategory = queue.lastCategory === 'cafe' ? 'kopi' : 'cafe'
+  const nextCategory = queue.lastCategory === 'bar' ? 'bir' : 'bar'
   let category = nextCategory
   let arr = queue[category]
 
@@ -136,7 +136,7 @@ async function pickKeyword(queue, anthropic) {
 
   // If still empty (e.g. DRY_RUN dummy), try the other category
   if (!arr || arr.length === 0) {
-    category = category === 'cafe' ? 'kopi' : 'cafe'
+    category = category === 'bar' ? 'bir' : 'bar'
     arr = queue[category]
     if (!arr || arr.length === 0) throw new Error('Both queue categories are empty')
   }
@@ -254,9 +254,9 @@ async function getRelevantCafes(keyword, supabase) {
 
 function buildSystemPrompt() {
   return `Hari ini adalah ${today()}. Tahun saat ini adalah ${currentYear()}.
-Kamu adalah penulis konten SEO dan AEO (Answer Engine Optimization) ahli untuk ngopi.di-mana.com — direktori cafe terlengkap di Indonesia.
+Kamu adalah penulis konten SEO dan AEO (Answer Engine Optimization) ahli untuk ngebir-dimana.com — direktori bar terlengkap di Indonesia.
 
-Tulis artikel dalam Bahasa Indonesia yang praktis dan berguna untuk pencari cafe di Indonesia.
+Tulis artikel dalam Bahasa Indonesia yang praktis dan berguna untuk pencari bar di Indonesia.
 
 Setiap artikel harus:
 - Minimum 1000 kata
@@ -264,7 +264,7 @@ Setiap artikel harus:
 - Sertakan minimal 1 FAQ section dengan format <h2>FAQ</h2> dan <h3>pertanyaan</h3><p>jawaban</p> untuk AEO optimization
 - Sertakan backlink ke cafe relevan dari data yang diberikan, format: <a href="${SITE_URL}/cafe/[slug]" class="cafe-backlink"><img src="[foto]" alt="[name]" class="cafe-thumb" />[name]</a>
 - Sertakan CTA box di tengah dan akhir artikel:
-  <div class="cta-box"><strong>[ajakan]</strong><br><a href="${SITE_URL}/cafes?[filter]">Temukan Cafe di Direktori →</a></div>
+  <div class="cta-box"><strong>[ajakan]</strong><br><a href="${SITE_URL}/cafes?[filter]">Temukan Bar di Direktori →</a></div>
 - JANGAN sertakan <html>, <head>, <body>, <style>
 - Mulai langsung dengan konten
 
@@ -276,7 +276,7 @@ Format output pakai delimiter (BUKAN JSON):
 %%META_DESC%%
 [SEO meta description max 155 karakter]
 %%CATEGORY%%
-[Tips atau Kopi]
+[Tips atau Bir]
 %%COVER_IMAGE_URL%%
 [URL foto dari kolom photo salah satu cafe yang paling relevan dari data yang diberikan]
 %%CONTENT%%
@@ -317,7 +317,7 @@ async function generateArticle(keyword, cafes, anthropic) {
       meta_desc: `Temukan informasi terlengkap tentang ${keyword}. Panduan praktis untuk coffee lovers di Indonesia.`,
       category: 'Tips',
       cover_image_url: cafes[0]?.photo || '',
-      content: `<h2>Panduan ${keyword}</h2><p>${'Lorem ipsum '.repeat(100)}</p><h2>FAQ</h2><h3>Apa itu ${keyword}?</h3><p>Jawaban dummy.</p><div class="cta-box"><strong>Temukan cafe terbaik!</strong><br><a href="${SITE_URL}/cafes">Temukan Cafe di Direktori →</a></div>`,
+      content: `<h2>Panduan ${keyword}</h2><p>${'Lorem ipsum '.repeat(100)}</p><h2>FAQ</h2><h3>Apa itu ${keyword}?</h3><p>Jawaban dummy.</p><div class="cta-box"><strong>Temukan bar terbaik!</strong><br><a href="${SITE_URL}/cafes">Temukan Bar di Direktori →</a></div>`,
     }
   }
 
@@ -339,12 +339,12 @@ async function generateArticle(keyword, cafes, anthropic) {
       .join('\n')
 
     const cafeSection = `
-<h2>Rekomendasi Cafe di Bandung</h2>
-<p>Ingin mencicipi specialty coffee langsung di cafe terbaik Bandung? Berikut beberapa pilihan yang bisa kamu kunjungi:</p>
+<h2>Rekomendasi Bar di Bandung</h2>
+<p>Ingin mencicipi craft beer langsung di bar terbaik Bandung? Berikut beberapa pilihan yang bisa kamu kunjungi:</p>
 <ul>
 ${cafeLinks}
 </ul>
-<div class="cta-box"><strong>Temukan lebih banyak cafe specialty di Bandung!</strong><br><a href="${SITE_URL}/cafes?city=bandung">Lihat Semua Cafe di Direktori →</a></div>`
+<div class="cta-box"><strong>Temukan lebih banyak bar di Bandung!</strong><br><a href="${SITE_URL}/cafes?city=bandung">Lihat Semua Bar di Direktori →</a></div>`
 
     article.content = article.content + cafeSection
   }
@@ -429,9 +429,9 @@ async function sendEmail({ title, keyword, wc, draftId, queueWarning, cafes }) {
       : '  (none)'
 
   const imagePrompt = `Buat gambar foto-realistis untuk artikel "${title}":
-- Suasana: cafe modern di Bandung, Indonesia
+- Suasana: bar modern di Bandung, Indonesia
 - Gaya: editorial food photography, cinematic lighting
-- Elemen: minuman kopi specialty, interior cafe estetik
+- Elemen: bir craft, interior bar estetik
 - Rasio: 16:9 landscape
 - Platform: Freepik AI Image Generator atau Midjourney`
 
@@ -448,7 +448,7 @@ ${ADMIN_REVIEW_URL}
 
 ${queueWarning ? `⚠️  PERHATIAN: Sisa keyword di queue < 5. Tambahkan keyword baru segera.\n` : ''}
 
-🔗 Cafe yang di-backlink:
+🔗 Bar yang di-backlink:
 ${cafeList}
 
 🎨 Image Generation Prompt:
@@ -495,11 +495,11 @@ async function main() {
   const { keyword, category } = await pickKeyword(queue, anthropic)
   console.log(`  Keyword: "${keyword}" (${category})`)
 
-  const cafeRemaining = (queue.cafe || []).length
-  const kopiRemaining = (queue.kopi || []).length
-  const totalRemaining = cafeRemaining + kopiRemaining
+  const barRemaining = (queue.bar || []).length
+  const birRemaining = (queue.bir || []).length
+  const totalRemaining = barRemaining + birRemaining
   const queueWarning = totalRemaining < 5
-  console.log(`  Queue remaining: cafe=${cafeRemaining}, kopi=${kopiRemaining}`)
+  console.log(`  Queue remaining: bar=${barRemaining}, bir=${birRemaining}`)
 
   // Step 2 — Dedup check
   console.log('\n[2/7] Checking for duplicates…')

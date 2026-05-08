@@ -13,7 +13,7 @@
           <div class="rounded-lg overflow-hidden max-h-96 mb-2">
             <NuxtImg
               :src="cafe.data.photo"
-              :alt="`${cafe.data.name} - cafe di ${cafe.data.city}`"
+              :alt="`${cafe.data.name} - bar di ${cafe.data.city}`"
               class="object-cover mb-4 rounded-lg w-full h-full"
               placeholder="/img/noimg.webp" />
           </div>
@@ -26,7 +26,7 @@
                     <div class="w-10 h-10 rounded-full overflow-hidden mr-2">
                       <NuxtImg
                         :src="cafe.data.logo"
-                        alt="Cafe Logo"
+                        alt="Bar Logo"
                         class="w-full h-full object-cover mb-4"
                         placeholder="/img/logo-default.png" />
                     </div>
@@ -96,7 +96,7 @@
               class="rounded-md object-cover cursor-pointer w-full h-full"
               :src="cafePic.url"
               @click="openImageModal(cafePic.url, index)"
-              :alt="`Cafe photo ${index + 1}`"
+              :alt="`Bar photo ${index + 1}`"
               style="aspect-ratio: 1/1" />
           </div>
         </div>
@@ -188,7 +188,7 @@
         </div> -->
       </div>
     </div>
-    <div v-else class="text-center text-gray-500">Cafe not found.</div>
+    <div v-else class="text-center text-gray-500">Bar not found.</div>
   </div>
   <!-- Image Modal -->
   <Teleport to="body">
@@ -262,22 +262,22 @@
       <div
         class="text-gray-800 text-center font-medium tracking-wide mb-2 sm:mb-4 border border-gray-600 h-40 w-80"
       >
-        Cafe Terbaru 1
+        Bar Terbaru 1
       </div>
       <div
         class="text-gray-800 text-center font-medium tracking-wide mb-2 sm:mb-4 border border-gray-600 h-40 w-80"
       >
-        Cafe Terbaru 2
+        Bar Terbaru 2
       </div>
       <div
         class="text-gray-800 text-center font-medium tracking-wide mb-2 sm:mb-4 border border-gray-600 h-40 w-80"
       >
-        Cafe Terbaru 3
+        Bar Terbaru 3
       </div>
       <div
         class="text-gray-800 text-center font-medium tracking-wide mb-2 sm:mb-4 border border-gray-600 h-40 w-80"
       >
-        Cafe Terbaru 4
+        Bar Terbaru 4
       </div>
     </div>
   </section> -->
@@ -299,15 +299,15 @@ const { data: cafe, pending: loading } = await useAsyncData(
 )
 
 if (!cafe.value || !cafe.value.data) {
-  throw createError({ statusCode: 404, statusMessage: 'Cafe not found', fatal: true })
+  throw createError({ statusCode: 404, statusMessage: 'Bar not found', fatal: true })
 }
 
 // SEO — synchronous so tags are in the initial SSR HTML
 const cafeData = cafe.value.data
 const slug = route.params.id
-const canonicalUrl = `https://ngopi.di-mana.com/cafe/${slug}`
-const metaDescription = `${cafeData.name} berlokasi di ${cafeData.street || cafeData.city}. ${cafeData.business_type || 'Cafe'} di ${cafeData.city}.`
-const ogImage = cafeData.photo || 'https://ngopi.di-mana.com/img/OG-img.png'
+const canonicalUrl = `https://ngebir-dimana.com/cafe/${slug}`
+const metaDescription = `${cafeData.name} berlokasi di ${cafeData.street || cafeData.city}. ${cafeData.business_type || 'Bar'} di ${cafeData.city}.`
+const ogImage = cafeData.photo || 'https://ngebir-dimana.com/img/OG-img.png'
 
 const openingHoursSpec = []
 if (cafeData.working_hours && isValidJson(cafeData.working_hours)) {
@@ -341,9 +341,9 @@ if (openingHoursSpec.length > 0) {
 }
 
 useSeoMeta({
-  title: `${cafeData.name} – Tempat Ngopi di ${cafeData.city} | Ngopi di Mana?`,
+  title: `${cafeData.name} – Tempat Ngebir di ${cafeData.city} | Ngebir Dimana?`,
   description: metaDescription,
-  ogTitle: `${cafeData.name} – Tempat Ngopi di ${cafeData.city} | Ngopi di Mana?`,
+  ogTitle: `${cafeData.name} – Tempat Ngebir di ${cafeData.city} | Ngebir Dimana?`,
   ogDescription: metaDescription,
   ogImage: ogImage,
   ogType: 'website',
@@ -484,7 +484,7 @@ async function sharePage() {
     await navigator.share({
       title: document.title,
       url: window.location.href,
-      text: 'Lagi cari tempat ngopi? Cek Cafe ini!', // Optional description
+      text: 'Lagi cari tempat ngebir? Cek Bar ini!', // Optional description
     })
     console.log('Shared successfully')
   } catch (error) {

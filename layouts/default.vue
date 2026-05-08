@@ -16,10 +16,10 @@
 
   // Default SEO setup for all pages
   useSeo({
-    title: 'Website Paling Lengkap buat Cari Tempat Ngopi!',
-    description: 'Satu Klik, Ribuan Cafe! Temukan yang Pas untuk Kamu.',
+    title: 'Website Paling Lengkap buat Cari Tempat Ngebir!',
+    description: 'Satu Klik, Ribuan Bar! Temukan yang Pas untuk Kamu.',
     image: '/img/OG-img.png',
-    url: 'https://ngopi.di-mana.com',
+    url: 'https://ngebir-dimana.com',
     type: 'website',
   });
 </script>

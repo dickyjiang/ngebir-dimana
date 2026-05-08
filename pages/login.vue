@@ -10,7 +10,7 @@
       <p class="subtitle">
         {{
           isRedirect
-            ? 'Untuk melihat profil atau menghubungi pemilik kafe, silakan login terlebih dahulu'
+            ? 'Untuk melihat profil atau menghubungi pemilik bar, silakan login terlebih dahulu'
             : 'Login atau Daftar baru menggunakan Akun Google'
         }}
       </p>

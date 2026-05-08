@@ -51,7 +51,7 @@ export default defineEventHandler(async (event) => {
   console.log('[ig] queuedIds:', queuedIds)
 
   if (!cafes || cafes.length === 0) {
-    return { result: 'no_cafes', message: 'Semua cafe sudah pernah diqueue. Reset skipped entries jika perlu.' }
+    return { result: 'no_cafes', message: 'Semua bar sudah pernah diqueue. Reset skipped entries jika perlu.' }
   }
 
   const cafe = cafes[0]
@@ -65,24 +65,24 @@ export default defineEventHandler(async (event) => {
     if (wh) hours = Object.entries(wh).map(([d, h]) => `${d}: ${h}`).join(', ')
   } catch {}
 
-  const prompt = `Kamu adalah content creator Instagram untuk @ngopidimana, direktori cafe Indonesia. Buat caption IG casual, friendly, Bahasa Indonesia (boleh mix sedikit Inggris yang natural).
+  const prompt = `Kamu adalah content creator Instagram untuk @ngebirdimana, direktori bar Indonesia. Buat caption IG casual, friendly, Bahasa Indonesia (boleh mix sedikit Inggris yang natural).
 
-Data cafe:
+Data bar:
 - Nama: ${cafe.name}
 - Kota: ${cafe.city || 'Indonesia'}
 - Area: ${cafe.borough || ''}
-- Tipe: ${tags.join(', ') || 'cafe'}
+- Tipe: ${tags.join(', ') || 'bar'}
 - Deskripsi: ${cafe.description || '-'}
 - Jam buka: ${hours || '-'}
 - Rating: ${cafe.rating || '-'} (${cafe.reviews || 0} ulasan)
 
 Struktur caption:
 1. Hook menarik (1-2 kalimat)
-2. Deskripsi mengundang highlight tipe/keunikan cafe (2-3 kalimat)
+2. Deskripsi mengundang highlight tipe/keunikan bar (2-3 kalimat)
 3. Info praktis singkat (lokasi, jam)
-4. CTA: "Cari info lengkap di ngopi.di-mana.com 🔗"
+4. CTA: "Cari info lengkap di ngebir-dimana.com 🔗"
 
-Lalu tulis persis: HASHTAGS: [15-20 hashtag relevan, mix populer + niche, sesuai kota dan tipe cafe]
+Lalu tulis persis: HASHTAGS: [15-20 hashtag relevan, mix populer + niche, sesuai kota dan tipe bar]
 
 Output HANYA caption + HASHTAGS. Tidak ada label, intro, atau penjelasan lain.`
 

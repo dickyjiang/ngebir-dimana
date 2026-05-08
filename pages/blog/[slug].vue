@@ -7,7 +7,7 @@ import type { BlogPost } from '~/composables/useBlog'
 
 const route = useRoute()
 const slug = route.params.slug as string
-const canonicalUrl = `https://ngopi.di-mana.com/blog/${slug}`
+const canonicalUrl = `https://ngebir-dimana.com/blog/${slug}`
 
 const supabase = useSupabaseClient()
 
@@ -29,12 +29,12 @@ if (!post.value) {
 }
 
 // SEO — synchronous so tags are in the initial SSR HTML
-const ogImage = post.value.cover_image_url || 'https://ngopi.di-mana.com/img/OG-img.png'
+const ogImage = post.value.cover_image_url || 'https://ngebir-dimana.com/img/OG-img.png'
 
 useSeoMeta({
-  title: `${post.value.title} | Ngopi di Mana?`,
+  title: `${post.value.title} | Ngebir Dimana?`,
   description: post.value.description || post.value.title,
-  ogTitle: `${post.value.title} | Ngopi di Mana?`,
+  ogTitle: `${post.value.title} | Ngebir Dimana?`,
   ogDescription: post.value.description || post.value.title,
   ogImage: ogImage,
   ogType: 'article',
@@ -55,8 +55,8 @@ useHead({
       datePublished: post.value.published_at,
       dateModified: post.value.published_at,
       url: canonicalUrl,
-      author: { '@type': 'Organization', name: 'Ngopi di Mana', url: 'https://ngopi.di-mana.com' },
-      publisher: { '@type': 'Organization', name: 'Ngopi di Mana', url: 'https://ngopi.di-mana.com' },
+      author: { '@type': 'Organization', name: 'Ngebir Dimana', url: 'https://ngebir-dimana.com' },
+      publisher: { '@type': 'Organization', name: 'Ngebir Dimana', url: 'https://ngebir-dimana.com' },
     }),
   }],
 })
@@ -69,7 +69,7 @@ const relatedPosts = ref<BlogPost[]>([])
 const cafePhotos = ref<Record<string, string>>({})
 
 function extractCafeSlugs(html: string): string[] {
-  const regex = /href=["'](?:https?:\/\/ngopi\.di-mana\.com)?\/cafe\/([^"'#?]+)["']/g
+  const regex = /href=["'](?:https?:\/\/ngebir-dimana\.com)?\/cafe\/([^"'#?]+)["']/g
   const slugs: string[] = []
   let match
   while ((match = regex.exec(html)) !== null) {
@@ -81,7 +81,7 @@ function extractCafeSlugs(html: string): string[] {
 function injectCafeImages(html: string, photos: Record<string, string>): string {
   // Match cafe links that do NOT already contain an <img> tag
   return html.replace(
-    /<a\s+([^>]*href=["'](?:https?:\/\/ngopi\.di-mana\.com)?\/cafe\/([^"'#?]+)["'][^>]*)>(?!.*?<img)(.*?)<\/a>/gi,
+    /<a\s+([^>]*href=["'](?:https?:\/\/ngebir-dimana\.com)?\/cafe\/([^"'#?]+)["'][^>]*)>(?!.*?<img)(.*?)<\/a>/gi,
     (full, attrs, slug, text) => {
       const photo = photos[slug]
       if (!photo) return full

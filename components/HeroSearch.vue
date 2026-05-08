@@ -186,16 +186,16 @@ onBeforeUnmount(() => {
       <img
         class="absolute object-cover object-center w-full h-full"
         src="/src/assets/img/hero.webp"
-        alt="Ngopi di Mana - Direktori Cafe Indonesia" />
+        alt="Ngebir Dimana - Direktori Bar Indonesia" />
       <div class="absolute inset-0 bg-black opacity-60 z-[1]"></div>
       <div
         class="z-[2] flex flex-col items-center justify-center w-[90%] sm:w-[90%] mx-auto h-full">
         <h1
           class="text-2xl sm:text-4xl md:text-5xl text-white text-center font-medium tracking-wide mb-2 sm:mb-4">
-          Ngopi di mana?
+          Ngebir dimana?
         </h1>
         <h2 class="text-sm md:text-xl tracking-wide text-white mb-2 sm:mb-4 text-center">
-          {{ totalCafes }} Cafes Directory
+          Direktori Bar Indonesia
         </h2>
         <div
           class="mt-2 sm:mt-4 w-full md:w-3/4 flex flex-col gap-2 sm:gap-4 items-center justify-center px-4">
@@ -204,7 +204,7 @@ onBeforeUnmount(() => {
               <input
                 v-model="searchQuery"
                 type="text"
-                placeholder="Search cafes..."
+                placeholder="Search bars..."
                 class="text-sm sm:text-base border w-full border-gray-600 rounded-lg p-2 sm:p-3 pl-4 pr-[120px]"
                 @input="handleSearch" />
               <div class="absolute right-0 top-0 h-full flex items-center gap-2 pr-2">
@@ -234,7 +234,7 @@ onBeforeUnmount(() => {
               }"
               class="text-white border border-white mt-2 px-3 sm:px-4 py-0 sm:py-1 rounded-full flex items-center gap-2 text-xs sm:text-base cursor-pointer touch-manipulation">
               <span id="terdekat-animate" class="w-8 h-8"></span>
-              <span>Cafe terdekat</span>
+              <span>Bar terdekat</span>
             </button>
             <!-- Cafe Terbaru filter -->
             <button

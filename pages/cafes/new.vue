@@ -25,7 +25,7 @@
 
   const validateForm = () => {
     if (!cafeData.value.name) {
-      errorMsg.value = 'Cafe name is required';
+      errorMsg.value = 'Bar name is required';
       return false;
     }
     if (!cafeData.value.full_address) {
@@ -67,7 +67,7 @@
 
       if (error) throw error;
 
-      successMsg.value = 'Cafe created successfully!';
+      successMsg.value = 'Bar created successfully!';
 
       // Navigate to the new cafe page
       if (data && data[0]) {
@@ -76,7 +76,7 @@
         }, 1500);
       }
     } catch (error: any) {
-      errorMsg.value = error.message || 'Failed to create cafe';
+      errorMsg.value = error.message || 'Failed to create bar';
     } finally {
       loading.value = false;
     }
@@ -85,7 +85,7 @@
 
 <template>
   <div class="max-w-4xl mx-auto p-4">
-    <h1 class="text-2xl font-bold mb-6">Add New Cafe</h1>
+    <h1 class="text-2xl font-bold mb-6">Add New Bar</h1>
 
     <div
       v-if="successMsg"
@@ -107,7 +107,7 @@
         <div class="space-y-4">
           <div>
             <label class="block text-sm font-medium text-gray-700"
-              >Cafe Name *</label
+              >Bar Name *</label
             >
             <input
               v-model="cafeData.name"
@@ -263,7 +263,7 @@
           class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700"
           :disabled="loading"
         >
-          {{ loading ? 'Saving...' : 'Save Cafe' }}
+          {{ loading ? 'Saving...' : 'Save Bar' }}
         </button>
       </div>
     </form>

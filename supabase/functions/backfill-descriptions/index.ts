@@ -17,10 +17,10 @@ async function generateDescription(
       .join(', ')
 
     const prompt = [
-      `Buatkan deskripsi singkat (2–3 kalimat) dalam Bahasa Indonesia yang menarik dan kasual untuk sebuah kafe bernama "${name}" yang berlokasi di ${city}.`,
+      `Buatkan deskripsi singkat (2–3 kalimat) dalam Bahasa Indonesia yang menarik dan kasual untuk sebuah bar bernama "${name}" yang berlokasi di ${city}.`,
       typeLabels ? `Tipe tempat: ${typeLabels}.` : '',
       rating ? `Rating: ${rating}/5 dari ${reviews?.toLocaleString() ?? '?'} ulasan.` : '',
-      `Gaya penulisan: hangat, mengundang, seperti rekomendasi teman — bukan iklan. Jangan mulai dengan kata "Kafe ini". Tidak perlu menyebut nama kafe lagi di kalimat pertama.`,
+      `Gaya penulisan: hangat, mengundang, seperti rekomendasi teman — bukan iklan. Jangan mulai dengan kata "Bar ini". Tidak perlu menyebut nama bar lagi di kalimat pertama.`,
     ]
       .filter(Boolean)
       .join(' ')
