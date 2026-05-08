@@ -49,18 +49,18 @@
                         <label class="flex items-center space-x-2">
                           <input
                             type="checkbox"
-                            :checked="includesBusinessType('cafe')"
-                            @change="toggleBusinessType('cafe')"
+                            :checked="includesBusinessType('bar')"
+                            @change="toggleBusinessType('bar')"
                             class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500" />
                           <span>Bar</span>
                         </label>
                         <label class="flex items-center space-x-2">
                           <input
                             type="checkbox"
-                            :checked="includesBusinessType('roastery')"
-                            @change="toggleBusinessType('roastery')"
+                            :checked="includesBusinessType('brewery')"
+                            @change="toggleBusinessType('brewery')"
                             class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500" />
-                          <span>Roastery</span>
+                          <span>Brewery</span>
                         </label>
                         <label class="flex items-center space-x-2">
                           <input
@@ -68,7 +68,7 @@
                             :checked="includesBusinessType('supplier')"
                             @change="toggleBusinessType('supplier')"
                             class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500" />
-                          <span>Tools & Supplies</span>
+                          <span>Supplier</span>
                         </label>
                       </div>
                       <div v-if="hasError('businessTypes')" class="text-red-500 text-sm mt-1">
@@ -413,7 +413,7 @@
                     </div>
                   </div>
 
-                  <div class="mb-10" v-if="includesBusinessType('cafe')">
+                  <div class="mb-10" v-if="includesBusinessType('bar')">
                     <label for="features">Fitur Bar:</label>
                     <div class="relative mt-2">
                       <div class="hs-dropdown relative w-full">
@@ -422,7 +422,7 @@
                           <!-- Selected tags -->
                           <div
                             v-for="feature in selectedFeatures.filter(
-                              (feature) => feature.business_type === 'cafe'
+                              (feature) => feature.business_type === 'bar'
                             )"
                             :key="feature.id"
                             class="inline-flex items-center px-2.5 py-0.5 m-0.5 rounded-full text-sm bg-blue-100 text-blue-800">
@@ -449,15 +449,15 @@
                           <!-- Search input -->
                           <input
                             type="text"
-                            id="cafe-features-search"
+                            id="bar-features-search"
                             class="flex-grow min-w-[80px] border-0 p-0 pl-1 focus:ring-0 focus:outline-none text-sm"
                             placeholder="Search and select features..."
-                            v-model="cafeFeatureSearchQuery"
-                            @input="() => searchFeaturesByType('cafe')"
+                            v-model="barFeatureSearchQuery"
+                            @input="() => searchFeaturesByType('bar')"
                             @focus="
                               () => {
                                 showFeatureDropdown = true
-                                currentFeatureType = 'cafe'
+                                currentFeatureType = 'bar'
                               }
                             "
                             @blur="handleBlur"
@@ -471,13 +471,13 @@
                         <div
                           v-if="
                             showFeatureDropdown &&
-                            filteredCafeFeatures.length > 0 &&
-                            currentFeatureType === 'cafe'
+                            filteredBarFeatures.length > 0 &&
+                            currentFeatureType === 'bar'
                           "
                           class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto"
-                          ref="cafeDropdownRef">
+                          ref="barDropdownRef">
                           <div
-                            v-for="(feature, index) in filteredCafeFeatures"
+                            v-for="(feature, index) in filteredBarFeatures"
                             :key="feature.id"
                             :class="[
                               'px-4 py-2 hover:bg-blue-50 cursor-pointer flex items-center',
@@ -507,20 +507,19 @@
                     </div>
 
                     <p class="text-gray-500 text-sm mt-2">
-                      <strong>Note:</strong> Pilih semua fitur yang sesuai dengan café anda.
+                      <strong>Note:</strong> Pilih semua fitur yang sesuai dengan bar anda.
                     </p>
                   </div>
 
-                  <div class="mb-10" v-if="includesBusinessType('roastery')">
-                    <label for="features">Fitur Beans & Roastery:</label>
+                  <div class="mb-10" v-if="includesBusinessType('brewery')">
+                    <label for="features">Fitur Brewery:</label>
                     <div class="relative mt-2">
                       <div class="hs-dropdown relative w-full">
                         <div
                           class="flex flex-wrap items-center border border-gray-300 rounded-md p-2 bg-white">
-                          <!-- Selected tags -->
                           <div
                             v-for="feature in selectedFeatures.filter(
-                              (feature) => feature.business_type === 'roastery'
+                              (feature) => feature.business_type === 'brewery'
                             )"
                             :key="feature.id"
                             class="inline-flex items-center px-2.5 py-0.5 m-0.5 rounded-full text-sm bg-blue-100 text-blue-800">
@@ -530,72 +529,39 @@
                               class="flex-shrink-0 ml-1 h-4 w-4 inline-flex items-center justify-center rounded-full text-blue-600 hover:bg-blue-200 hover:text-blue-800 focus:outline-none focus:bg-blue-200 focus:text-blue-800"
                               @click="removeSelectedFeature(feature)">
                               <span class="sr-only">Remove feature</span>
-                              <svg
-                                class="h-3 w-3"
-                                xmlns="http://www.w3.org/2000/svg"
-                                viewBox="0 0 20 20"
-                                fill="currentColor"
-                                aria-hidden="true">
-                                <path
-                                  fill-rule="evenodd"
-                                  d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                                  clip-rule="evenodd" />
+                              <svg class="h-3 w-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
                               </svg>
                             </button>
                           </div>
-
-                          <!-- Search input -->
                           <input
                             type="text"
-                            id="roastery-features-search"
+                            id="brewery-features-search"
                             class="flex-grow min-w-[80px] border-0 p-0 pl-1 focus:ring-0 focus:outline-none text-sm"
                             placeholder="Search and select features..."
-                            v-model="roasteryFeatureSearchQuery"
-                            @input="() => searchFeaturesByType('roastery')"
-                            @focus="
-                              () => {
-                                showFeatureDropdown = true
-                                currentFeatureType = 'roastery'
-                              }
-                            "
+                            v-model="breweryFeatureSearchQuery"
+                            @input="() => searchFeaturesByType('brewery')"
+                            @focus="() => { showFeatureDropdown = true; currentFeatureType = 'brewery' }"
                             @blur="handleBlur"
                             @keydown.down="focusNextDropdownItem"
                             @keydown.up="focusPreviousDropdownItem"
                             @keydown.enter.prevent="selectFocusedFeature"
                             @keydown.escape="hideDropdown" />
                         </div>
-
-                        <!-- Dropdown -->
                         <div
-                          v-if="
-                            showFeatureDropdown &&
-                            filteredRoasteryFeatures.length > 0 &&
-                            currentFeatureType === 'roastery'
-                          "
+                          v-if="showFeatureDropdown && filteredBreweryFeatures.length > 0 && currentFeatureType === 'brewery'"
                           class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto"
-                          ref="roasteryDropdownRef">
+                          ref="breweryDropdownRef">
                           <div
-                            v-for="(feature, index) in filteredRoasteryFeatures"
+                            v-for="(feature, index) in filteredBreweryFeatures"
                             :key="feature.id"
-                            :class="[
-                              'px-4 py-2 hover:bg-blue-50 cursor-pointer flex items-center',
-                              focusedFeatureIndex === index ? 'bg-blue-50' : '',
-                              isFeatureSelected(feature) ? 'bg-blue-100' : '',
-                            ]"
+                            :class="['px-4 py-2 hover:bg-blue-50 cursor-pointer flex items-center', focusedFeatureIndex === index ? 'bg-blue-50' : '', isFeatureSelected(feature) ? 'bg-blue-100' : '']"
                             @click="handleFeatureClick(feature)"
                             @mouseover="focusedFeatureIndex = index"
                             :id="`feature-item-${index}`">
                             <div class="flex-shrink-0 mr-2">
-                              <svg
-                                class="h-4 w-4 text-blue-600"
-                                v-if="isFeatureSelected(feature)"
-                                xmlns="http://www.w3.org/2000/svg"
-                                viewBox="0 0 20 20"
-                                fill="currentColor">
-                                <path
-                                  fill-rule="evenodd"
-                                  d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                                  clip-rule="evenodd" />
+                              <svg class="h-4 w-4 text-blue-600" v-if="isFeatureSelected(feature)" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
                               </svg>
                             </div>
                             <span>{{ feature.name }}</span>
@@ -603,19 +569,18 @@
                         </div>
                       </div>
                     </div>
-
                     <p class="text-gray-500 text-sm mt-2">
-                      <strong>Note:</strong> Pilih semua fitur yang sesuai dengan Roastery anda.
+                      <strong>Note:</strong> Pilih semua fitur yang sesuai dengan brewery anda.
                     </p>
                   </div>
 
+
                   <div class="mb-10" v-if="includesBusinessType('supplier')">
-                    <label for="features">Fitur Tools & Supplies:</label>
+                    <label for="features">Fitur Supplier:</label>
                     <div class="relative mt-2">
                       <div class="hs-dropdown relative w-full">
                         <div
                           class="flex flex-wrap items-center border border-gray-300 rounded-md p-2 bg-white">
-                          <!-- Selected tags -->
                           <div
                             v-for="feature in selectedFeatures.filter(
                               (feature) => feature.business_type === 'supplier'
@@ -628,21 +593,11 @@
                               class="flex-shrink-0 ml-1 h-4 w-4 inline-flex items-center justify-center rounded-full text-blue-600 hover:bg-blue-200 hover:text-blue-800 focus:outline-none focus:bg-blue-200 focus:text-blue-800"
                               @click="removeSelectedFeature(feature)">
                               <span class="sr-only">Remove feature</span>
-                              <svg
-                                class="h-3 w-3"
-                                xmlns="http://www.w3.org/2000/svg"
-                                viewBox="0 0 20 20"
-                                fill="currentColor"
-                                aria-hidden="true">
-                                <path
-                                  fill-rule="evenodd"
-                                  d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                                  clip-rule="evenodd" />
+                              <svg class="h-3 w-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
                               </svg>
                             </button>
                           </div>
-
-                          <!-- Search input -->
                           <input
                             type="text"
                             id="supplier-features-search"
@@ -650,50 +605,27 @@
                             placeholder="Search and select features..."
                             v-model="supplierFeatureSearchQuery"
                             @input="() => searchFeaturesByType('supplier')"
-                            @focus="
-                              () => {
-                                showFeatureDropdown = true
-                                currentFeatureType = 'supplier'
-                              }
-                            "
+                            @focus="() => { showFeatureDropdown = true; currentFeatureType = 'supplier' }"
                             @blur="handleBlur"
                             @keydown.down="focusNextDropdownItem"
                             @keydown.up="focusPreviousDropdownItem"
                             @keydown.enter.prevent="selectFocusedFeature"
                             @keydown.escape="hideDropdown" />
                         </div>
-
-                        <!-- Dropdown -->
                         <div
-                          v-if="
-                            showFeatureDropdown &&
-                            filteredSupplierFeatures.length > 0 &&
-                            currentFeatureType === 'supplier'
-                          "
+                          v-if="showFeatureDropdown && filteredSupplierFeatures.length > 0 && currentFeatureType === 'supplier'"
                           class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto"
                           ref="supplierDropdownRef">
                           <div
                             v-for="(feature, index) in filteredSupplierFeatures"
                             :key="feature.id"
-                            :class="[
-                              'px-4 py-2 hover:bg-blue-50 cursor-pointer flex items-center',
-                              focusedFeatureIndex === index ? 'bg-blue-50' : '',
-                              isFeatureSelected(feature) ? 'bg-blue-100' : '',
-                            ]"
+                            :class="['px-4 py-2 hover:bg-blue-50 cursor-pointer flex items-center', focusedFeatureIndex === index ? 'bg-blue-50' : '', isFeatureSelected(feature) ? 'bg-blue-100' : '']"
                             @click="handleFeatureClick(feature)"
                             @mouseover="focusedFeatureIndex = index"
                             :id="`feature-item-${index}`">
                             <div class="flex-shrink-0 mr-2">
-                              <svg
-                                class="h-4 w-4 text-blue-600"
-                                v-if="isFeatureSelected(feature)"
-                                xmlns="http://www.w3.org/2000/svg"
-                                viewBox="0 0 20 20"
-                                fill="currentColor">
-                                <path
-                                  fill-rule="evenodd"
-                                  d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                                  clip-rule="evenodd" />
+                              <svg class="h-4 w-4 text-blue-600" v-if="isFeatureSelected(feature)" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
                               </svg>
                             </div>
                             <span>{{ feature.name }}</span>
@@ -701,10 +633,8 @@
                         </div>
                       </div>
                     </div>
-
                     <p class="text-gray-500 text-sm mt-2">
-                      <strong>Note:</strong> Pilih semua fitur yang sesuai dengan Tools & Supplies
-                      anda.
+                      <strong>Note:</strong> Pilih semua fitur yang sesuai dengan supplier anda.
                     </p>
                   </div>
 
@@ -877,13 +807,13 @@ const allFeatures = ref<Feature[]>(features || [])
 const featureSearchQuery = ref('')
 
 // Add after the existing featureSearchQuery ref
-const cafeFeatureSearchQuery = ref('')
-const roasteryFeatureSearchQuery = ref('')
+const barFeatureSearchQuery = ref('')
+const breweryFeatureSearchQuery = ref('')
 const supplierFeatureSearchQuery = ref('')
-const currentFeatureType = ref('cafe') // Default to cafe
+const currentFeatureType = ref('bar') // Default to bar
 
-const filteredCafeFeatures = ref<Feature[]>([])
-const filteredRoasteryFeatures = ref<Feature[]>([])
+const filteredBarFeatures = ref<Feature[]>([])
+const filteredBreweryFeatures = ref<Feature[]>([])
 const filteredSupplierFeatures = ref<Feature[]>([])
 
 // Add this helper method to handle both array formats
@@ -1098,8 +1028,8 @@ onMounted(() => {
     })
   }
   // Initialize all feature types
-  searchFeaturesByType('cafe')
-  searchFeaturesByType('roastery')
+  searchFeaturesByType('bar')
+  searchFeaturesByType('brewery')
   searchFeaturesByType('supplier')
 })
 
@@ -1263,51 +1193,27 @@ const searchFeaturesByType = (businessType) => {
   let query = ''
 
   // Get the appropriate search query based on business type
-  if (businessType === 'cafe') {
-    query = cafeFeatureSearchQuery.value
+  const typeConfig = {
+    bar: { queryRef: barFeatureSearchQuery, filteredRef: filteredBarFeatures },
+    brewery: { queryRef: breweryFeatureSearchQuery, filteredRef: filteredBreweryFeatures },
+    supplier: { queryRef: supplierFeatureSearchQuery, filteredRef: filteredSupplierFeatures },
+  }
 
-    // Filter by both business type and search query
-    if (query.trim() === '') {
-      filteredCafeFeatures.value = allFeatures.value.filter(
-        (feature) => feature.business_type === 'cafe'
-      )
-    } else {
-      filteredCafeFeatures.value = allFeatures.value.filter(
-        (feature) =>
-          feature.business_type === 'cafe' &&
-          feature.name?.toLowerCase().includes(query.toLowerCase())
-      )
-    }
-  } else if (businessType === 'roastery') {
-    query = roasteryFeatureSearchQuery.value
+  const config = typeConfig[businessType]
+  if (!config) return
 
-    // Filter by both business type and search query
-    if (query.trim() === '') {
-      filteredRoasteryFeatures.value = allFeatures.value.filter(
-        (feature) => feature.business_type === 'roastery'
-      )
-    } else {
-      filteredRoasteryFeatures.value = allFeatures.value.filter(
-        (feature) =>
-          feature.business_type === 'roastery' &&
-          feature.name?.toLowerCase().includes(query.toLowerCase())
-      )
-    }
-  } else if (businessType === 'supplier') {
-    query = supplierFeatureSearchQuery.value
+  query = config.queryRef.value
 
-    // Filter by both business type and search query
-    if (query.trim() === '') {
-      filteredSupplierFeatures.value = allFeatures.value.filter(
-        (feature) => feature.business_type === 'supplier'
-      )
-    } else {
-      filteredSupplierFeatures.value = allFeatures.value.filter(
-        (feature) =>
-          feature.business_type === 'supplier' &&
-          feature.name?.toLowerCase().includes(query.toLowerCase())
-      )
-    }
+  if (query.trim() === '') {
+    config.filteredRef.value = allFeatures.value.filter(
+      (feature) => feature.business_type === businessType
+    )
+  } else {
+    config.filteredRef.value = allFeatures.value.filter(
+      (feature) =>
+        feature.business_type === businessType &&
+        feature.name?.toLowerCase().includes(query.toLowerCase())
+    )
   }
 }
 
@@ -1320,8 +1226,8 @@ onMounted(() => {
   }
 
   // Initialize all feature types
-  searchFeaturesByType('cafe')
-  searchFeaturesByType('roastery')
+  searchFeaturesByType('bar')
+  searchFeaturesByType('brewery')
   searchFeaturesByType('supplier')
 })
 const handleBlur = (event: FocusEvent) => {
@@ -1342,13 +1248,12 @@ const handleBlur = (event: FocusEvent) => {
 const focusNextDropdownItem = () => {
   let featuresList = []
 
-  if (currentFeatureType.value === 'cafe') {
-    featuresList = filteredCafeFeatures.value
-  } else if (currentFeatureType.value === 'roastery') {
-    featuresList = filteredRoasteryFeatures.value
-  } else if (currentFeatureType.value === 'supplier') {
-    featuresList = filteredSupplierFeatures.value
+  const filteredMap = {
+    bar: filteredBarFeatures,
+    brewery: filteredBreweryFeatures,
+    supplier: filteredSupplierFeatures,
   }
+  featuresList = filteredMap[currentFeatureType.value]?.value || []
 
   if (featuresList.length === 0) return
   focusedFeatureIndex.value = (focusedFeatureIndex.value + 1) % featuresList.length
@@ -1358,13 +1263,12 @@ const focusNextDropdownItem = () => {
 const focusPreviousDropdownItem = () => {
   let featuresList = []
 
-  if (currentFeatureType.value === 'cafe') {
-    featuresList = filteredCafeFeatures.value
-  } else if (currentFeatureType.value === 'roastery') {
-    featuresList = filteredRoasteryFeatures.value
-  } else if (currentFeatureType.value === 'supplier') {
-    featuresList = filteredSupplierFeatures.value
+  const filteredMap = {
+    bar: filteredBarFeatures,
+    brewery: filteredBreweryFeatures,
+    supplier: filteredSupplierFeatures,
   }
+  featuresList = filteredMap[currentFeatureType.value]?.value || []
 
   if (featuresList.length === 0) return
   focusedFeatureIndex.value =
@@ -1375,13 +1279,12 @@ const focusPreviousDropdownItem = () => {
 const selectFocusedFeature = () => {
   let featuresList = []
 
-  if (currentFeatureType.value === 'cafe') {
-    featuresList = filteredCafeFeatures.value
-  } else if (currentFeatureType.value === 'roastery') {
-    featuresList = filteredRoasteryFeatures.value
-  } else if (currentFeatureType.value === 'supplier') {
-    featuresList = filteredSupplierFeatures.value
+  const filteredMap = {
+    bar: filteredBarFeatures,
+    brewery: filteredBreweryFeatures,
+    supplier: filteredSupplierFeatures,
   }
+  featuresList = filteredMap[currentFeatureType.value]?.value || []
 
   if (focusedFeatureIndex.value >= 0 && focusedFeatureIndex.value < featuresList.length) {
     handleFeatureClick(featuresList[focusedFeatureIndex.value])

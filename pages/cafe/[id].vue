@@ -129,9 +129,9 @@
                 :href="`/cafes?features=${feature.feature_slug}`"
                 class="px-3 py-2 flex text-white text-xs items-center gap-2  rounded-full bg-gray-800 hover:bg-gray-800 transition-colors"
                 :class="{
-                  'bg-yellow-500 text-gray-800': feature.business_type === 'cafe',
-                  'bg-yellow-800 text-white': feature.business_type === 'roastery',
-                  'bg-stone-500 text-white': feature.business_type === 'supplier',
+                  'bg-yellow-500 text-gray-800': feature.business_type === 'bar',
+                  'bg-amber-700 text-white': feature.business_type === 'brewery',
+                  'bg-gray-600 text-white': feature.business_type === 'supplier',
                 }">
                   {{ feature.name }}
               </a>

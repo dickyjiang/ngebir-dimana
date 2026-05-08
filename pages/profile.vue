@@ -94,12 +94,12 @@
               <p class="font-medium text-gray-600">Pilih Jenis usaha yang mau ditambahkan.</p>
               <p class="text-gray-500">Kamu boleh menambah lebih dari satu jenis usaha.</p>
             </div>
-            <div class="grid grid-cols-2 gap-4 pt-8">
+            <div class="grid grid-cols-3 gap-4 pt-8">
               <div
                 class="flex flex-col items-center justify-end gap-8 bg-gray-100 px-4 py-3 rounded-md border border-gray-600">
                 <img class="w-20" src="/src/assets/img/newCafe.svg" alt="" />
                 <NuxtLink
-                  to="/cafe/owner/form?business_type=cafe"
+                  to="/cafe/owner/form?business_type=bar"
                   class="border w-full border-gray-600 text-gray-600 py-2 px-3 rounded-md text-sm text-center font-medium hover:bg-gray-800 hover:text-yellow-500 transition-colors">
                   Bar</NuxtLink
                 >
@@ -108,9 +108,9 @@
                 class="flex flex-col items-center justify-between gap-4 bg-gray-100 px-4 py-3 rounded-md border border-gray-600">
                 <img class="w-20 opacity-70" src="/src/assets/img/coffee-beans.svg" alt="" />
                 <NuxtLink
-                  to="/cafe/owner/form?business_type=roastery"
+                  to="/cafe/owner/form?business_type=brewery"
                   class="border w-full border-gray-600 text-gray-600 py-2 px-3 rounded-md text-sm text-center font-medium">
-                  Roastery
+                  Brewery
                 </NuxtLink>
               </div>
               <div
@@ -119,9 +119,8 @@
                 <NuxtLink
                   to="/cafe/owner/form?business_type=supplier"
                   class="border w-full border-gray-600 text-gray-600 py-2 px-3 rounded-md text-sm text-center font-medium">
-                  Tools & Supplies
+                  Supplier
                 </NuxtLink>
-                <p class="text-gray-500 text-sm">Contoh: Alat Bar, bir craft, perlengkapan bar dll.</p>
               </div>
             </div>
           </div>
@@ -154,17 +153,17 @@
                       :key="type"
                       class="px-3 py-1 rounded-full text-center text-sm font-medium"
                       :class="{
-                        'bg-yellow-400 text-gray-800': type.trim().toLowerCase() === 'cafe',
-                        'bg-yellow-800 text-white': type.trim().toLowerCase() === 'roastery',
-                        'bg-stone-500 text-white': type.trim().toLowerCase() === 'supplier',
+                        'bg-yellow-400 text-gray-800': type.trim().toLowerCase() === 'bar',
+                        'bg-amber-700 text-white': type.trim().toLowerCase() === 'brewery',
+                        'bg-gray-600 text-white': type.trim().toLowerCase() === 'supplier',
                       }">
                       {{
-                        type.trim() === 'cafe'
+                        type.trim() === 'bar'
                           ? 'Bar'
-                          : type.trim() === 'roastery'
-                            ? 'Roastery'
+                          : type.trim() === 'brewery'
+                            ? 'Brewery'
                             : type.trim() === 'supplier'
-                              ? 'Tools & Supplies'
+                              ? 'Supplier'
                               : type.trim()
                       }}
                     </div>

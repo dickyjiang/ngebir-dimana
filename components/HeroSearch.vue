@@ -78,7 +78,7 @@ function handleFeatureToggle(feature_id: string) {
 }
 
 function handleFilterTypeChange() {
-  // Track category filter type switch (All / Cafes / Roastery / Supplies)
+  // Track category filter type switch (All / Bar / Brewery / Supplier)
   trackCategoryTab(filterType.value)
   handleSearch()
 }
@@ -216,9 +216,9 @@ onBeforeUnmount(() => {
                   class="h-full bg-transparent text-gray-600 focus:outline-none text-sm sm:text-base pl-2 border-l border-gray-300"
                   @change="handleFilterTypeChange">
                   <option value="all">All</option>
-                  <option value="cafe">Cafes</option>
-                  <option value="roastery">Roastery</option>
-                  <option value="supplier">Supplies</option>
+                  <option value="bar">Bar</option>
+                  <option value="brewery">Brewery</option>
+                  <option value="supplier">Supplier</option>
                 </select>
               </div>
             </div>

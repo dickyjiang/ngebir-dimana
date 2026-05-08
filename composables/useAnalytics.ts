@@ -8,7 +8,7 @@ export function useAnalytics() {
   const { gtag } = useGtag()
 
   /**
-   * Fires when user switches category filter type (All / Cafes / Roastery / Supplies).
+   * Fires when user switches category filter type (All / Bar / Rooftop / Sports Bar / Brewery / Beach Club).
    * Measures which content categories users are most interested in browsing.
    */
   function trackCategoryTab(category_name: string) {
