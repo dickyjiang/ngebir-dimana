@@ -1,4 +1,6 @@
 <script setup lang="ts">
+definePageMeta({ layout: 'member' })
+
   import { ref, onMounted } from 'vue';
   import { useSupabaseClient } from '#imports';
   import type { Tables, TablesInsert } from '~/types/database.types';

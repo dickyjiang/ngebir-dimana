@@ -1,4 +1,5 @@
-export default defineEventHandler(async () => {
+export default defineEventHandler(async (event) => {
+  await requireAdmin(event)
   const config = useRuntimeConfig()
   const supabaseUrl = config.supabaseUrl || process.env.SUPABASE_URL!
   const serviceKey = config.supabaseServiceKey || process.env.SUPABASE_SERVICE_KEY!
