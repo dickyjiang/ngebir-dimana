@@ -1,6 +1,7 @@
 import { serverSupabaseServiceRole } from '#supabase/server'
 
 export default defineEventHandler(async (event) => {
+  await requireAdmin(event)
   const client = serverSupabaseServiceRole(event)
   const body = await readBody<{ ids: number[]; action: 'publish' | 'delete' }>(event)
 

@@ -146,6 +146,12 @@
 
           <!-- sudah login -->
           <div v-if="data.session" class="flex items-center gap-2">
+            <NuxtLink
+              v-if="isAdmin"
+              to="/admin/review"
+              class="text-sm font-semibold flex border px-3 py-2 rounded-lg border-none transition-colors hover:bg-black hover:text-yellow-500">
+              Admin
+            </NuxtLink>
             <NuxtLink to="/profile">
               <button
                 class="text-sm font-semibold flex border px-3 py-2 rounded-lg border-none transition-colors hover:bg-black hover:text-yellow-500"
@@ -176,6 +182,16 @@ const supabase = useSupabaseClient();
 let anim = null;
 const { data } = await supabase.auth.getSession();
 const { trackRegistrationIntent, trackLoginClick } = useAnalytics()
+
+const isAdmin = ref(false)
+if (data.session) {
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('is_admin')
+    .eq('id', data.session.user.id)
+    .single()
+  isAdmin.value = profile?.is_admin ?? false
+}
 
 const isMenuOpen = ref(false);
 

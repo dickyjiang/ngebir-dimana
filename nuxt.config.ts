@@ -41,6 +41,7 @@ export default defineNuxtConfig({
       '/profile',
       '/cafe/owner/**',
       '/cafes/new',
+      '/cafe/feature/new',
       '/admin/**',
       '/confirm',
       '/Disclaimer',
@@ -70,7 +71,7 @@ export default defineNuxtConfig({
       login: '/login',
       callback: '/confirm',
       cookieRedirect: true,
-      include: ['/account/*', '/account', '/cafe/owner/*'],
+      include: ['/account/*', '/account', '/cafe/owner/*', '/cafe/feature/new', '/cafes/new', '/admin/*'],
     }
   },
   vite: {

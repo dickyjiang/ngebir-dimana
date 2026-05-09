@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 
+definePageMeta({ layout: 'admin', middleware: 'admin' })
+
 interface BlogDraft {
   id: number
   title: string
@@ -11,26 +13,6 @@ interface BlogDraft {
   category: string | null
   published_at: string
   created_at: string
-}
-
-// ── Auth gate (same password as cafe review) ───────────────────────────────
-const ADMIN_PASSWORD = 'NDM'
-const SESSION_KEY = 'ndm_admin_auth'
-
-const authed = ref(false)
-const passwordInput = ref('')
-const passwordError = ref(false)
-
-function checkPassword() {
-  if (passwordInput.value === ADMIN_PASSWORD) {
-    authed.value = true
-    sessionStorage.setItem(SESSION_KEY, '1')
-    passwordError.value = false
-    loadDrafts()
-  } else {
-    passwordError.value = true
-    passwordInput.value = ''
-  }
 }
 
 // ── Data ───────────────────────────────────────────────────────────────────
@@ -96,10 +78,7 @@ async function bulkDelete() {
 
 // ── Mount ──────────────────────────────────────────────────────────────────
 onMounted(() => {
-  if (sessionStorage.getItem(SESSION_KEY) === '1') {
-    authed.value = true
-    loadDrafts()
-  }
+  loadDrafts()
 })
 </script>
 
@@ -158,40 +137,8 @@ onMounted(() => {
     </div>
   </div>
 
-  <!-- Password gate -->
-  <div v-if="!authed" class="min-h-screen bg-gray-900 flex items-center justify-center p-4">
-    <div class="bg-white rounded-lg shadow-xl p-8 w-full max-w-sm">
-      <div class="text-center mb-6">
-        <div class="inline-flex items-center justify-center w-12 h-12 bg-amber-100 rounded-full mb-3">
-          <span class="text-2xl">📝</span>
-        </div>
-        <h1 class="text-xl font-bold text-gray-800">Blog Review</h1>
-        <p class="text-sm text-gray-500 mt-1">ngebir-dimana.com</p>
-      </div>
-      <form @submit.prevent="checkPassword" class="space-y-4">
-        <div>
-          <input
-            v-model="passwordInput"
-            type="password"
-            placeholder="Password"
-            autofocus
-            :class="[
-              'w-full px-4 py-3 border rounded-md text-sm focus:outline-none focus:ring-2',
-              passwordError ? 'border-red-400 focus:ring-red-300' : 'border-gray-300 focus:ring-amber-300',
-            ]" />
-          <p v-if="passwordError" class="mt-1 text-xs text-red-500">Password salah.</p>
-        </div>
-        <button
-          type="submit"
-          class="w-full bg-amber-600 hover:bg-amber-700 text-white py-3 rounded-md font-medium transition-colors">
-          Masuk
-        </button>
-      </form>
-    </div>
-  </div>
-
   <!-- Main content -->
-  <div v-else class="min-h-screen bg-gray-50">
+  <div class="min-h-screen bg-gray-50">
     <!-- Header -->
     <div class="bg-white border-b border-gray-200 sticky top-0 z-10">
       <div class="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
@@ -199,11 +146,6 @@ onMounted(() => {
           <h1 class="text-lg font-bold text-gray-800">Blog Review</h1>
           <p class="text-xs text-gray-500">ngebir-dimana.com · Draft Artikel</p>
         </div>
-        <a
-          href="/admin/review"
-          class="text-sm text-gray-500 hover:text-gray-700 flex items-center gap-1">
-          → Bar Review
-        </a>
       </div>
     </div>
 

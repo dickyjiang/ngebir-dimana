@@ -2,6 +2,7 @@ import { serverSupabaseServiceRole } from '#supabase/server'
 import type { Database } from '~~/types/database.types'
 
 export default defineEventHandler(async (event) => {
+  await requireAdmin(event)
   const client = serverSupabaseServiceRole<Database>(event)
   const body = await readBody(event)
   // body: { ids: number[], action: 'publish' | 'reject' }

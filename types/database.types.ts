@@ -326,6 +326,7 @@ export type Database = {
           bio_profile: string | null
           full_name: string | null
           id: string
+          is_admin: boolean
           phone_number: string | null
           updated_at: string | null
           username: string | null
@@ -336,6 +337,7 @@ export type Database = {
           bio_profile?: string | null
           full_name?: string | null
           id: string
+          is_admin?: boolean
           phone_number?: string | null
           updated_at?: string | null
           username?: string | null
@@ -346,6 +348,7 @@ export type Database = {
           bio_profile?: string | null
           full_name?: string | null
           id?: string
+          is_admin?: boolean
           phone_number?: string | null
           updated_at?: string | null
           username?: string | null
