@@ -5,7 +5,7 @@ export default defineEventHandler(async (event) => {
   const serviceKey = config.supabaseServiceKey || process.env.SUPABASE_SERVICE_KEY!
 
   const res = await fetch(
-    `${supabaseUrl}/functions/v1/discover-cafes`,
+    `${supabaseUrl}/functions/v1/discover-bars`,
     {
       method: 'POST',
       headers: {

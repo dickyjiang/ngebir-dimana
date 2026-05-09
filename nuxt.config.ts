@@ -10,6 +10,7 @@ export default defineNuxtConfig({
   ],
 
   runtimeConfig: {
+    supabaseUrl: process.env.SUPABASE_URL || '',
     supabaseServiceKey: process.env.SUPABASE_SERVICE_KEY || '',
     anthropicApiKey: process.env.ANTHROPIC_API_KEY || '',
     cronSecret: process.env.CRON_SECRET || '',
@@ -61,7 +62,12 @@ export default defineNuxtConfig({
   },
 
   compatibilityDate: '2025-04-30',
-  devtools: { enabled: true },
+  devtools: {
+    enabled: true,
+    vscode: {
+      reuseExistingServer: true,
+    },
+  },
   sourcemap: {
     server: true,
     client: true

@@ -195,7 +195,7 @@ onBeforeUnmount(() => {
           Ngebir dimana?
         </h1>
         <h2 class="text-sm md:text-xl tracking-wide text-white mb-2 sm:mb-4 text-center">
-          Direktori Bar Indonesia
+          {{ totalCafes ? `${totalCafes} Tempat nge-Beer` : 'Tempat ngeBir' }}
         </h2>
         <div
           class="mt-2 sm:mt-4 w-full md:w-3/4 flex flex-col gap-2 sm:gap-4 items-center justify-center px-4">
