@@ -4,7 +4,6 @@ import '@fortawesome/fontawesome-free/css/all.css'
 import hoursAnimationData from '../public/animations/24-hours.json'
 import goldenRetrieverAnimationData from '../public/animations/golden-retriever.json'
 import coffeeBeansAnimationData from '../public/animations/coffee-beans.json'
-import wfcAnimationData from '../public/animations/wfc.json'
 import terdekatAnimationData from '../public/animations/terdekat.json'
 import wheelchairAnimationData from '../public/animations/wheelchair.json'
 
@@ -90,7 +89,6 @@ async function resetFeatureFilter() {
 let hoursAnim = null
 let petAnim = null
 let specialtyAnim = null
-let wfcAnim = null
 let terdekatAnim = null
 let wheelchairAnim = null // Add this line
 
@@ -115,7 +113,6 @@ onMounted(async () => {
     const hoursContainer = document.getElementById('hours-animate')
     const petContainer = document.getElementById('pet-animate')
     const specialtyContainer = document.getElementById('specialty-animate')
-    const wfcContainer = document.getElementById('wfc-animate')
     const terdekatContainer = document.getElementById('terdekat-animate')
     const wheelchairContainer = document.getElementById('wheelchair-animate')
 
@@ -143,14 +140,6 @@ onMounted(async () => {
       animationData: coffeeBeansAnimationData,
     })
 
-    wfcAnim = lottie.loadAnimation({
-      container: wfcContainer,
-      renderer: 'svg',
-      loop: true,
-      autoplay: props.activeFilters.features.includes('wfc'),
-      animationData: wfcAnimationData,
-    })
-
     terdekatAnim = lottie.loadAnimation({
       container: terdekatContainer,
       renderer: 'svg',
@@ -173,7 +162,6 @@ onBeforeUnmount(() => {
   if (hoursAnim) hoursAnim.destroy()
   if (petAnim) petAnim.destroy()
   if (specialtyAnim) specialtyAnim.destroy()
-  if (wfcAnim) wfcAnim.destroy()
   if (terdekatAnim) terdekatAnim.destroy()
   if (wheelchairAnim) wheelchairAnim.destroy()
 })
@@ -187,7 +175,7 @@ onBeforeUnmount(() => {
         class="absolute object-cover object-center w-full h-full"
         src="/src/assets/img/hero.webp"
         alt="Ngebir Dimana - Direktori Bar Indonesia" />
-      <div class="absolute inset-0 bg-black opacity-60 z-[1]"></div>
+      <div class="absolute inset-0 bg-black opacity-40 z-[1]"></div>
       <div
         class="z-[2] flex flex-col items-center justify-center w-[90%] sm:w-[90%] mx-auto h-full">
         <h1
@@ -264,7 +252,7 @@ onBeforeUnmount(() => {
               }"
               class="text-white border border-white mt-2 px-3 sm:px-4 py-0 sm:py-1 rounded-full flex items-center gap-2 text-xs sm:text-base cursor-pointer touch-manipulation">
               <span id="specialty-animate" class="w-8 h-8"></span>
-              <span>Specialty | Artisan</span>
+              <span>Craft Beer</span>
             </button>
             <button
               @click="handleFeatureToggle('pets-dogs-allowed')"
@@ -322,19 +310,6 @@ onBeforeUnmount(() => {
               }">
               Outdoor
             </button> -->
-            <button
-              @click="handleFeatureToggle('wfc')"
-              @mouseenter="playAnimation(wfcAnim)"
-              @mouseleave="pauseAnimation(wfcAnim, activeFilters.features.includes('wfc'))"
-              class="text-white border border-white mt-2 px-3 sm:px-4 py-0 sm:py-1 rounded-full flex items-center gap-2 text-xs sm:text-base cursor-pointer touch-manipulation"
-              :class="{
-                'text-yellow-500 bg-black border border-yellow-500':
-                  activeFilters.features.includes('wfc'),
-                'text-gray-100 border-gray-400': !activeFilters.features.includes('wfc'),
-              }">
-              <span id="wfc-animate" class="w-8 h-8"></span>
-              <span>WFC</span>
-            </button>
             <button
               v-if="activeFilters.features.length > 0"
               class="ml-2 text-yellow-500 text-xs sm:text-base cursor-pointer touch-manipulation"

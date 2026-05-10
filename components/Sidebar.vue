@@ -40,7 +40,7 @@
               @click="handleFilterToggle('city', childCity.city_slug)"
               :class="{
                 'bg-black text-yellow-500 border-yellow-500 font-medium': selectedCities.has(childCity.city_slug),
-                'bg-gray-100 text-gray-700 border-transparent': !selectedCities.has(childCity.city_slug),
+                'bg-gray-800 text-yellow-400 border-transparent': !selectedCities.has(childCity.city_slug),
               }"
               class="px-3 py-1 text-xs rounded-full border transition-colors"
             >

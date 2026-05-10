@@ -1,6 +1,6 @@
 <template>
   <div
-    class="relative flex items-center justify-between w-full p-2 max-w-[90%] lg:max-w-[98%] mx-auto bg-white border-t-2 border-b-2 border-gray-800 my-2"
+    class="relative flex items-center justify-between w-full p-2 max-w-[90%] lg:max-w-[98%] mx-auto border-t-2 border-b-2 border-gray-800 my-2"
   >
     <!-- Back arrow remains at left -->
     <button

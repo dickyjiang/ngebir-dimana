@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col min-h-screen">
+  <div class="flex flex-col min-h-screen bg-orange-100">
     <Nav />
     <div class="flex-1 pb-4">
       <slot />
@@ -17,7 +17,7 @@
   // Default SEO setup for all pages
   useSeo({
     title: 'Website Paling Lengkap buat Cari Tempat Ngebir!',
-    description: 'Satu Klik, Ribuan Bar! Temukan yang Pas untuk Kamu.',
+    description: 'Satu Klik, Ribuan Tempat ngeBir! Temukan yang Pas untuk Kamu.',
     image: '/img/OG-img.png',
     url: 'https://ngebir-dimana.com',
     type: 'website',

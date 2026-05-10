@@ -436,7 +436,7 @@ onMounted(async () => {
     <!-- Sidebar -->
     <div
       :class="{
-        'fixed inset-y-0 left-0 w-[80%] bg-white z-40 transform transition-transform duration-300 ease-in-out': true,
+        'fixed inset-y-0 left-0 w-[80%] bg-white z-40 transform transition-transform duration-300 ease-in-out md:bg-transparent': true,
         'translate-x-0': isSidebarOpen,
         '-translate-x-full': !isSidebarOpen,
         'md:translate-x-0 md:static  md:max-w-[20%] md:sticky md:top-4': true,
