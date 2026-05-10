@@ -380,8 +380,11 @@ function qualityCheck(article, keyword, hasBars) {
 
   const kwLower = keyword.toLowerCase()
   const contentLower = article.content.toLowerCase()
-  const kwOccurrences = (contentLower.match(new RegExp(kwLower.split(' ')[0], 'g')) || []).length
-  if (kwOccurrences < 3) errors.push(`Keyword "${kwLower.split(' ')[0]}" appears only ${kwOccurrences}× (min 3)`)
+  // FIX: skip generic Indonesian stop words — check first meaningful word instead
+  const stopWords = new Set(['tips', 'cara', 'apa', 'itu', 'di', 'dan', 'yang', 'untuk', 'tentang', 'panduan', 'rekomendasi', 'daftar', 'list'])
+  const meaningfulWord = kwLower.split(' ').find(w => w.length > 3 && !stopWords.has(w)) || kwLower.split(' ')[0]
+  const kwOccurrences = (contentLower.match(new RegExp(meaningfulWord, 'g')) || []).length
+  if (kwOccurrences < 3) errors.push(`Keyword "${meaningfulWord}" appears only ${kwOccurrences}× (min 3)`)
 
   // FIX: missing backlinks is now always a WARNING, never a hard error.
   // The programmatic injection in generateArticle() already handles this case.
