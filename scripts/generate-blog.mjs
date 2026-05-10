@@ -4,8 +4,8 @@
  *
  * Required GitHub Secrets (Settings → Secrets → Actions):
  *   ANTHROPIC_API_KEY         — Anthropic API key
- *   SUPABASE_URL              — https://iblcxviqmqiutjzxnblx.supabase.co
- *   SUPABASE_SERVICE_ROLE_KEY — NDM Supabase service role key (from project settings)
+ *   SUPABASE_URL              — your Supabase project URL
+ *   SUPABASE_SERVICE_ROLE_KEY — Supabase service role key (from project settings)
  *   GMAIL_USER                — Gmail address for notifications
  *   GMAIL_APP_PASSWORD        — Gmail App Password (16-char, not your login password)
  *
@@ -33,6 +33,8 @@ const GMAIL_APP_PASSWORD = process.env.GMAIL_APP_PASSWORD
 const DRY_RUN = process.env.DRY_RUN === 'true'
 
 const SITE_URL = 'https://ngebir-dimana.com'
+// FIX: updated to /bars/ to match Nuxt route structure
+const BAR_PATH = '/bars/'
 const ADMIN_REVIEW_URL = `${SITE_URL}/admin/blog-review`
 const MIN_WORD_COUNT = 800
 
@@ -103,10 +105,12 @@ async function refillCategory(category, anthropic) {
   if (DRY_RUN) {
     return Array.from({ length: 10 }, (_, i) => `${category} dummy keyword ${i + 1}`)
   }
+
+  // FIX: added city variety (Bandung, Jakarta, Bali) and bar-specific topics
   const prompt =
     category === 'bar'
-      ? 'Generate 10 unique Indonesian-language SEO keyword phrases for a bar directory website (ngebir-dimana.com) about bars in Bandung. Focus on: rooftop bars, sports bars, craft beer bars, live music bars, bars for hangout, instagrammable bars, cheap bars near campus, bars with food, cocktail bars, bar recommendations. Return ONLY a JSON array of strings, no explanation.'
-      : 'Generate 10 unique Indonesian-language SEO/AEO keyword phrases for a bar directory website about beer knowledge and education. Focus on: craft beer, IPA, stout, lager, beer brewing, Indonesian beer brands, beer tasting guides, FAQ-style questions starting with "apa itu" or "cara". Return ONLY a JSON array of strings, no explanation.'
+      ? 'Generate 10 unique Indonesian-language SEO keyword phrases for a bar directory website (ngebir-dimana.com) covering bars in Bandung, Jakarta, and Bali. Mix of cities. Focus on: rooftop bar, sports bar, craft beer bar, bar live musik, bar buat nongkrong, bar instagrammable, bar murah dekat kampus, bar dengan makanan enak, cocktail bar, rekomendasi bar terbaik. Return ONLY a JSON array of strings, no explanation.'
+      : 'Generate 10 unique Indonesian-language SEO/AEO keyword phrases for a bar directory website about beer knowledge and education in Indonesia. Focus on: craft beer Indonesia, jenis bir IPA stout lager, cara bikin bir rumahan, merek bir Indonesia, panduan cicip bir, FAQ style starting with "apa itu" or "cara", bir terbaik di Bali, bir lokal vs impor. Return ONLY a JSON array of strings, no explanation.'
 
   const msg = await anthropic.messages.create({
     model: 'claude-haiku-4-5-20251001',
@@ -169,23 +173,33 @@ async function isDuplicate(keyword, supabase) {
   return false
 }
 
-// ─── Step 3: Query Relevant Cafes for Backlinks ───────────────────────────────
+// ─── Step 3: Query Relevant Bars for Backlinks ────────────────────────────────
 
-async function getRelevantCafes(keyword, supabase) {
+async function getRelevantBars(keyword, supabase) {
   const kw = keyword.toLowerCase()
 
-  // Determine feature slug to filter by
+  // FIX: bar-specific feature detection (removed cafe-specific ones)
   let featureSlug = null
-  if (kw.includes('wfc') || kw.includes('work from')) featureSlug = 'wfc'
-  else if (kw.includes('pet') || kw.includes('anjing') || kw.includes('kucing')) featureSlug = 'pet'
+  if (kw.includes('rooftop')) featureSlug = 'rooftop'
+  else if (kw.includes('live musik') || kw.includes('live music') || kw.includes('musik')) featureSlug = 'live_music'
+  else if (kw.includes('sports') || kw.includes('nonton bola')) featureSlug = 'sports'
+  else if (kw.includes('craft beer') || kw.includes('bir craft')) featureSlug = 'craft_beer'
   else if (kw.includes('outdoor')) featureSlug = 'outdoor'
+  else if (kw.includes('cocktail')) featureSlug = 'cocktail'
+  else if (kw.includes('karaoke')) featureSlug = 'karaoke'
 
-  // Keyword-based about/subtype filter (no feature table needed)
+  // Keyword-based subtype filter
   let aboutFilter = null
-  if (kw.includes('roastery')) aboutFilter = 'roastery'
-  else if (kw.includes('specialty')) aboutFilter = 'specialty'
+  if (kw.includes('sports bar')) aboutFilter = 'sports'
+  else if (kw.includes('rooftop')) aboutFilter = 'rooftop'
+  else if (kw.includes('jazz')) aboutFilter = 'jazz'
 
-  let cafeIds = null
+  // FIX: detect city from keyword to broaden coverage beyond Bandung only
+  let cityFilter = '%bandung%'
+  if (kw.includes('jakarta') || kw.includes('jkt')) cityFilter = '%jakarta%'
+  else if (kw.includes('bali') || kw.includes('seminyak') || kw.includes('canggu') || kw.includes('ubud')) cityFilter = '%bali%'
+
+  let barIds = null
 
   if (featureSlug) {
     // Step 3a: resolve feature IDs
@@ -197,46 +211,46 @@ async function getRelevantCafes(keyword, supabase) {
     if (featureData && featureData.length > 0) {
       const featureIds = featureData.map(f => f.id)
 
-      // Step 3b: get cafe IDs that have those features
+      // Step 3b: get bar IDs that have those features
       const { data: cfData } = await supabase
         .from('cafe_features')
         .select('cafe_id')
         .in('feature_id', featureIds)
 
       if (cfData && cfData.length > 0) {
-        cafeIds = [...new Set(cfData.map(cf => cf.cafe_id))]
+        barIds = [...new Set(cfData.map(cf => cf.cafe_id))]
       }
     }
   }
 
-  // Base cafe query — use neq(false) to include rows where is_published is null
+  // Base bar query
   const baseQuery = () =>
     supabase
       .from('cafes')
       .select('name, slug_name, borough, city, rating_num, about, photo')
-      .ilike('city', '%bandung%')
+      .ilike('city', cityFilter)
       .neq('is_published', false)
       .order('rating_num', { ascending: false })
       .limit(8)
 
   let q = baseQuery()
 
-  if (cafeIds && cafeIds.length > 0) {
-    q = q.in('id', cafeIds)
+  if (barIds && barIds.length > 0) {
+    q = q.in('id', barIds)
   } else if (aboutFilter) {
     q = q.ilike('subtypes', `%${aboutFilter}%`)
   }
 
   let { data, error } = await q
 
-  // Fallback: if filtered query returned nothing, just grab top cafes by rating
-  if ((!data || data.length === 0) && (cafeIds || aboutFilter)) {
-    console.log('  Filtered query returned 0 cafes — falling back to top rated')
+  // Fallback: if filtered query returned nothing, just grab top bars by rating
+  if ((!data || data.length === 0) && (barIds || aboutFilter)) {
+    console.log('  Filtered query returned 0 bars — falling back to top rated')
     ;({ data, error } = await baseQuery())
   }
 
   if (error) {
-    console.warn('  Cafe query failed:', error.message)
+    console.warn('  Bar query failed:', error.message)
     return []
   }
 
@@ -253,8 +267,9 @@ async function getRelevantCafes(keyword, supabase) {
 // ─── Step 4: Generate Article via Anthropic ───────────────────────────────────
 
 function buildSystemPrompt() {
+  // FIX: updated all copy — removed "coffee lovers", fixed CTA URLs to /bars
   return `Hari ini adalah ${today()}. Tahun saat ini adalah ${currentYear()}.
-Kamu adalah penulis konten SEO dan AEO (Answer Engine Optimization) ahli untuk ngebir-dimana.com — direktori bar terlengkap di Indonesia.
+Kamu adalah penulis konten SEO dan AEO (Answer Engine Optimization) ahli untuk ngebir-dimana.com — direktori bar dan tempat minum bir terlengkap di Indonesia.
 
 Tulis artikel dalam Bahasa Indonesia yang praktis dan berguna untuk pencari bar di Indonesia.
 
@@ -262,9 +277,9 @@ Setiap artikel harus:
 - Minimum 1000 kata
 - HTML formatting: <h2>, <h3>, <p>, <ul>, <strong>
 - Sertakan minimal 1 FAQ section dengan format <h2>FAQ</h2> dan <h3>pertanyaan</h3><p>jawaban</p> untuk AEO optimization
-- Sertakan backlink ke cafe relevan dari data yang diberikan, format: <a href="${SITE_URL}/cafe/[slug]" class="cafe-backlink"><img src="[foto]" alt="[name]" class="cafe-thumb" />[name]</a>
+- Sertakan backlink ke bar relevan dari data yang diberikan, format: <a href="${SITE_URL}${BAR_PATH}[slug]" class="bar-backlink"><img src="[foto]" alt="[name]" class="bar-thumb" />[name]</a>
 - Sertakan CTA box di tengah dan akhir artikel:
-  <div class="cta-box"><strong>[ajakan]</strong><br><a href="${SITE_URL}/cafes?[filter]">Temukan Bar di Direktori →</a></div>
+  <div class="cta-box"><strong>[ajakan]</strong><br><a href="${SITE_URL}/bars?[filter]">Temukan Bar di Direktori →</a></div>
 - JANGAN sertakan <html>, <head>, <body>, <style>
 - Mulai langsung dengan konten
 
@@ -278,28 +293,29 @@ Format output pakai delimiter (BUKAN JSON):
 %%CATEGORY%%
 [Tips atau Bir]
 %%COVER_IMAGE_URL%%
-[URL foto dari kolom photo salah satu cafe yang paling relevan dari data yang diberikan]
+[URL foto dari kolom photo salah satu bar yang paling relevan dari data yang diberikan]
 %%CONTENT%%
 [full HTML article]
 %%END%%`
 }
 
-function buildUserPrompt(keyword, cafes) {
-  const cafeContext =
-    cafes.length > 0
-      ? `\n\nData cafe relevan untuk backlink (gunakan link HTML persis seperti di bawah):\n${cafes
+function buildUserPrompt(keyword, bars) {
+  // FIX: renamed cafes → bars throughout
+  const barContext =
+    bars.length > 0
+      ? `\n\nData bar relevan untuk backlink (gunakan link HTML persis seperti di bawah):\n${bars
           .map(
             c =>
-              `- <a href="${SITE_URL}/cafe/${c.slug}">${c.name}</a> | area: ${c.location_area} | rating: ${c.rating} | foto: ${c.photo}\n  tentang: ${c.about.slice(0, 200)}`
+              `- <a href="${SITE_URL}${BAR_PATH}${c.slug}">${c.name}</a> | area: ${c.location_area} | rating: ${c.rating} | foto: ${c.photo}\n  tentang: ${c.about.slice(0, 200)}`
           )
           .join('\n')}`
-      : '\n\n(Tidak ada data cafe spesifik — gunakan referensi umum ke direktori saja, tidak perlu backlink ke cafe individual)'
+      : '\n\n(Tidak ada data bar spesifik — gunakan referensi umum ke direktori saja, tidak perlu backlink ke bar individual)'
 
-  const backlinkInstruction = cafes.length > 0
-    ? '2. Sertakan semua backlink cafe di atas — copy-paste tag <a> persis seperti yang diberikan\n3. Gunakan foto cafe (kolom photo) yang paling relevan untuk %%COVER_IMAGE_URL%%'
-    : '2. Tidak ada backlink cafe — fokus pada konten informatif dan CTA ke direktori\n3. Gunakan URL gambar placeholder kosong untuk %%COVER_IMAGE_URL%%'
+  const backlinkInstruction = bars.length > 0
+    ? `2. Sertakan semua backlink bar di atas — copy-paste tag <a> persis seperti yang diberikan\n3. Gunakan foto bar (kolom photo) yang paling relevan untuk %%COVER_IMAGE_URL%%`
+    : '2. Tidak ada backlink bar — fokus pada konten informatif dan CTA ke direktori\n3. Gunakan URL gambar placeholder kosong untuk %%COVER_IMAGE_URL%%'
 
-  return `Tulis artikel SEO/AEO lengkap untuk keyword: "${keyword}"${cafeContext}
+  return `Tulis artikel SEO/AEO lengkap untuk keyword: "${keyword}"${barContext}
 
 Pastikan:
 1. Artikel sangat berguna dan informatif untuk pembaca yang mencari ${keyword}
@@ -307,17 +323,18 @@ ${backlinkInstruction}
 4. Tambahkan FAQ section yang menjawab pertanyaan umum tentang topik ini`
 }
 
-async function generateArticle(keyword, cafes, anthropic) {
+async function generateArticle(keyword, bars, anthropic) {
   if (DRY_RUN) {
     console.log('  [DRY RUN] Skipping Anthropic API call')
     const dummyTitle = `Panduan ${keyword.charAt(0).toUpperCase() + keyword.slice(1)}`
     return {
       title: dummyTitle,
-      description: `Panduan lengkap tentang ${keyword} di Bandung untuk tahun ${currentYear()}.`,
-      meta_desc: `Temukan informasi terlengkap tentang ${keyword}. Panduan praktis untuk coffee lovers di Indonesia.`,
+      description: `Panduan lengkap tentang ${keyword} di Indonesia untuk tahun ${currentYear()}.`,
+      meta_desc: `Temukan informasi terlengkap tentang ${keyword}. Panduan praktis untuk pecinta bir di Indonesia.`,
       category: 'Tips',
-      cover_image_url: cafes[0]?.photo || '',
-      content: `<h2>Panduan ${keyword}</h2><p>${'Lorem ipsum '.repeat(100)}</p><h2>FAQ</h2><h3>Apa itu ${keyword}?</h3><p>Jawaban dummy.</p><div class="cta-box"><strong>Temukan bar terbaik!</strong><br><a href="${SITE_URL}/cafes">Temukan Bar di Direktori →</a></div>`,
+      cover_image_url: bars[0]?.photo || '',
+      // FIX: DRY_RUN dummy uses /bars/ path and correct copy
+      content: `<h2>Panduan ${keyword}</h2><p>${'Lorem ipsum '.repeat(100)}</p><h2>FAQ</h2><h3>Apa itu ${keyword}?</h3><p>Jawaban dummy.</p><div class="cta-box"><strong>Temukan bar terbaik!</strong><br><a href="${SITE_URL}/bars">Temukan Bar di Direktori →</a></div><a href="${SITE_URL}${BAR_PATH}dummy-slug" class="bar-backlink">Dummy Bar</a>`,
     }
   }
 
@@ -325,28 +342,28 @@ async function generateArticle(keyword, cafes, anthropic) {
     model: 'claude-haiku-4-5-20251001',
     max_tokens: 4096,
     system: buildSystemPrompt(),
-    messages: [{ role: 'user', content: buildUserPrompt(keyword, cafes) }],
+    messages: [{ role: 'user', content: buildUserPrompt(keyword, bars) }],
   })
 
   const article = parseDelimitedOutput(msg.content[0].text)
 
-  // If model didn't inject backlinks, append a cafe recommendation section
-  if (cafes.length > 0 && !article.content.includes(`${SITE_URL}/cafe/`)) {
-    console.log('  Model skipped backlinks — injecting cafe section programmatically')
-    const cafeLinks = cafes
+  // If model didn't inject backlinks, append a bar recommendation section
+  if (bars.length > 0 && !article.content.includes(`${SITE_URL}${BAR_PATH}`)) {
+    console.log('  Model skipped backlinks — injecting bar section programmatically')
+    const barLinks = bars
       .filter(c => c.slug)
-      .map(c => `<li><a href="${SITE_URL}/cafe/${c.slug}">${c.name}</a> — ${c.location_area}${c.rating ? ` (⭐ ${c.rating})` : ''}</li>`)
+      .map(c => `<li><a href="${SITE_URL}${BAR_PATH}${c.slug}">${c.name}</a> — ${c.location_area}${c.rating ? ` (⭐ ${c.rating})` : ''}</li>`)
       .join('\n')
 
-    const cafeSection = `
-<h2>Rekomendasi Bar di Bandung</h2>
-<p>Ingin mencicipi craft beer langsung di bar terbaik Bandung? Berikut beberapa pilihan yang bisa kamu kunjungi:</p>
+    const barSection = `
+<h2>Rekomendasi Bar Terbaik</h2>
+<p>Ingin langsung menemukan bar terbaik di kotamu? Berikut beberapa pilihan yang bisa kamu kunjungi:</p>
 <ul>
-${cafeLinks}
+${barLinks}
 </ul>
-<div class="cta-box"><strong>Temukan lebih banyak bar di Bandung!</strong><br><a href="${SITE_URL}/cafes?city=bandung">Lihat Semua Bar di Direktori →</a></div>`
+<div class="cta-box"><strong>Temukan lebih banyak bar!</strong><br><a href="${SITE_URL}/bars">Lihat Semua Bar di Direktori →</a></div>`
 
-    article.content = article.content + cafeSection
+    article.content = article.content + barSection
   }
 
   return article
@@ -354,7 +371,7 @@ ${cafeLinks}
 
 // ─── Step 5: Quality Checks ───────────────────────────────────────────────────
 
-function qualityCheck(article, keyword, hasCafes) {
+function qualityCheck(article, keyword, hasBars) {
   const errors = []
   const warnings = []
   const wc = wordCount(article.content)
@@ -366,11 +383,13 @@ function qualityCheck(article, keyword, hasCafes) {
   const kwOccurrences = (contentLower.match(new RegExp(kwLower.split(' ')[0], 'g')) || []).length
   if (kwOccurrences < 3) errors.push(`Keyword "${kwLower.split(' ')[0]}" appears only ${kwOccurrences}× (min 3)`)
 
-  if (!article.content.includes(`${SITE_URL}/cafe/`)) {
-    if (hasCafes) {
-      errors.push('Missing backlink to /cafe/')
+  // FIX: missing backlinks is now always a WARNING, never a hard error.
+  // The programmatic injection in generateArticle() already handles this case.
+  if (!article.content.includes(`${SITE_URL}${BAR_PATH}`)) {
+    if (hasBars) {
+      warnings.push('Backlinks to /bars/ missing after generation — check programmatic injection')
     } else {
-      warnings.push('No backlinks to /cafe/ (no cafe data was available)')
+      warnings.push('No backlinks to /bars/ (no bar data was available — expected)')
     }
   }
 
@@ -413,7 +432,7 @@ async function saveDraft(article, keyword, supabase) {
 
 // ─── Step 7: Email Notification ───────────────────────────────────────────────
 
-async function sendEmail({ title, keyword, wc, draftId, queueWarning, cafes }) {
+async function sendEmail({ title, keyword, wc, draftId, queueWarning, bars }) {
   if (!GMAIL_USER || !GMAIL_APP_PASSWORD) {
     console.log('  Email skipped — GMAIL_USER or GMAIL_APP_PASSWORD not set')
     return
@@ -423,20 +442,21 @@ async function sendEmail({ title, keyword, wc, draftId, queueWarning, cafes }) {
     return
   }
 
-  const cafeList =
-    cafes.length > 0
-      ? cafes.map(c => `  • ${c.name} (${c.location_area}) — ${SITE_URL}/cafe/${c.slug}`).join('\n')
+  // FIX: email uses /bars/ path
+  const barList =
+    bars.length > 0
+      ? bars.map(c => `  • ${c.name} (${c.location_area}) — ${SITE_URL}${BAR_PATH}${c.slug}`).join('\n')
       : '  (none)'
 
   const imagePrompt = `Buat gambar foto-realistis untuk artikel "${title}":
-- Suasana: bar modern di Bandung, Indonesia
-- Gaya: editorial food photography, cinematic lighting
-- Elemen: bir craft, interior bar estetik
+- Suasana: bar modern di Indonesia (Bandung / Jakarta / Bali)
+- Gaya: editorial photography, cinematic lighting, warm amber tones
+- Elemen: bir craft di meja bar, interior bar estetik, bokeh lights
 - Rasio: 16:9 landscape
 - Platform: Freepik AI Image Generator atau Midjourney`
 
   const body = `
-📝 Draft artikel NDM baru siap review
+📝 Draft artikel ngebir-dimana baru siap review
 
 Judul   : ${title}
 Keyword : ${keyword}
@@ -446,10 +466,9 @@ ID Draft    : ${draftId}
 🔍 Review di:
 ${ADMIN_REVIEW_URL}
 
-${queueWarning ? `⚠️  PERHATIAN: Sisa keyword di queue < 5. Tambahkan keyword baru segera.\n` : ''}
-
+${queueWarning ? `⚠️  PERHATIAN: Sisa keyword di queue < 5. Tambahkan keyword baru segera.\n` : ''}\
 🔗 Bar yang di-backlink:
-${cafeList}
+${barList}
 
 🎨 Image Generation Prompt:
 ${imagePrompt}
@@ -460,7 +479,7 @@ ${imagePrompt}
 3. Ping Google Search Console: https://search.google.com/search-console → URL Inspection → Request Indexing
 
 ---
-NDM Blog Generator · ${today()}
+ngebir-dimana Blog Generator · ${today()}
 `
 
   const transporter = nodemailer.createTransport({
@@ -471,7 +490,7 @@ NDM Blog Generator · ${today()}
   await transporter.sendMail({
     from: GMAIL_USER,
     to: GMAIL_USER,
-    subject: `📝 Draft artikel NDM siap review: ${title}`,
+    subject: `📝 Draft artikel ngebir-dimana siap review: ${title}`,
     text: body,
   })
 
@@ -481,7 +500,7 @@ NDM Blog Generator · ${today()}
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
 async function main() {
-  console.log(`\n🚀 NDM Blog Generator — ${today()}${DRY_RUN ? ' [DRY RUN]' : ''}`)
+  console.log(`\n🚀 ngebir-dimana Blog Generator — ${today()}${DRY_RUN ? ' [DRY RUN]' : ''}`)
 
   if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) throw new Error('Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY')
   if (!ANTHROPIC_API_KEY && !DRY_RUN) throw new Error('Missing ANTHROPIC_API_KEY')
@@ -510,31 +529,33 @@ async function main() {
   }
   console.log('  No duplicate found.')
 
-  // Step 3 — Query relevant cafes
-  console.log('\n[3/7] Querying relevant cafes for backlinks…')
-  const cafes = DRY_RUN ? [] : await getRelevantCafes(keyword, supabase)
-  console.log(`  Found ${cafes.length} cafes`)
-  if (cafes.length > 0) {
-    cafes.forEach(c => console.log(`    • ${c.name} (${c.location_area})`))
+  // Step 3 — Query relevant bars
+  console.log('\n[3/7] Querying relevant bars for backlinks…')
+  const bars = DRY_RUN ? [] : await getRelevantBars(keyword, supabase)
+  console.log(`  Found ${bars.length} bars`)
+  if (bars.length > 0) {
+    bars.forEach(c => console.log(`    • ${c.name} (${c.location_area})`))
   } else {
-    console.warn('  ⚠️ No backlinks found for this article, continuing without them')
+    console.warn('  ⚠️ No bars found — article will use generic CTA instead of backlinks')
   }
 
   // Step 4 — Generate article
   console.log('\n[4/7] Generating article via Anthropic…')
-  const article = await generateArticle(keyword, cafes, anthropic)
+  const article = await generateArticle(keyword, bars, anthropic)
   console.log(`  Title: "${article.title}"`)
 
   // Step 5 — Quality checks
   console.log('\n[5/7] Running quality checks…')
-  const { wc, errors, warnings } = qualityCheck(article, keyword, cafes.length > 0)
+  const { wc, errors, warnings } = qualityCheck(article, keyword, bars.length > 0)
   console.log(`  Word count: ${wc}`)
+
   if (warnings.length > 0) {
     warnings.forEach(w => console.warn(`    ⚠️  ${w}`))
   }
+
   if (errors.length > 0) {
-    console.warn('  Quality issues:')
-    errors.forEach(e => console.warn(`    ⚠  ${e}`))
+    console.warn('  Quality issues found:')
+    errors.forEach(e => console.warn(`    ✖  ${e}`))
     if (!DRY_RUN) {
       console.warn('  Saving queue and aborting due to quality check failure.')
       writeQueue(queue)
@@ -552,7 +573,7 @@ async function main() {
 
   // Step 7 — Email notification
   console.log('\n[7/7] Sending email notification…')
-  await sendEmail({ title: article.title, keyword, wc, draftId: draft.id, queueWarning, cafes })
+  await sendEmail({ title: article.title, keyword, wc, draftId: draft.id, queueWarning, bars })
 
   // Persist updated queue
   writeQueue(queue)
