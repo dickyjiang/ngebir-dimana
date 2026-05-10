@@ -32,7 +32,7 @@ const GMAIL_USER = process.env.GMAIL_USER
 const GMAIL_APP_PASSWORD = process.env.GMAIL_APP_PASSWORD
 const DRY_RUN = process.env.DRY_RUN === 'true'
 
-const SITE_URL = 'https://ngebir-dimana.com'
+const SITE_URL = 'https://ngebir.di-mana.com'
 // FIX: updated to /bars/ to match Nuxt route structure
 const BAR_PATH = '/bars/'
 const ADMIN_REVIEW_URL = `${SITE_URL}/admin/blog-review`
@@ -459,7 +459,7 @@ async function sendEmail({ title, keyword, wc, draftId, queueWarning, bars }) {
 - Platform: Freepik AI Image Generator atau Midjourney`
 
   const body = `
-📝 Draft artikel ngebir-dimana baru siap review
+📝 Draft artikel ngebir.di-mana baru siap review
 
 Judul   : ${title}
 Keyword : ${keyword}
