@@ -16,39 +16,19 @@
         Reset Lokasi
       </button>
     </div>
-    <div class="flex flex-wrap gap-3 text-sm text-gray-600 text-nowrap my-4 overflow-auto">
-      <div class="w-full">
-        <div
-          v-for="parentCity in uniqueCities.parentCities"
-          :key="parentCity.city_slug"
-          class="mb-8"
-        >
-          <button
-            @click="handleFilterToggle('city', parentCity.city_slug)"
-            :class="{
-              'text-yellow-500': selectedCities.has(parentCity.city_slug),
-            }"
-            class="font-medium mb-3 cursor-pointer hover:text-yellow-500 transition-colors"
-          >
-            {{ parentCity.city_name }}
-          </button>
-          <div class="flex flex-wrap gap-2 text-sm">
-            <!-- Child cities belonging to this parent -->
-            <button
-              v-for="childCity in getChildCities(parentCity.city_slug)"
-              :key="childCity.city_slug"
-              @click="handleFilterToggle('city', childCity.city_slug)"
-              :class="{
-                'bg-black text-yellow-500 border-yellow-500 font-medium': selectedCities.has(childCity.city_slug),
-                'bg-gray-800 text-yellow-400 border-transparent': !selectedCities.has(childCity.city_slug),
-              }"
-              class="px-3 py-1 text-xs rounded-full border transition-colors"
-            >
-              {{ childCity.city_name }}
-            </button>
-          </div>
-        </div>
-      </div>
+    <div class="flex flex-wrap gap-2 text-sm text-gray-600 text-nowrap my-4 overflow-auto">
+      <button
+        v-for="parentCity in uniqueCities.parentCities"
+        :key="parentCity.city_slug"
+        @click="handleFilterToggle('city', parentCity.city_slug)"
+        :class="{
+          'bg-black text-yellow-500 border-yellow-500 font-medium': selectedCities.has(parentCity.city_slug),
+          'bg-yellow-400 text-gray-900 border-transparent': !selectedCities.has(parentCity.city_slug),
+        }"
+        class="px-3 py-1 text-xs rounded-full border transition-colors cursor-pointer"
+      >
+        {{ parentCity.city_name }}
+      </button>
     </div>
   </aside>
 </template>
@@ -73,13 +53,6 @@
   const uniqueCities = computed(() => {
     return props.cities || { parentCities: [], childCities: [] };
   });
-
-  function getChildCities(parentSlug) {
-    if (!props.cities || !props.cities.childCities) return [];
-    return props.cities.childCities.filter(
-      (city) => city.city_parent === parentSlug
-    );
-  }
 
   function handleFilterToggle(type, value) {
     if (type === 'city') {

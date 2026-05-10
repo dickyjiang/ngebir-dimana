@@ -62,9 +62,10 @@ export default defineEventHandler(async (event) => {
     }
   }
 
-  // City filtering
+  // City filtering - match by city_slug OR by city name (case-insensitive)
   if (body.city && body.city.length > 0) {
-    query = query.in('city_slug', body.city)
+    const cityFilters = body.city.map((c: string) => `city_slug.eq.${c},city.ilike.${c}`).join(',')
+    query = query.or(cityFilters)
   }
 
   // Search query filtering
