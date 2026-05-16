@@ -50,6 +50,7 @@ export default defineNuxtConfig({
       '/dashboard',
       '/profile',
       '/cafe/owner/**',
+      '/cafes',
       '/cafes/new',
       '/cafe/feature/new',
       '/admin/**',
