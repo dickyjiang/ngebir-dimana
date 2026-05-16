@@ -457,9 +457,7 @@ function openInGoogleMaps() {
   if (cafe.value.data?.lat && cafe.value?.data.long) {
     const lat = cafe.value.data.lat.toString().replace(',', '.').trim()
     const lng = cafe.value.data.long.toString().replace(',', '.').trim()
-    const url = `https://www.google.com/maps/search/${encodeURIComponent(
-      cafe.value.data.name
-    )}/@${lat},${lng},17z`
+    const url = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`
     window.open(url, '_blank')
   } else {
     console.error('No location data available')

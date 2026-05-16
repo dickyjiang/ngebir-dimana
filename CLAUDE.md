@@ -11,7 +11,7 @@ Indonesian bar directory website at https://ngebir-dimana.com
 - **Images:** `@nuxt/image` (NuxtImg component), domain: `storage.di-mana.com`
 - **Maps:** Leaflet (`@nuxtjs/leaflet`)
 - **Backend:** Supabase (`@nuxtjs/supabase`) for auth & database
-- **Analytics:** Google Tag via `nuxt-gtag` (ID: `G-BNWTEJPQY2`)
+- **Analytics:** Google Tag via `nuxt-gtag` (ID from `NUXT_PUBLIC_GTAG_ID` env var)
 - **Deployment:** Cloudflare Pages (SSR)
 
 ## Design System
