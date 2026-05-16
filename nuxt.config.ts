@@ -9,6 +9,14 @@ export default defineNuxtConfig({
     '@nuxtjs/sitemap',
   ],
 
+  app: {
+    head: {
+      meta: [
+        { name: 'google-site-verification', content: 'dNfSOEBSJtqhGJLTFUAwj0q1UOCtbaQ9bdqkUkxwPuU' }
+      ]
+    }
+  },
+
   runtimeConfig: {
     supabaseUrl: process.env.SUPABASE_URL || '',
     supabaseServiceKey: process.env.SUPABASE_SERVICE_KEY || '',
@@ -51,7 +59,7 @@ export default defineNuxtConfig({
   },
 
   gtag: {
-    id: 'G-BNWTEJPQY2',
+    id: process.env.NUXT_PUBLIC_GTAG_ID || '',
     config: {
       send_page_view: true
     }

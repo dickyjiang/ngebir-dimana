@@ -2,7 +2,7 @@
  * useAnalytics — central GA4 event tracking composable.
  * All tracking logic lives here. No raw gtag calls anywhere else.
  * Uses nuxt-gtag's auto-imported useGtag() composable (already configured
- * in nuxt.config.ts with measurement ID G-BNWTEJPQY2).
+ * in nuxt.config.ts via NUXT_PUBLIC_GTAG_ID env variable).
  */
 export function useAnalytics() {
   const { gtag } = useGtag()
