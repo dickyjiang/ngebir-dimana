@@ -29,7 +29,7 @@ export default defineEventHandler(async () => {
   const config = useRuntimeConfig()
   const supabaseUrl = config.public.supabase.url as string
   const anonKey = config.public.supabase.key as string
-  const serviceKey = (config.supabaseServiceKey as string) || anonKey
+  const serviceKey = (config.supabaseServiceKey as string) || (config.supabaseServiceRoleKey as string) || anonKey
 
   const serviceHeaders = {
     'apikey': serviceKey,
@@ -56,6 +56,8 @@ export default defineEventHandler(async () => {
 
   if (cafeRes.status === 'rejected') console.error('Sitemap cafe error:', cafeRes.reason)
   if (blogRes.status === 'rejected') console.error('Sitemap blog error:', blogRes.reason)
+  if (cafeData.length === 0) console.warn('Sitemap: no published cafes returned from Supabase')
+  if (blogData.length === 0) console.warn('Sitemap: no published blogs returned from Supabase')
 
   const staticUrls = [
     { loc: '/', changefreq: 'daily', priority: 1.0 },
