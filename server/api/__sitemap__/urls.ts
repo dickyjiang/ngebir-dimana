@@ -46,11 +46,11 @@ export default defineEventHandler(async () => {
     'Authorization': `Bearer ${anonKey}`,
   }
 
-  const cafeQueryUrl = `${supabaseUrl}/rest/v1/cafes?select=slug_name,updated_at,created_at&slug_name=not.is.null&is_published=eq.true`
+  const cafeQueryUrl = `${supabaseUrl}/rest/v1/cafes?select=slug_name&slug_name=not.is.null&is_published=eq.true`
   console.log('[Sitemap DEBUG] cafe fetch URL:', cafeQueryUrl)
 
   // Fetch cafes with detailed logging
-  let cafeData: { slug_name: string; updated_at: string | null; created_at: string | null }[] = []
+  let cafeData: { slug_name: string }[] = []
   try {
     const res = await globalThis.fetch(`${cafeQueryUrl}&limit=1000&offset=0`, {
       headers: serviceHeaders,
@@ -69,8 +69,8 @@ export default defineEventHandler(async () => {
   console.log('[Sitemap DEBUG] cafe results count:', cafeData.length)
 
   const [blogRes] = await Promise.allSettled([
-    fetchAll<{ slug: string; published_at: string | null; updated_at: string | null }>(
-      `${supabaseUrl}/rest/v1/blogs?select=slug,published_at,updated_at&is_published=eq.true`,
+    fetchAll<{ slug: string; published_at: string | null }>(
+      `${supabaseUrl}/rest/v1/blogs?select=slug,published_at&is_published=eq.true`,
       anonHeaders
     ),
   ])
@@ -94,14 +94,13 @@ export default defineEventHandler(async () => {
     loc: `/bars/${cafe.slug_name}`,
     changefreq: 'weekly',
     priority: 0.8,
-    lastmod: cafe.updated_at || cafe.created_at || new Date().toISOString(),
   }))
 
   const blogUrls = blogData.map((post) => ({
     loc: `/blog/${post.slug}`,
     changefreq: 'weekly',
     priority: 0.6,
-    lastmod: post.updated_at || post.published_at || new Date().toISOString(),
+    lastmod: post.published_at || new Date().toISOString(),
   }))
 
   return [...staticUrls, ...cafeUrls, ...blogUrls]
