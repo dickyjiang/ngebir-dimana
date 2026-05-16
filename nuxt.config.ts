@@ -26,7 +26,7 @@ export default defineNuxtConfig({
 
   // Site URL used by @nuxtjs/sitemap for absolute URLs
   site: {
-    url: 'https://ngebir-dimana.com',
+    url: process.env.NUXT_PUBLIC_SITE_URL || 'https://ngebir-dimana.com',
     name: 'Ngebir Dimana',
   },
 
@@ -48,13 +48,13 @@ export default defineNuxtConfig({
       '/login',
       '/dashboard',
       '/profile',
-      '/cafe/owner/**',
-      '/cafes/new',
-      '/cafe/feature/new',
+      '/bars/owner/**',
+      '/bars/new',
+      '/bars/feature/new',
       '/admin/**',
       '/confirm',
       '/Disclaimer',
-      '/cafes',
+      '/bars',
     ],
   },
 

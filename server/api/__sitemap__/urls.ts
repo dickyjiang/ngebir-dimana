@@ -59,7 +59,7 @@ export default defineEventHandler(async () => {
 
   const staticUrls = [
     { loc: '/', changefreq: 'daily', priority: 1.0 },
-    { loc: '/cafes', changefreq: 'weekly', priority: 0.8 },
+    { loc: '/bars', changefreq: 'weekly', priority: 0.8 },
     { loc: '/blog', changefreq: 'weekly', priority: 0.7 },
     { loc: '/about-us', changefreq: 'monthly', priority: 0.5 },
     { loc: '/privacy-policy', changefreq: 'monthly', priority: 0.3 },
@@ -67,7 +67,7 @@ export default defineEventHandler(async () => {
   ]
 
   const cafeUrls = cafeData.map((cafe) => ({
-    loc: `/cafe/${cafe.slug_name}`,
+    loc: `/bars/${cafe.slug_name}`,
     changefreq: 'weekly',
     priority: 0.8,
     lastmod: cafe.updated_at || cafe.created_at || new Date().toISOString(),
