@@ -439,7 +439,10 @@ function openInGoogleMaps() {
 
   // Second priority: use google_place_id
   if (cafe.value?.data.google_place_id) {
-    const url = `https://maps.google.com/?q=${encodeURIComponent(cafe.value.data.name)}&ftid=${cafe.value.data.google_place_id}`
+    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
+    const url = isMobile
+      ? `https://maps.google.com/?q=${encodeURIComponent(cafe.value.data.name)}&ftid=${cafe.value.data.google_place_id}`
+      : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(cafe.value.data.name)}&query_place_id=${cafe.value.data.google_place_id}`
     window.open(url, '_blank')
     return
   }
