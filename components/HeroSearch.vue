@@ -170,7 +170,7 @@ onBeforeUnmount(() => {
 <template>
   <section id="hero" class="my-4 px-4">
     <div
-      class="container mx-auto lg:max-w-[98%] py-8 rounded-2xl overflow-clip relative flex items-center justify-center">
+      class="container mx-auto min-h-[30vh] lg:max-w-[98%] py-8 rounded-2xl overflow-clip relative flex items-center justify-center">
       <img
         class="absolute object-cover object-center w-full h-full"
         src="/src/assets/img/hero.webp"
@@ -211,7 +211,7 @@ onBeforeUnmount(() => {
               </div>
             </div>
           </div>
-          <div class="flex flex-wrap items-center justify-center gap-2 w-full">
+          <div v-show="false" class="flex flex-wrap items-center justify-center gap-2 w-full">
             <button
               @click="toggleNearbyFilter"
               @mouseenter="playAnimation(terdekatAnim)"
