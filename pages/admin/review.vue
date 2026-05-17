@@ -287,7 +287,7 @@ onMounted(() => {
               </span>
               <a
                 v-if="cafe.google_place_id"
-                :href="`https://www.google.com/maps/place/?q=place_id:${cafe.google_place_id}`"
+                :href="`https://www.google.com/maps/search/?api=1&query=Google&query_place_id=${cafe.google_place_id}`"
                 target="_blank"
                 rel="noopener noreferrer"
                 class="flex items-center gap-1 text-blue-500 hover:underline">
