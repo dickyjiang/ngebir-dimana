@@ -439,7 +439,7 @@ function openInGoogleMaps() {
 
   // Second priority: use google_place_id
   if (cafe.value?.data.google_place_id) {
-    const url = `https://www.google.com/maps/search/?api=1&query=Google&query_place_id=${cafe.value.data.google_place_id}`
+    const url = `https://maps.google.com/?q=${encodeURIComponent(cafe.value.data.name)}&ftid=${cafe.value.data.google_place_id}`
     window.open(url, '_blank')
     return
   }
