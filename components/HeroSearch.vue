@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, defineProps, defineEmits, onMounted, onBeforeUnmount } from 'vue'
+import { debounce } from 'lodash'
 import '@fortawesome/fontawesome-free/css/all.css'
 import hoursAnimationData from '../public/animations/24-hours.json'
 import goldenRetrieverAnimationData from '../public/animations/golden-retriever.json'
@@ -31,6 +32,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  noResultsMessage: {
+    type: String,
+    default: '',
+  },
 })
 
 const emit = defineEmits(['search', 'toggle-nearby', 'toggle-feature'])
@@ -44,6 +49,10 @@ function handleSearch() {
     filter: filterType.value,
   })
 }
+
+const debouncedSearch = debounce(() => {
+  handleSearch()
+}, 200)
 
 function clearSearch() {
   searchQuery.value = ''
@@ -194,7 +203,7 @@ onBeforeUnmount(() => {
                 type="text"
                 placeholder="Search bars..."
                 class="text-sm sm:text-base border w-full border-gray-600 rounded-lg p-2 sm:p-3 pl-4 pr-[120px]"
-                @input="handleSearch" />
+                @input="debouncedSearch" />
               <div class="absolute right-0 top-0 h-full flex items-center gap-2 pr-2">
                 <button class="text-gray-500 mr-2" @click="handleSearchButton">
                   <i :class="searchQuery ? 'fa fa-times' : 'fas fa-search'"></i>
@@ -211,7 +220,10 @@ onBeforeUnmount(() => {
               </div>
             </div>
           </div>
-          <div v-show="false" class="flex flex-wrap items-center justify-center gap-2 w-full">
+          <p v-if="noResultsMessage" class="text-sm text-yellow-300 mt-2 text-center">
+            {{ noResultsMessage }}
+          </p>
+          <div v-show="true" class="flex flex-wrap items-center justify-center gap-2 w-full">
             <button
               @click="toggleNearbyFilter"
               @mouseenter="playAnimation(terdekatAnim)"
@@ -225,52 +237,53 @@ onBeforeUnmount(() => {
               <span>Bar terdekat</span>
             </button>
             <!-- Cafe Terbaru filter -->
-            <button
-              @click="handleFeatureToggle('24-hours')"
-              @mouseenter="playAnimation(hoursAnim)"
-              @mouseleave="pauseAnimation(hoursAnim, activeFilters.features.includes('24-hours'))"
-              :class="{
-                'text-yellow-500 bg-black border border-yellow-500':
-                  activeFilters.features.includes('24-hours'),
-                'text-gray-100 border-gray-400': !activeFilters.features.includes('24-hours'),
-              }"
-              class="text-white border border-white mt-2 px-3 sm:px-4 py-0 sm:py-1 rounded-full flex items-center gap-2 text-xs sm:text-base cursor-pointer touch-manipulation">
-              <span id="hours-animate" class="w-8 h-8"></span>
-              <span>24 hours</span>
-            </button>
-            <button
-              @click="handleFeatureToggle('specialty-coffee')"
-              @mouseenter="playAnimation(specialtyAnim)"
-              @mouseleave="
-                pauseAnimation(specialtyAnim, activeFilters.features.includes('specialty-coffee'))
-              "
-              :class="{
-                'text-yellow-500 bg-black border border-yellow-500':
-                  activeFilters.features.includes('specialty-coffee'),
-                'text-gray-100 border-gray-400':
-                  !activeFilters.features.includes('specialty-coffee'),
-              }"
-              class="text-white border border-white mt-2 px-3 sm:px-4 py-0 sm:py-1 rounded-full flex items-center gap-2 text-xs sm:text-base cursor-pointer touch-manipulation">
-              <span id="specialty-animate" class="w-8 h-8"></span>
-              <span>Craft Beer</span>
-            </button>
-            <button
-              @click="handleFeatureToggle('pets-dogs-allowed')"
-              @mouseenter="playAnimation(petAnim)"
-              @mouseleave="
-                pauseAnimation(petAnim, activeFilters.features.includes('pets-dogs-allowed'))
-              "
-              :class="{
-                'text-yellow-500 bg-black border border-yellow-500':
-                  activeFilters.features.includes('pets-dogs-allowed'),
-                'text-gray-100 border-gray-400':
-                  !activeFilters.features.includes('pets-dogs-allowed'),
-              }"
-              class="text-white border border-white mt-2 px-3 sm:px-4 py-0 sm:py-1 rounded-full flex items-center gap-2 text-xs sm:text-base cursor-pointer touch-manipulation">
-              <span id="pet-animate" class="w-8 h-8"></span>
-              <span>Pet Friendly</span>
-            </button>
-            <!-- <button
+            <div v-show="false">
+              <button
+                @click="handleFeatureToggle('24-hours')"
+                @mouseenter="playAnimation(hoursAnim)"
+                @mouseleave="pauseAnimation(hoursAnim, activeFilters.features.includes('24-hours'))"
+                :class="{
+                  'text-yellow-500 bg-black border border-yellow-500':
+                    activeFilters.features.includes('24-hours'),
+                  'text-gray-100 border-gray-400': !activeFilters.features.includes('24-hours'),
+                }"
+                class="text-white border border-white mt-2 px-3 sm:px-4 py-0 sm:py-1 rounded-full flex items-center gap-2 text-xs sm:text-base cursor-pointer touch-manipulation">
+                <span id="hours-animate" class="w-8 h-8"></span>
+                <span>24 hours</span>
+              </button>
+              <button
+                @click="handleFeatureToggle('specialty-coffee')"
+                @mouseenter="playAnimation(specialtyAnim)"
+                @mouseleave="
+                  pauseAnimation(specialtyAnim, activeFilters.features.includes('specialty-coffee'))
+                "
+                :class="{
+                  'text-yellow-500 bg-black border border-yellow-500':
+                    activeFilters.features.includes('specialty-coffee'),
+                  'text-gray-100 border-gray-400':
+                    !activeFilters.features.includes('specialty-coffee'),
+                }"
+                class="text-white border border-white mt-2 px-3 sm:px-4 py-0 sm:py-1 rounded-full flex items-center gap-2 text-xs sm:text-base cursor-pointer touch-manipulation">
+                <span id="specialty-animate" class="w-8 h-8"></span>
+                <span>Craft Beer</span>
+              </button>
+              <button
+                @click="handleFeatureToggle('pets-dogs-allowed')"
+                @mouseenter="playAnimation(petAnim)"
+                @mouseleave="
+                  pauseAnimation(petAnim, activeFilters.features.includes('pets-dogs-allowed'))
+                "
+                :class="{
+                  'text-yellow-500 bg-black border border-yellow-500':
+                    activeFilters.features.includes('pets-dogs-allowed'),
+                  'text-gray-100 border-gray-400':
+                    !activeFilters.features.includes('pets-dogs-allowed'),
+                }"
+                class="text-white border border-white mt-2 px-3 sm:px-4 py-0 sm:py-1 rounded-full flex items-center gap-2 text-xs sm:text-base cursor-pointer touch-manipulation">
+                <span id="pet-animate" class="w-8 h-8"></span>
+                <span>Pet Friendly</span>
+              </button>
+              <!-- <button
               @click="handleFeatureToggle('crowd-family-friendly')"
               class="text-white border border-white mt-2 px-3 sm:px-4 py-1 sm:py-2 rounded-full flex items-center gap-2 text-xs sm:text-base cursor-pointer touch-manipulation"
               :class="{
@@ -280,27 +293,27 @@ onBeforeUnmount(() => {
               }">
               Family Friendly
             </button> -->
-            <button
-              @click="handleFeatureToggle('accessibility-wheelchair-accessible')"
-              @mouseenter="playAnimation(wheelchairAnim)"
-              @mouseleave="
-                pauseAnimation(
-                  wheelchairAnim,
-                  activeFilters.features.includes('accessibility-wheelchair-accessible')
-                )
-              "
-              class="text-white border border-white mt-2 px-3 sm:px-4 py-0 sm:py-1 rounded-full flex items-center gap-2 text-xs sm:text-base cursor-pointer touch-manipulation"
-              :class="{
-                'text-yellow-500 bg-black border border-yellow-500':
-                  activeFilters.features.includes('accessibility-wheelchair-accessible'),
-                'text-gray-100 border-gray-400': !activeFilters.features.includes(
-                  'accessibility-wheelchair-accessible'
-                ),
-              }">
-              <span id="wheelchair-animate" class="w-8 h-8"></span>
-              <span>Wheelchair Friendly</span>
-            </button>
-            <!-- <button
+              <button
+                @click="handleFeatureToggle('accessibility-wheelchair-accessible')"
+                @mouseenter="playAnimation(wheelchairAnim)"
+                @mouseleave="
+                  pauseAnimation(
+                    wheelchairAnim,
+                    activeFilters.features.includes('accessibility-wheelchair-accessible')
+                  )
+                "
+                class="text-white border border-white mt-2 px-3 sm:px-4 py-0 sm:py-1 rounded-full flex items-center gap-2 text-xs sm:text-base cursor-pointer touch-manipulation"
+                :class="{
+                  'text-yellow-500 bg-black border border-yellow-500':
+                    activeFilters.features.includes('accessibility-wheelchair-accessible'),
+                  'text-gray-100 border-gray-400': !activeFilters.features.includes(
+                    'accessibility-wheelchair-accessible'
+                  ),
+                }">
+                <span id="wheelchair-animate" class="w-8 h-8"></span>
+                <span>Wheelchair Friendly</span>
+              </button>
+              <!-- <button
               @click="handleFeatureToggle('service-options-outdoor-seating')"
               class="text-white border border-white mt-2 px-3 sm:px-4 py-1 sm:py-2 rounded-full flex items-center gap-2 text-xs sm:text-base cursor-pointer touch-manipulation"
               :class="{
@@ -310,12 +323,13 @@ onBeforeUnmount(() => {
               }">
               Outdoor
             </button> -->
-            <button
-              v-if="activeFilters.features.length > 0"
-              class="ml-2 text-yellow-500 text-xs sm:text-base cursor-pointer touch-manipulation"
-              @click="resetFeatureFilter">
-              Reset Filter
-            </button>
+              <button
+                v-if="activeFilters.features.length > 0"
+                class="ml-2 text-yellow-500 text-xs sm:text-base cursor-pointer touch-manipulation"
+                @click="resetFeatureFilter">
+                Reset Filter
+              </button>
+            </div>
           </div>
         </div>
       </div>

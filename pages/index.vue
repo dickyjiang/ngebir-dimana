@@ -7,7 +7,6 @@ import NewCafesList from '~/components/cafe/NewCafesList.vue'
 import HeroSearch from '~/components/HeroSearch.vue'
 import WorldOfCoffeeBanner from '~/components/WorldOfCoffeeBanner.vue'
 import '@fortawesome/fontawesome-free/css/all.css'
-import { debounce } from 'lodash'
 import { useFilterToggle } from '~/composables/useFilterToggle'
 import { useFetchCafes } from '~/composables/useFetchCafes'
 import { useNearbyFilter } from '~/composables/useNearbyFilter'
@@ -81,6 +80,8 @@ const currentPage = ref(1)
 const itemsPerPage = 24
 const searchQuery = ref('')
 const filterType = ref('all') // Add this new ref
+const noResultsMessage = ref('')
+const isFallingBack = ref(false)
 
 // Initialize filter options with correct structure
 const uniqueCities = ref({ parentCities: [], childCities: [] })
@@ -104,14 +105,7 @@ const { trackSearch, setupScrollTracking } = useAnalytics()
 const latestBlogPosts = ref<BlogPost[]>([])
 const { fetchLatestPosts } = useBlog()
 
-// Debounced search function
-const debouncedFetchBySearch = debounce((query, filters) => {
-  currentPage.value = 1
-  if (query?.trim()) {
-    trackSearch(query.trim())
-  }
-  fetchCafes(1, filters)
-}, 500)
+const isShowingFallback = ref(false)
 
 async function fetchNewCafes() {
   loadingNewCafes.value = true
@@ -138,13 +132,16 @@ async function fetchNewCafes() {
 }
 // Use the composable function instead of the original function
 async function fetchCafes(page, filters = null) {
-  console.log('🔍 Fetching cafes:', { 
-    page, 
-    filters, 
+  // Skip fetches triggered by the fallback search query reset
+  if (isFallingBack.value) return
+
+  console.log('🔍 Fetching cafes:', {
+    page,
+    filters,
     isNearbyActive: isNearbyActive.value,
-    hasLocation: !!userLocation.value 
+    hasLocation: !!userLocation.value
   })
-  
+
   await fetchCafesFromComposable(
     page,
     itemsPerPage,
@@ -153,20 +150,60 @@ async function fetchCafes(page, filters = null) {
     isNearbyActive.value,
     userLocation.value
   )
+
+  // If no results found and there was an active filter/search, fallback to showing all cafes
+  if (data.value.length === 0 && (isNearbyActive.value || searchQuery.value?.trim())) {
+    if (isNearbyActive.value) {
+      noResultsMessage.value = 'Tidak ada tempat nge-bir ditemukan di area Anda. Menampilkan semua tempat nge-bir.'
+    } else {
+      noResultsMessage.value = 'Tidak ada hasil untuk pencarian Anda. Menampilkan semua tempat nge-bir.'
+    }
+    isShowingFallback.value = true
+
+    // Deactivate nearby filter if it was active
+    if (isNearbyActive.value) {
+      isNearbyActive.value = false
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('isNearbyActive', 'false')
+      }
+    }
+
+    // Clear search query without triggering watcher-based re-fetch
+    isFallingBack.value = true
+    searchQuery.value = ''
+    await nextTick()
+    isFallingBack.value = false
+
+    // Re-fetch all cafes without filters
+    await fetchCafesFromComposable(1, itemsPerPage, activeFilters.value, '', false, null)
+    currentPage.value = 1
+  } else if (data.value.length > 0 && !isShowingFallback.value) {
+    // Clear no-results message once cafes are found (but not during fallback)
+    noResultsMessage.value = ''
+  }
 }
 
 // Watch filters — pass current searchQuery so typed search is not lost when a filter toggles
 watch(
   () => [JSON.stringify(activeFilters.value.city), JSON.stringify(activeFilters.value.features)],
   () => {
+    isShowingFallback.value = false
+    noResultsMessage.value = ''
     currentPage.value = 1
     fetchCafes(1, activeFilters.value)
   }
 )
 
-// Watch search query — debounced to avoid firing on every keystroke
+// Watch search query — debounce is handled in HeroSearch component
 watch(searchQuery, (newQuery) => {
-  debouncedFetchBySearch(newQuery, activeFilters.value)
+  if (isFallingBack.value) return
+  isShowingFallback.value = false
+  noResultsMessage.value = ''
+  currentPage.value = 1
+  if (newQuery?.trim()) {
+    trackSearch(newQuery.trim())
+  }
+  fetchCafes(1, activeFilters.value)
 })
 
 // Use data directly
@@ -381,6 +418,7 @@ onMounted(async () => {
     :activeFilters="activeFilters"
     :isNearbyActive="isNearbyActive"
     :locationLoading="locationLoading"
+    :noResultsMessage="noResultsMessage"
     @search="handleSearch"
     @toggle-nearby="toggleNearbyFilter"
     @toggle-feature="handleFeatureToggle" />

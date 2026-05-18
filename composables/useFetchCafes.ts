@@ -56,8 +56,9 @@ export function useFetchCafes() {
         }
       }
 
-      // 🎯 Add location data if nearby filtering is active
-      if (isNearbyActive && userLocation && userLocation.latitude && userLocation.longitude) {
+      // 🎯 Add location data if nearby filtering is active (but not when city filter is set)
+      const hasCityFilter = filters && filters.city && filters.city.length > 0
+      if (isNearbyActive && userLocation && userLocation.latitude && userLocation.longitude && !hasCityFilter) {
         payload.cariLocation = true
         payload.latitude = userLocation.latitude
         payload.longitude = userLocation.longitude

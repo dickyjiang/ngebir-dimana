@@ -249,8 +249,7 @@ export function useNearbyFilter() {
         showLocationModal.value = true
       }
     } else {
-      // User declined, show manual location option
-      showLocationModal.value = true
+      // User declined — do nothing, initial fetchCafes already loaded all cafes
     }
   }
 

@@ -73,6 +73,8 @@
   const currentPage = ref(1);
   const itemsPerPage = 24;
   const searchQuery = ref('');
+  const noResultsMessage = ref('');
+  const isFallingBack = ref(false);
 
   // Initialize filter options with empty arrays
   const uniqueCities = ref([]);
@@ -122,13 +124,16 @@
 
   // Use the composable function instead of the original function
   async function fetchCafes(page, filters = null) {
-    console.log('🔍 Fetching cafes:', { 
-      page, 
-      filters, 
+    // Skip fetches triggered by the fallback search query reset
+    if (isFallingBack.value) return
+
+    console.log('🔍 Fetching cafes:', {
+      page,
+      filters,
       isNearbyActive: isNearbyActive.value,
-      hasLocation: !!userLocation.value 
+      hasLocation: !!userLocation.value
     })
-    
+
     await fetchCafesFromComposable(
       page,
       itemsPerPage,
@@ -137,6 +142,32 @@
       isNearbyActive.value,
       userLocation.value
     );
+
+    // If no results found and there was an active filter/search, fallback to showing all cafes
+    if (data.value.length === 0 && (isNearbyActive.value || searchQuery.value?.trim())) {
+      noResultsMessage.value = 'Tidak ada tempat nge-bir ditemukan'
+
+      // Deactivate nearby filter if it was active
+      if (isNearbyActive.value) {
+        isNearbyActive.value = false
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('isNearbyActive', 'false')
+        }
+      }
+
+      // Clear search query without triggering watcher-based re-fetch
+      isFallingBack.value = true
+      searchQuery.value = ''
+      await nextTick()
+      isFallingBack.value = false
+
+      // Re-fetch all cafes without filters
+      await fetchCafesFromComposable(1, itemsPerPage, activeFilters.value, '', false, null)
+      currentPage.value = 1
+    } else if (data.value.length > 0 && !isFallingBack.value) {
+      // Clear no-results message once cafes are found
+      noResultsMessage.value = ''
+    }
   }
 
   // Update the watch functionality to apply filters
@@ -370,6 +401,7 @@
     :activeFilters="activeFilters"
     :isNearbyActive="isNearbyActive"
     :locationLoading="locationLoading"
+    :noResultsMessage="noResultsMessage"
     @search="handleSearch"
     @toggle-nearby="toggleNearbyFilter"
     @toggle-feature="handleFeatureToggle"
