@@ -51,7 +51,7 @@
                   </div>
                   <div class="flex items-center justify-center gap-2 max-w-1/2">
                       <!-- kl owner na budi enggak keluar  -->
-                      <NuxtLink
+                      <!-- <NuxtLink
                         :to="`/profile-public/${cafe.data.uuid}`"
                         v-if="cafe.data.uuid != 'b069ef6a-046b-440b-9004-d5fdd0758c80'">
                         <button class="flex flex-col gap-1 items-center px-2">
@@ -61,7 +61,7 @@
                             class="h-5 hover:transform hover:scale-110 transition-transform" />
                           <p class="text-xs">Kontak Owner</p>
                         </button>
-                      </NuxtLink>
+                      </NuxtLink> -->
                       <button class="flex flex-col gap-1 items-center px-2" @click="sharePage">
                         <img
                           src="/src/assets/img/send.svg"
