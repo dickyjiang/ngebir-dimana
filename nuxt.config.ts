@@ -27,7 +27,7 @@ export default defineNuxtConfig({
 
   // Site URL used by @nuxtjs/sitemap for absolute URLs
   site: {
-    url: process.env.NUXT_PUBLIC_SITE_URL || 'https://ngebir-dimana.com',
+    url: process.env.NUXT_PUBLIC_SITE_URL || 'https://ngebir.di-mana.com',
     name: 'Ngebir Dimana',
   },
 
