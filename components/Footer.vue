@@ -2,7 +2,7 @@
     <div class="flex items-center justify-between w-full p-2 bg-gradient-to-t from-amber-600 to-yellow-400 py-8">
       <div class="max-w-7xl w-full mx-auto flex flex-col gap-4 sm:flex-row items-center justify-between">
         <div>
-          <a href="https://ngebir-dimana.com/">
+          <a href="https://ngebir.di-mana.com/">
             <img src="/src/assets/img/BDM-footer.svg" alt="Ngebir Dimana" class="h-10" />
           </a>
         </div>

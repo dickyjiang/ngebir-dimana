@@ -1,6 +1,6 @@
 /**
  * NDM Blog Generator
- * Generates SEO/AEO articles for ngebir-dimana.com using Anthropic + Supabase.
+ * Generates SEO/AEO articles for ngebir.di-mana.com using Anthropic + Supabase.
  *
  * Required GitHub Secrets (Settings → Secrets → Actions):
  *   ANTHROPIC_API_KEY         — Anthropic API key
@@ -109,7 +109,7 @@ async function refillCategory(category, anthropic) {
   // FIX: added city variety (Bandung, Jakarta, Bali) and bar-specific topics
   const prompt =
     category === 'bar'
-      ? 'Generate 10 unique Indonesian-language SEO keyword phrases for a bar directory website (ngebir-dimana.com) covering bars in Bandung, Jakarta, and Bali. Mix of cities. Focus on: rooftop bar, sports bar, craft beer bar, bar live musik, bar buat nongkrong, bar instagrammable, bar murah dekat kampus, bar dengan makanan enak, cocktail bar, rekomendasi bar terbaik. Return ONLY a JSON array of strings, no explanation.'
+      ? 'Generate 10 unique Indonesian-language SEO keyword phrases for a bar directory website (ngebir.di-mana.com) covering bars in Bandung, Jakarta, and Bali. Mix of cities. Focus on: rooftop bar, sports bar, craft beer bar, bar live musik, bar buat nongkrong, bar instagrammable, bar murah dekat kampus, bar dengan makanan enak, cocktail bar, rekomendasi bar terbaik. Return ONLY a JSON array of strings, no explanation.'
       : 'Generate 10 unique Indonesian-language SEO/AEO keyword phrases for a bar directory website about beer knowledge and education in Indonesia. Focus on: craft beer Indonesia, jenis bir IPA stout lager, cara bikin bir rumahan, merek bir Indonesia, panduan cicip bir, FAQ style starting with "apa itu" or "cara", bir terbaik di Bali, bir lokal vs impor. Return ONLY a JSON array of strings, no explanation.'
 
   const msg = await anthropic.messages.create({
@@ -269,7 +269,7 @@ async function getRelevantBars(keyword, supabase) {
 function buildSystemPrompt() {
   // FIX: updated all copy — removed "coffee lovers", fixed CTA URLs to /bars
   return `Hari ini adalah ${today()}. Tahun saat ini adalah ${currentYear()}.
-Kamu adalah penulis konten SEO dan AEO (Answer Engine Optimization) ahli untuk ngebir-dimana.com — direktori bar dan tempat minum bir terlengkap di Indonesia.
+Kamu adalah penulis konten SEO dan AEO (Answer Engine Optimization) ahli untuk ngebir.di-mana.com — direktori bar dan tempat minum bir terlengkap di Indonesia.
 
 Tulis artikel dalam Bahasa Indonesia yang praktis dan berguna untuk pencari bar di Indonesia.
 

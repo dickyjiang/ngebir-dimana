@@ -14,14 +14,14 @@
       ? `Daftar bar terbaik di ${cityParam.value} — craft beer, rooftop bar, sports bar, dan pet friendly.`
       : 'Temukan ribuan bar di seluruh Indonesia — craft beer, rooftop bar, sports bar, pet friendly, dan banyak lagi.'
   )
-  const canonicalUrl = computed(() => 'https://ngebir-dimana.com/cafes')
+  const canonicalUrl = computed(() => 'https://ngebir.di-mana.com/cafes')
 
   useSeoMeta({
     title: () => pageTitle.value,
     description: () => pageDescription.value,
     ogTitle: () => pageTitle.value,
     ogDescription: () => pageDescription.value,
-    ogImage: 'https://ngebir-dimana.com/img/OG-img.png',
+    ogImage: 'https://ngebir.di-mana.com/img/OG-img.png',
     ogType: 'website',
     ogUrl: () => canonicalUrl.value,
   })

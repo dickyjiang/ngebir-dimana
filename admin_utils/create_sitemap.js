@@ -82,7 +82,7 @@ async function generateSitemap() {
 
     // Create a stream to write to
     const stream = new SitemapStream({
-      hostname: 'https://ngebir-dimana.com',
+      hostname: 'https://ngebir.di-mana.com',
     });
 
     // Return a promise that resolves with your XML string

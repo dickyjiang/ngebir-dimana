@@ -21,13 +21,13 @@ useSeoMeta({
   description: 'Temukan ribuan bar di Indonesia — dari craft beer, rooftop bar, sports bar, hingga brewery. Satu klik, ribuan pilihan.',
   ogTitle: 'Ngebir Dimana? | Direktori Bar Indonesia Terlengkap',
   ogDescription: 'Temukan ribuan bar di Indonesia — dari craft beer, rooftop bar, sports bar, hingga brewery. Satu klik, ribuan pilihan.',
-  ogImage: 'https://ngebir-dimana.com/img/OG-img.png',
+  ogImage: 'https://ngebir.di-mana.com/img/OG-img.png',
   ogType: 'website',
-  ogUrl: 'https://ngebir-dimana.com',
+  ogUrl: 'https://ngebir.di-mana.com',
 })
 
 useHead({
-  link: [{ rel: 'canonical', href: 'https://ngebir-dimana.com' }],
+  link: [{ rel: 'canonical', href: 'https://ngebir.di-mana.com' }],
   script: [
     {
       type: 'application/ld+json',
@@ -35,10 +35,10 @@ useHead({
         "@context": "https://schema.org/",
         "@type": "WebSite",
         "name": "ngebir-dimana",
-        "url": "https://ngebir-dimana.com/",
+        "url": "https://ngebir.di-mana.com/",
         "potentialAction": {
           "@type": "SearchAction",
-          "target": "https://ngebir-dimana.com/cafes?city=bandung&features={search_term_string}/cafes?city=bandung&features=",
+          "target": "https://ngebir.di-mana.com/cafes?city=bandung&features={search_term_string}/cafes?city=bandung&features=",
           "query-input": "required name=search_term_string"
         }
       })

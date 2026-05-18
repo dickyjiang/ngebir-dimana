@@ -144,7 +144,7 @@ onMounted(() => {
       <div class="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
         <div>
           <h1 class="text-lg font-bold text-gray-800">Blog Review</h1>
-          <p class="text-xs text-gray-500">ngebir-dimana.com · Draft Artikel</p>
+          <p class="text-xs text-gray-500">ngebir.di-mana.com · Draft Artikel</p>
         </div>
       </div>
     </div>

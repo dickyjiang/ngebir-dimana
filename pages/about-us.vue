@@ -103,7 +103,7 @@ useSeo({
   title: 'Tentang Kami | Ngebir Dimana?',
   description: 'Ngebir Dimana adalah direktori bar Indonesia terlengkap. Temukan bar, brewery, dan tempat minum terbaik di seluruh Indonesia.',
   type: 'website',
-  url: 'https://ngebir-dimana.com/about-us',
+  url: 'https://ngebir.di-mana.com/about-us',
 });
 </script>
 

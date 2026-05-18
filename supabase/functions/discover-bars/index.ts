@@ -203,7 +203,7 @@ async function sendSummaryEmail(
     `🍺 NDM Daily Discovery — ${date}`,
     ``,
     `${inserted.length} bar baru menunggu review:`,
-    `https://ngebir-dimana.com/admin/review`,
+    `https://ngebir.di-mana.com/admin/review`,
     ``,
     barList,
     errorSection,

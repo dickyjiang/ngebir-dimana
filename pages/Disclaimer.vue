@@ -4,7 +4,7 @@
     <div class="max-w-3xl mx-auto px-4 py-10">
     <h1 class="text-3xl font-bold mb-6">Disclaimer</h1>
 
-    <p class="mb-4 text-gray-500">Situs web <span><a class="text-gray-700 font-semibold hover:underline" href="https://ngebir-dimana.com">Ngebir Dimana</a></span> bertujuan untuk menyediakan informasi mengenai bar, tempat minum, dan tempat sejenis yang diperoleh dari berbagai sumber publik yang tersedia di internet. Informasi yang disajikan bersifat umum dan tidak dimaksudkan sebagai bentuk dukungan, promosi, ataupun pernyataan resmi dari pihak pemilik usaha atau lembaga terkait.</p>
+    <p class="mb-4 text-gray-500">Situs web <span><a class="text-gray-700 font-semibold hover:underline" href="https://ngebir.di-mana.com">Ngebir Dimana</a></span> bertujuan untuk menyediakan informasi mengenai bar, tempat minum, dan tempat sejenis yang diperoleh dari berbagai sumber publik yang tersedia di internet. Informasi yang disajikan bersifat umum dan tidak dimaksudkan sebagai bentuk dukungan, promosi, ataupun pernyataan resmi dari pihak pemilik usaha atau lembaga terkait.</p>
 
     <h2 class="text-xl font-semibold mt-6 mb-2">Keterbatasan Afiliasi</h2>
     <p class="mb-4 text-gray-500">Kami tidak memiliki afiliasi, kerja sama resmi, maupun hubungan langsung dengan bar, brand, atau entitas manapun yang disebutkan dalam situs ini, kecuali secara eksplisit dinyatakan sebaliknya. Segala logo, nama usaha, dan gambar yang ditampilkan merupakan hak milik dari masing-masing pemiliknya.</p>
@@ -27,7 +27,7 @@
     <hr class="my-10 border-t" />
 
     <h1 class="text-3xl font-bold mb-6">Disclaimer</h1>
-    <p class="mb-4 text-gray-500">The website <span><a class="text-gray-700 font-semibold hover:underline" href="https://ngebir-dimana.com">Ngebir Dimana</a></span> aims to provide information about bars, pubs, and similar places obtained from various publicly available sources on the internet. The information presented is general and is not intended as a form of endorsement, promotion, or official statement from the business owners or related institutions.</p>
+    <p class="mb-4 text-gray-500">The website <span><a class="text-gray-700 font-semibold hover:underline" href="https://ngebir.di-mana.com">Ngebir Dimana</a></span> aims to provide information about bars, pubs, and similar places obtained from various publicly available sources on the internet. The information presented is general and is not intended as a form of endorsement, promotion, or official statement from the business owners or related institutions.</p>
     <h2 class="text-xl font-semibold mt-6 mb-2">Affiliation Disclaimer</h2>
     <p class="mb-4 text-gray-500">We are not affiliated with, officially partnered with, or directly connected to any bars, brands, or entities mentioned on this site, unless explicitly stated otherwise. All logos, business names, and images are the property of their respective owners.</p>
 
@@ -52,7 +52,7 @@ useSeo({
   title: 'Disclaimer | Ngebir Dimana?',
   description: 'Disclaimer Ngebir Dimana — batasan tanggung jawab atas informasi yang tersedia di direktori bar Indonesia ini.',
   type: 'website',
-  url: 'https://ngebir-dimana.com/disclaimer',
+  url: 'https://ngebir.di-mana.com/disclaimer',
 })
 </script>
 

@@ -7,7 +7,7 @@ import type { BlogPost } from '~/composables/useBlog'
 
 const route = useRoute()
 const slug = route.params.slug as string
-const canonicalUrl = `https://ngebir-dimana.com/blog/${slug}`
+const canonicalUrl = `https://ngebir.di-mana.com/blog/${slug}`
 
 const supabase = useSupabaseClient()
 
@@ -29,7 +29,7 @@ if (!post.value) {
 }
 
 // SEO — synchronous so tags are in the initial SSR HTML
-const ogImage = post.value.cover_image_url || 'https://ngebir-dimana.com/img/OG-img.png'
+const ogImage = post.value.cover_image_url || 'https://ngebir.di-mana.com/img/OG-img.png'
 
 useSeoMeta({
   title: `${post.value.title} | Ngebir Dimana?`,
@@ -55,8 +55,8 @@ useHead({
       datePublished: post.value.published_at,
       dateModified: post.value.published_at,
       url: canonicalUrl,
-      author: { '@type': 'Organization', name: 'Ngebir Dimana', url: 'https://ngebir-dimana.com' },
-      publisher: { '@type': 'Organization', name: 'Ngebir Dimana', url: 'https://ngebir-dimana.com' },
+      author: { '@type': 'Organization', name: 'Ngebir Dimana', url: 'https://ngebir.di-mana.com' },
+      publisher: { '@type': 'Organization', name: 'Ngebir Dimana', url: 'https://ngebir.di-mana.com' },
     }),
   }],
 })

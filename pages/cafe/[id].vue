@@ -305,9 +305,9 @@ if (!cafe.value || !cafe.value.data) {
 // SEO — synchronous so tags are in the initial SSR HTML
 const cafeData = cafe.value.data
 const slug = route.params.id
-const canonicalUrl = `https://ngebir-dimana.com/cafe/${slug}`
+const canonicalUrl = `https://ngebir.di-mana.com/cafe/${slug}`
 const metaDescription = `${cafeData.name} berlokasi di ${cafeData.street || cafeData.city}. ${cafeData.business_type || 'Bar'} di ${cafeData.city}.`
-const ogImage = cafeData.photo || 'https://ngebir-dimana.com/img/OG-img.png'
+const ogImage = cafeData.photo || 'https://ngebir.di-mana.com/img/OG-img.png'
 
 const openingHoursSpec = []
 if (cafeData.working_hours && isValidJson(cafeData.working_hours)) {

@@ -19,7 +19,7 @@
     title: 'Website Paling Lengkap buat Cari Tempat Ngebir!',
     description: 'Satu Klik, Ribuan Tempat ngeBir! Temukan yang Pas untuk Kamu.',
     image: '/img/OG-img.png',
-    url: 'https://ngebir-dimana.com',
+    url: 'https://ngebir.di-mana.com',
     type: 'website',
   });
 </script>

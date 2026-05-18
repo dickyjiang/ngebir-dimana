@@ -80,7 +80,7 @@ Struktur caption:
 1. Hook menarik (1-2 kalimat)
 2. Deskripsi mengundang highlight tipe/keunikan bar (2-3 kalimat)
 3. Info praktis singkat (lokasi, jam)
-4. CTA: "Cari info lengkap di ngebir-dimana.com 🔗"
+4. CTA: "Cari info lengkap di ngebir.di-mana.com 🔗"
 
 Lalu tulis persis: HASHTAGS: [15-20 hashtag relevan, mix populer + niche, sesuai kota dan tipe bar]
 

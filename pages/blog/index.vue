@@ -8,11 +8,11 @@ useSeoMeta({
   description: 'Tips, panduan, dan artikel seputar bar dan bir di Indonesia. Temukan rekomendasi terbaik dari Ngebir Dimana.',
   ogTitle: 'Blog | Ngebir Dimana?',
   ogDescription: 'Tips, panduan, dan artikel seputar bar dan bir di Indonesia.',
-  ogImage: 'https://ngebir-dimana.com/img/OG-img.png',
+  ogImage: 'https://ngebir.di-mana.com/img/OG-img.png',
   ogType: 'website',
-  ogUrl: 'https://ngebir-dimana.com/blog',
+  ogUrl: 'https://ngebir.di-mana.com/blog',
 })
-useHead({ link: [{ rel: 'canonical', href: 'https://ngebir-dimana.com/blog' }] })
+useHead({ link: [{ rel: 'canonical', href: 'https://ngebir.di-mana.com/blog' }] })
 
 const MD_BREAKPOINT = 768
 const itemsPerPage = ref(9)
