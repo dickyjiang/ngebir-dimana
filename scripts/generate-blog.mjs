@@ -111,8 +111,8 @@ async function refillCategory(category, anthropic) {
 
   const prompt =
     category === 'bar'
-      ? 'Generate 10 unique Indonesian-language SEO keyword phrases for a bar directory website (ngebir.di-mana.com) covering bars in Bandung, Jakarta, and Bali. Mix of cities. Focus on: rooftop bar, sports bar, craft beer bar, bar live musik, bar buat nongkrong, bar instagrammable, bar murah dekat kampus, bar dengan makanan enak, cocktail bar, rekomendasi bar terbaik. Return ONLY a JSON array of strings, no explanation.'
-      : 'Generate 10 unique Indonesian-language SEO/AEO keyword phrases for a bar directory website about beer knowledge and education in Indonesia. Focus on: craft beer Indonesia, jenis bir IPA stout lager, cara bikin bir rumahan, merek bir Indonesia, panduan cicip bir, FAQ style starting with "apa itu" or "cara", bir terbaik di Bali, bir lokal vs impor. Return ONLY a JSON array of strings, no explanation.'
+      ? 'Generate 10 unique Indonesian-language SEO keyword phrases for a bar directory website (ngebir.di-mana.com) covering bars in Bandung, Jakarta, and Bali. Mix of cities. Focus on: rooftop bar, sports bar, craft beer bar, bar live musik, bar buat nongkrong, bar instagrammable, bar murah dekat kampus, bar dengan makanan enak, cocktail bar, rekomendasi bar terbaik. Avoid slang/informal verbs like "bikin" in the phrases; use standard Indonesian ("membuat", "cara membuat"). Return ONLY a JSON array of strings, no explanation.'
+      : 'Generate 10 unique Indonesian-language SEO/AEO keyword phrases for a bar directory website about beer knowledge and education in Indonesia. Focus on: craft beer Indonesia, jenis bir IPA stout lager, cara membuat bir rumahan, merek bir Indonesia, panduan cicip bir, FAQ style starting with "apa itu" or "cara", bir terbaik di Bali, bir lokal vs impor. Avoid slang/informal verbs like "bikin" in the phrases; use standard Indonesian ("membuat", "cara membuat"). Return ONLY a JSON array of strings, no explanation.'
 
   const msg = await anthropic.messages.create({
     model: 'claude-haiku-4-5-20251001',
@@ -457,7 +457,13 @@ function qualityCheck(article, keyword, hasBars) {
 
   const kwLower = keyword.toLowerCase()
   const contentLower = article.content.toLowerCase()
-  const stopWords = new Set(['tips', 'cara', 'apa', 'itu', 'di', 'dan', 'yang', 'untuk', 'tentang', 'panduan', 'rekomendasi', 'daftar', 'list'])
+  // Kata kolokial/generik yang tidak boleh jadi kata kunci utama (model sering menggantinya
+  // dengan padanan formal, mis. "bikin" -> "membuat").
+  const stopWords = new Set([
+    'tips', 'cara', 'apa', 'itu', 'di', 'dan', 'yang', 'untuk', 'tentang', 'panduan', 'rekomendasi', 'daftar', 'list',
+    'bikin', 'buat', 'membuat', 'pembuatan', 'resep', 'terbaik', 'murah', 'dekat', 'dengan', 'bagaimana', 'kenapa',
+    'mengapa', 'apakah', 'lengkap', 'terbukti', 'berhasil', 'pakai', 'bahan', 'enak', 'nongkrong', 'vs',
+  ])
   const meaningfulWord = kwLower.split(' ').find(w => w.length > 3 && !stopWords.has(w)) || kwLower.split(' ')[0]
   const kwOccurrences = (contentLower.match(new RegExp(meaningfulWord, 'g')) || []).length
   if (kwOccurrences < 3) errors.push(`Keyword "${meaningfulWord}" appears only ${kwOccurrences}× (min 3)`)
