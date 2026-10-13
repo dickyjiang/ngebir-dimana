@@ -312,13 +312,7 @@ const metaDescription = buildBarMetaDescription(
 )
 const ogImage = cafeData.photo || 'https://ngebir.di-mana.com/img/OG-img.png'
 
-const openingHoursSpec = []
-if (cafeData.working_hours && isValidJson(cafeData.working_hours)) {
-  const hours = JSON.parse(cafeData.working_hours)
-  for (const [day, time] of Object.entries(hours)) {
-    if (time) openingHoursSpec.push(`${day} ${time}`)
-  }
-}
+const openingHoursSpec = buildOpeningHoursSpecification(cafeData.working_hours)
 
 const jsonLd = {
   "@context": "https://schema.org",
@@ -326,7 +320,7 @@ const jsonLd = {
   "name": cafeData.name,
   "address": {
     "@type": "PostalAddress",
-    "streetAddress": cafeData.street || '',
+    "streetAddress": cafeData.street || cafeData.full_address || '',
     "addressLocality": cafeData.city || '',
     "addressCountry": "ID"
   },
@@ -336,6 +330,7 @@ if (cafeData.photo) jsonLd["image"] = cafeData.photo
 if (cafeData.phone) jsonLd["telephone"] = cafeData.phone
 if (cafeData.site) jsonLd["sameAs"] = [cafeData.site]
 if (cafeData.state) jsonLd.address["addressRegion"] = cafeData.state
+if (cafeData.range && String(cafeData.range).trim()) jsonLd["priceRange"] = String(cafeData.range).trim()
 if (cafeData.lat && cafeData.long) {
   jsonLd["geo"] = {
     "@type": "GeoCoordinates",
@@ -344,7 +339,7 @@ if (cafeData.lat && cafeData.long) {
   }
 }
 if (openingHoursSpec.length > 0) {
-  jsonLd["openingHours"] = openingHoursSpec
+  jsonLd["openingHoursSpecification"] = openingHoursSpec
 }
 
 useSeoMeta({
