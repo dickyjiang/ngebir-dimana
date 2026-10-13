@@ -95,7 +95,7 @@
             class="rounded-md flex flex-col h-full pb-4 border overflow-hidden"
           >
             <NuxtLink
-              :to="`/cafe/${cafe.slug_name}`"
+              :to="`/bars/${cafe.slug_name}`"
               class="flex flex-col h-full"
               @click="handleCafeClick(cafe)"
             >

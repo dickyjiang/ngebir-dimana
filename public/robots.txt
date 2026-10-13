@@ -1,12 +1,3 @@
-User-agent: Googlebot
-Allow: /
-
-User-agent: Bingbot
-Allow: /
-
-User-agent: GPTBot
-Allow: /
-
 User-agent: Google-Extended
 Disallow: /
 
@@ -18,11 +9,11 @@ Disallow: /
 
 User-agent: *
 Allow: /
-
 Disallow: /login
 Disallow: /dashboard
 Disallow: /profile
 Disallow: /cafe/owner/
 Disallow: /admin/
 Disallow: /confirm
-Sitemap: https://ngopi.di-mana.com/sitemap.xml
+
+Sitemap: https://ngebir.di-mana.com/sitemap.xml

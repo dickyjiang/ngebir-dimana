@@ -29,7 +29,7 @@
           :key="index"
           class="rounded-md flex flex-col h-full pb-4 border overflow-hidden"
         >
-          <NuxtLink :to="`/cafe/${cafe.slug_name}`">
+          <NuxtLink :to="`/bars/${cafe.slug_name}`">
             <NuxtImg
               alt="Bar Image"
               class="w-full h-48 object-cover mb-4"
