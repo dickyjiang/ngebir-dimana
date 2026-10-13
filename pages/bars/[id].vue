@@ -306,7 +306,10 @@ if (!cafe.value || !cafe.value.data) {
 const cafeData = cafe.value.data
 const slug = route.params.id
 const canonicalUrl = `https://ngebir.di-mana.com/bars/${slug}`
-const metaDescription = `${cafeData.name} berlokasi di ${cafeData.street || cafeData.city}. ${cafeData.business_type || 'Bar'} di ${cafeData.city}.`
+const metaDescription = buildBarMetaDescription(
+  cafeData,
+  (cafe.value.features || []).map((f) => f.name),
+)
 const ogImage = cafeData.photo || 'https://ngebir.di-mana.com/img/OG-img.png'
 
 const openingHoursSpec = []
@@ -329,6 +332,10 @@ const jsonLd = {
   },
   "url": canonicalUrl,
 }
+if (cafeData.photo) jsonLd["image"] = cafeData.photo
+if (cafeData.phone) jsonLd["telephone"] = cafeData.phone
+if (cafeData.site) jsonLd["sameAs"] = [cafeData.site]
+if (cafeData.state) jsonLd.address["addressRegion"] = cafeData.state
 if (cafeData.lat && cafeData.long) {
   jsonLd["geo"] = {
     "@type": "GeoCoordinates",
