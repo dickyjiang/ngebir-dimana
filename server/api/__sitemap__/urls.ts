@@ -83,7 +83,6 @@ export default defineEventHandler(async () => {
 
   const staticUrls = [
     { loc: '/', changefreq: 'daily', priority: 1.0 },
-    { loc: '/bars', changefreq: 'weekly', priority: 0.8 },
     { loc: '/blog', changefreq: 'weekly', priority: 0.7 },
     { loc: '/about-us', changefreq: 'monthly', priority: 0.5 },
     { loc: '/privacy-policy', changefreq: 'monthly', priority: 0.3 },

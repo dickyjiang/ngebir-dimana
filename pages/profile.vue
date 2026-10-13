@@ -183,7 +183,7 @@
                   {{ cafe.is_published ? "Published" : "Not Published" }}
                 </div> -->
                 <div class="flex gap-2 ml-auto">
-                  <NuxtLink :to="`/cafe/${cafe.slug_name}`" v-if="cafe.is_published">
+                  <NuxtLink :to="`/bars/${cafe.slug_name}`" v-if="cafe.is_published">
                     <button
                       class="border w-full border-gray-600 text-gray-600 py-2 px-6 rounded-md text-sm text-center font-medium hover:bg-gray-800 hover:text-yellow-500 transition-colors disabled:cursor-not-allowed">
                       View
