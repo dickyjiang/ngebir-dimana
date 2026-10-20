@@ -23,6 +23,10 @@ export default defineNuxtConfig({
     supabaseServiceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY || '',
     anthropicApiKey: process.env.ANTHROPIC_API_KEY || '',
     cronSecret: process.env.CRON_SECRET || '',
+    public: {
+      // Google Tag Manager container for ngebir (empty = GTM not loaded)
+      gtmId: process.env.NUXT_PUBLIC_GTM_ID || '',
+    },
   },
 
   // Site URL used by @nuxtjs/sitemap for absolute URLs
