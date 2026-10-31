@@ -97,6 +97,102 @@ async function runDiscovery() {
   }
 }
 
+// ── Manual add ─────────────────────────────────────────────────────────────
+type AddStatus = 'new' | 'duplicate' | 'not_found' | 'not_bandung' | 'error'
+
+interface AddCandidate {
+  query: string
+  status: AddStatus
+  reason?: string
+  placeId: string
+  name: string
+  address: string
+  rating: number | null
+  reviews: number | null
+}
+
+const addInput = ref('')
+const addCandidates = ref<AddCandidate[]>([])
+const addSelected = ref<Set<string>>(new Set())
+const addSearching = ref(false)
+const addCommitting = ref(false)
+const addProgress = ref('')
+
+const statusLabel: Record<AddStatus, string> = {
+  new: 'Baru',
+  duplicate: 'Duplikat',
+  not_found: 'Tidak ditemukan',
+  not_bandung: 'Bukan di Bandung',
+  error: 'Error',
+}
+
+async function previewBars() {
+  const queries = addInput.value
+    .split('\n')
+    .map((q) => q.trim())
+    .filter(Boolean)
+  if (!queries.length) return
+  if (queries.length > 15) {
+    showToast('Maksimal 15 bar sekali cari', 'error')
+    return
+  }
+
+  addSearching.value = true
+  try {
+    const { results } = await $fetch<{ results: AddCandidate[] }>('/api/admin/add-bars', {
+      method: 'POST',
+      body: { action: 'preview', queries },
+    })
+    addCandidates.value = results
+    addSelected.value = new Set(results.filter((r) => r.status === 'new').map((r) => r.placeId))
+  } catch (err) {
+    console.error('[admin/review] previewBars error:', err)
+    showToast('Gagal mencari bar', 'error')
+  } finally {
+    addSearching.value = false
+  }
+}
+
+function toggleSelected(placeId: string) {
+  const next = new Set(addSelected.value)
+  if (next.has(placeId)) next.delete(placeId)
+  else next.add(placeId)
+  addSelected.value = next
+}
+
+async function commitBars() {
+  const targets = addCandidates.value.filter((c) => addSelected.value.has(c.placeId))
+  if (!targets.length) return
+
+  addCommitting.value = true
+  let added = 0
+  const failed: AddCandidate[] = []
+
+  for (let i = 0; i < targets.length; i++) {
+    addProgress.value = `Menambahkan ${i + 1}/${targets.length}: ${targets[i].name}`
+    try {
+      await $fetch('/api/admin/add-bars', {
+        method: 'POST',
+        body: { action: 'commit', placeId: targets[i].placeId },
+      })
+      added++
+    } catch (err) {
+      console.error('[admin/review] commitBars error:', err)
+      failed.push(targets[i])
+    }
+  }
+
+  addProgress.value = ''
+  addCommitting.value = false
+  addCandidates.value = failed.map((f) => ({ ...f, status: 'error' as AddStatus, reason: 'Gagal ditambahkan' }))
+  addSelected.value = new Set()
+  if (!failed.length) addInput.value = ''
+  showToast(
+    failed.length ? `${added} bar ditambahkan, ${failed.length} gagal` : `${added} bar ditambahkan dan tayang`,
+    failed.length ? 'error' : 'success'
+  )
+}
+
 // ── Toast ──────────────────────────────────────────────────────────────────
 const toast = ref<{ message: string; type: 'success' | 'error' | 'info' } | null>(null)
 let toastTimer: ReturnType<typeof setTimeout> | null = null
@@ -215,6 +311,76 @@ onMounted(() => {
                 : 'fa-info-circle',
           ]"></i>
         {{ discoveryResult }}
+      </div>
+
+      <!-- Manual add -->
+      <div class="bg-white rounded-lg border border-gray-200 p-4 space-y-3">
+        <div>
+          <h2 class="text-base font-bold text-gray-800">Tambah Bar Manual</h2>
+          <p class="text-xs text-gray-500">Satu nama bar per baris (maks 15). Semua dicari di Bandung dan langsung tayang.</p>
+        </div>
+        <textarea
+          v-model="addInput"
+          rows="4"
+          :disabled="addSearching || addCommitting"
+          placeholder="Nama bar, satu per baris"
+          class="w-full border border-gray-300 rounded-md p-2 text-sm text-gray-800 focus:outline-none focus:border-blue-500 disabled:opacity-60"></textarea>
+        <button
+          @click="previewBars"
+          :disabled="addSearching || addCommitting || !addInput.trim()"
+          class="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white rounded-md text-sm font-medium transition-colors">
+          <i :class="['fas', addSearching ? 'fa-spinner fa-spin' : 'fa-search']"></i>
+          {{ addSearching ? 'Mencari...' : 'Cari' }}
+        </button>
+
+        <div v-if="addCandidates.length" class="space-y-2">
+          <label
+            v-for="c in addCandidates"
+            :key="c.query + c.placeId"
+            :class="[
+              'flex items-start gap-3 p-3 border rounded-md text-sm',
+              c.status === 'new' ? 'border-gray-200 cursor-pointer' : 'border-gray-100 bg-gray-50 text-gray-400',
+            ]">
+            <input
+              type="checkbox"
+              class="mt-1"
+              :disabled="c.status !== 'new' || addCommitting"
+              :checked="addSelected.has(c.placeId)"
+              @change="toggleSelected(c.placeId)" />
+            <div class="flex-1 min-w-0">
+              <div class="flex flex-wrap items-center gap-2">
+                <span class="font-semibold text-gray-800">{{ c.name || c.query }}</span>
+                <span
+                  :class="[
+                    'px-2 py-0.5 text-xs rounded-full font-medium',
+                    c.status === 'new' ? 'bg-green-100 text-green-700' : c.status === 'error' ? 'bg-red-100 text-red-700' : 'bg-gray-200 text-gray-600',
+                  ]">
+                  {{ statusLabel[c.status] }}
+                </span>
+              </div>
+              <p v-if="c.address" class="text-xs text-gray-500 truncate">{{ c.address }}</p>
+              <p v-if="c.rating" class="text-xs text-gray-500">
+                <i class="fas fa-star text-yellow-400"></i> {{ c.rating }}
+                <span v-if="c.reviews">({{ c.reviews.toLocaleString() }})</span>
+              </p>
+              <p v-if="c.reason" class="text-xs text-gray-400 truncate">{{ c.reason }}</p>
+              <p v-if="c.name && c.query.toLowerCase() !== c.name.toLowerCase()" class="text-xs text-gray-400">
+                dicari: {{ c.query }}
+              </p>
+            </div>
+          </label>
+
+          <div class="flex items-center gap-3">
+            <button
+              @click="commitBars"
+              :disabled="addCommitting || addSelected.size === 0"
+              class="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 disabled:opacity-60 text-white rounded-md text-sm font-medium transition-colors">
+              <i :class="['fas', addCommitting ? 'fa-spinner fa-spin' : 'fa-plus']"></i>
+              Tambahkan {{ addSelected.size }} bar
+            </button>
+            <span v-if="addProgress" class="text-xs text-gray-500">{{ addProgress }}</span>
+          </div>
+        </div>
       </div>
 
       <!-- Stats bar -->
