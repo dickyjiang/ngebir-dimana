@@ -98,7 +98,7 @@ async function runDiscovery() {
 }
 
 // ── Manual add ─────────────────────────────────────────────────────────────
-type AddStatus = 'new' | 'duplicate' | 'not_found' | 'not_bandung' | 'error'
+type AddStatus = 'new' | 'duplicate' | 'not_found' | 'wrong_city' | 'error'
 
 interface AddCandidate {
   query: string
@@ -111,6 +111,8 @@ interface AddCandidate {
   reviews: number | null
 }
 
+const addCities = ['Bandung', 'Jakarta', 'Tangerang', 'Surabaya', 'Medan', 'Bali', 'Yogyakarta', 'Solo']
+const addCity = ref('Bandung')
 const addInput = ref('')
 const addCandidates = ref<AddCandidate[]>([])
 const addSelected = ref<Set<string>>(new Set())
@@ -122,7 +124,7 @@ const statusLabel: Record<AddStatus, string> = {
   new: 'Baru',
   duplicate: 'Duplikat',
   not_found: 'Tidak ditemukan',
-  not_bandung: 'Bukan di Bandung',
+  wrong_city: 'Bukan di kota ini',
   error: 'Error',
 }
 
@@ -141,7 +143,7 @@ async function previewBars() {
   try {
     const { results } = await $fetch<{ results: AddCandidate[] }>('/api/admin/add-bars', {
       method: 'POST',
-      body: { action: 'preview', queries },
+      body: { action: 'preview', city: addCity.value, queries },
     })
     addCandidates.value = results
     addSelected.value = new Set(results.filter((r) => r.status === 'new').map((r) => r.placeId))
@@ -173,7 +175,7 @@ async function commitBars() {
     try {
       await $fetch('/api/admin/add-bars', {
         method: 'POST',
-        body: { action: 'commit', placeId: targets[i].placeId },
+        body: { action: 'commit', city: addCity.value, placeId: targets[i].placeId },
       })
       added++
     } catch (err) {
@@ -317,8 +319,15 @@ onMounted(() => {
       <div class="bg-white rounded-lg border border-gray-200 p-4 space-y-3">
         <div>
           <h2 class="text-base font-bold text-gray-800">Tambah Bar Manual</h2>
-          <p class="text-xs text-gray-500">Satu nama bar per baris (maks 15). Semua dicari di Bandung dan langsung tayang.</p>
+          <p class="text-xs text-gray-500">Satu nama bar per baris (maks 15). Dicari di kota yang dipilih dan langsung tayang.</p>
         </div>
+        <select
+          v-model="addCity"
+          :disabled="addSearching || addCommitting"
+          @change="addCandidates = []; addSelected = new Set()"
+          class="border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-800 focus:outline-none focus:border-blue-500 disabled:opacity-60">
+          <option v-for="c in addCities" :key="c" :value="c">{{ c }}</option>
+        </select>
         <textarea
           v-model="addInput"
           rows="4"

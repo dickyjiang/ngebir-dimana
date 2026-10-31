@@ -2,11 +2,23 @@ import { serverSupabaseServiceRole } from '#supabase/server'
 
 const MAX_QUERIES = 15
 const MAX_PHOTOS = 3
-const CITY = 'Bandung'
-const BANDUNG_CENTER = { latitude: -6.9175, longitude: 107.6191 }
+const DEFAULT_RADIUS = 25000
+
+// Same cities as supabase/functions/discover-bars. `keywords` are matched against the
+// Google formatted address to confirm a place really is in that city.
+const CITIES: Record<string, { latitude: number; longitude: number; radius: number; keywords: string[] }> = {
+  Bandung: { latitude: -6.9175, longitude: 107.6191, radius: DEFAULT_RADIUS, keywords: ['bandung'] },
+  Jakarta: { latitude: -6.2088, longitude: 106.8456, radius: DEFAULT_RADIUS, keywords: ['jakarta'] },
+  Tangerang: { latitude: -6.1783, longitude: 106.6319, radius: DEFAULT_RADIUS, keywords: ['tangerang'] },
+  Surabaya: { latitude: -7.2575, longitude: 112.7521, radius: DEFAULT_RADIUS, keywords: ['surabaya'] },
+  Medan: { latitude: 3.5952, longitude: 98.6722, radius: DEFAULT_RADIUS, keywords: ['medan'] },
+  Bali: { latitude: -8.4095, longitude: 115.1889, radius: 50000, keywords: ['bali'] },
+  Yogyakarta: { latitude: -7.7956, longitude: 110.3695, radius: DEFAULT_RADIUS, keywords: ['yogyakarta'] },
+  Solo: { latitude: -7.5755, longitude: 110.8243, radius: DEFAULT_RADIUS, keywords: ['solo', 'surakarta'] },
+}
 const PLACES_BASE = 'https://places.googleapis.com/v1'
 
-type PreviewStatus = 'new' | 'duplicate' | 'not_found' | 'not_bandung' | 'error'
+type PreviewStatus = 'new' | 'duplicate' | 'not_found' | 'wrong_city' | 'error'
 
 interface PlaceSummary {
   id: string
@@ -57,12 +69,20 @@ function buildWorkingHoursJson(weekdayDescriptions: string[]): string {
   return JSON.stringify(obj)
 }
 
-function isBandung(address: string | undefined): boolean {
-  return (address ?? '').toLowerCase().includes('bandung')
+function resolveCity(raw: unknown): string {
+  if (typeof raw !== 'string' || !(raw in CITIES)) {
+    throw createError({ statusCode: 400, message: 'Kota tidak valid' })
+  }
+  return raw
 }
 
-async function isDuplicate(client: any, placeId: string, name: string): Promise<boolean> {
-  const baseSlug = `${slugify(name)}-bandung`
+function isInCity(city: string, address: string | undefined): boolean {
+  const addr = (address ?? '').toLowerCase()
+  return CITIES[city].keywords.some((k) => addr.includes(k))
+}
+
+async function isDuplicate(client: any, city: string, placeId: string, name: string): Promise<boolean> {
+  const baseSlug = `${slugify(name)}-${city.toLowerCase()}`
 
   const { data: byPlace } = await client
     .from('cafes')
@@ -81,13 +101,13 @@ async function isDuplicate(client: any, placeId: string, name: string): Promise<
   const { data: sameCity } = await client
     .from('cafes')
     .select('name')
-    .ilike('city', `%${CITY}%`)
+    .ilike('city', `%${city}%`)
   const target = normalizeName(name)
   return (sameCity ?? []).some((c: { name: string }) => normalizeName(c.name) === target)
 }
 
-async function getUniqueSlug(client: any, name: string): Promise<string> {
-  const baseSlug = `${slugify(name)}-bandung`
+async function getUniqueSlug(client: any, city: string, name: string): Promise<string> {
+  const baseSlug = `${slugify(name)}-${city.toLowerCase()}`
   let slug = baseSlug
   let attempt = 1
 
@@ -118,7 +138,7 @@ async function fetchAndUploadPhoto(
   }
 }
 
-async function generateDescription(place: PlaceDetail, name: string): Promise<string> {
+async function generateDescription(place: PlaceDetail, name: string, city: string): Promise<string> {
   const editorialSummary = place.editorialSummary?.text ?? ''
   const anthropicKey = process.env.ANTHROPIC_API_KEY
   if (!anthropicKey) return editorialSummary
@@ -131,7 +151,7 @@ async function generateDescription(place: PlaceDetail, name: string): Promise<st
       .join(', ')
 
     const prompt = [
-      `Buatkan deskripsi singkat (2–3 kalimat) dalam Bahasa Indonesia yang menarik dan kasual untuk sebuah bar bernama "${name}" yang berlokasi di ${CITY}.`,
+      `Buatkan deskripsi singkat (2–3 kalimat) dalam Bahasa Indonesia yang menarik dan kasual untuk sebuah bar bernama "${name}" yang berlokasi di ${city}.`,
       editorialSummary ? `Deskripsi dari Google: "${editorialSummary}".` : '',
       typeLabels ? `Tipe tempat: ${typeLabels}.` : '',
       place.rating
@@ -169,7 +189,7 @@ async function generateDescription(place: PlaceDetail, name: string): Promise<st
   }
 }
 
-async function searchPlace(query: string): Promise<PlaceSummary | null> {
+async function searchPlace(city: string, query: string): Promise<PlaceSummary | null> {
   const res = await fetch(`${PLACES_BASE}/places:searchText`, {
     method: 'POST',
     headers: {
@@ -179,10 +199,15 @@ async function searchPlace(query: string): Promise<PlaceSummary | null> {
         'places.id,places.displayName,places.formattedAddress,places.rating,places.userRatingCount',
     },
     body: JSON.stringify({
-      textQuery: `${query} ${CITY}`,
+      textQuery: `${query} ${city}`,
       languageCode: 'id',
       maxResultCount: 1,
-      locationBias: { circle: { center: BANDUNG_CENTER, radius: 25000 } },
+      locationBias: {
+        circle: {
+          center: { latitude: CITIES[city].latitude, longitude: CITIES[city].longitude },
+          radius: CITIES[city].radius,
+        },
+      },
     }),
   })
 
@@ -191,7 +216,7 @@ async function searchPlace(query: string): Promise<PlaceSummary | null> {
   return json.places?.[0] ?? null
 }
 
-async function preview(client: any, rawQueries: unknown) {
+async function preview(client: any, city: string, rawQueries: unknown) {
   const queries = (Array.isArray(rawQueries) ? rawQueries : [])
     .map((q) => String(q).trim())
     .filter(Boolean)
@@ -203,7 +228,7 @@ async function preview(client: any, rawQueries: unknown) {
   const searched = await Promise.all(
     queries.map(async (query) => {
       try {
-        return { query, place: await searchPlace(query), error: null as string | null }
+        return { query, place: await searchPlace(city, query), error: null as string | null }
       } catch (err) {
         return { query, place: null, error: err instanceof Error ? err.message : String(err) }
       }
@@ -237,12 +262,12 @@ async function preview(client: any, rawQueries: unknown) {
       reviews: place.userRatingCount ?? null,
     }
 
-    if (!isBandung(place.formattedAddress)) {
-      status = 'not_bandung'
+    if (!isInCity(city, place.formattedAddress)) {
+      status = 'wrong_city'
     } else if (seen.has(place.id)) {
       status = 'duplicate'
       reason = 'Sudah ada di daftar input'
-    } else if (await isDuplicate(client, place.id, name)) {
+    } else if (await isDuplicate(client, city, place.id, name)) {
       status = 'duplicate'
       reason = 'Sudah ada di database'
     } else {
@@ -256,7 +281,7 @@ async function preview(client: any, rawQueries: unknown) {
   return { results }
 }
 
-async function commit(client: any, placeId: unknown) {
+async function commit(client: any, city: string, placeId: unknown) {
   if (typeof placeId !== 'string' || !placeId) {
     throw createError({ statusCode: 400, message: 'placeId wajib diisi' })
   }
@@ -275,14 +300,14 @@ async function commit(client: any, placeId: unknown) {
   const place: PlaceDetail = await res.json()
   const name = place.displayName?.text ?? 'Unknown Bar'
 
-  if (!isBandung(place.formattedAddress)) {
-    throw createError({ statusCode: 400, message: 'Bar ini bukan di Bandung' })
+  if (!isInCity(city, place.formattedAddress)) {
+    throw createError({ statusCode: 400, message: `Bar ini bukan di ${city}` })
   }
-  if (await isDuplicate(client, placeId, name)) {
+  if (await isDuplicate(client, city, placeId, name)) {
     throw createError({ statusCode: 409, message: 'Bar ini sudah ada di database' })
   }
 
-  const slug = await getUniqueSlug(client, name)
+  const slug = await getUniqueSlug(client, city, name)
 
   const photoUrls: string[] = []
   const photosToFetch = (place.photos ?? []).slice(0, MAX_PHOTOS)
@@ -296,12 +321,12 @@ async function commit(client: any, placeId: unknown) {
     .insert({
       name,
       full_address: place.formattedAddress ?? '',
-      city: CITY,
+      city,
       slug_name: slug,
       google_place_id: placeId,
       rating: place.rating ?? null,
       reviews: place.userRatingCount ?? null,
-      description: await generateDescription(place, name),
+      description: await generateDescription(place, name, city),
       working_hours: buildWorkingHoursJson(place.regularOpeningHours?.weekdayDescriptions ?? []),
       photo: photoUrls[0] ?? null,
       source: 'manual',
@@ -327,10 +352,10 @@ export default defineEventHandler(async (event) => {
   await requireAdmin(event)
   const client = serverSupabaseServiceRole(event)
   const body = await readBody(event)
-  // body: { action: 'preview', queries: string[] } | { action: 'commit', placeId: string }
+  // body: { action: 'preview', city, queries: string[] } | { action: 'commit', city, placeId: string }
 
-  if (body?.action === 'preview') return preview(client, body.queries)
-  if (body?.action === 'commit') return commit(client, body.placeId)
+  if (body?.action === 'preview') return preview(client, resolveCity(body.city), body.queries)
+  if (body?.action === 'commit') return commit(client, resolveCity(body.city), body.placeId)
 
   throw createError({ statusCode: 400, message: 'Invalid payload' })
 })
