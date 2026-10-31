@@ -33,3 +33,7 @@ supabase/.temp/
 
 # Vim swap files
 *.swp
+
+# Local-only
+scripts/add-bar.mjs
+Ngebir-dimana/
