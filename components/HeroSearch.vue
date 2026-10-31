@@ -38,7 +38,7 @@ const props = defineProps({
   },
 })
 
-const emit = defineEmits(['search', 'toggle-nearby', 'toggle-feature'])
+const emit = defineEmits(['search', 'submit', 'toggle-nearby', 'toggle-feature'])
 
 const searchQuery = ref('')
 const filterType = ref('all') // Add this new ref
@@ -53,6 +53,12 @@ function handleSearch() {
 const debouncedSearch = debounce(() => {
   handleSearch()
 }, 200)
+
+function submitSearch() {
+  debouncedSearch.cancel()
+  handleSearch()
+  emit('submit')
+}
 
 function clearSearch() {
   searchQuery.value = ''
@@ -203,7 +209,8 @@ onBeforeUnmount(() => {
                 type="text"
                 placeholder="Search bars..."
                 class="text-sm sm:text-base border w-full border-gray-600 rounded-lg p-2 sm:p-3 pl-4 pr-[120px]"
-                @input="debouncedSearch" />
+                @input="debouncedSearch"
+                @keyup.enter="submitSearch" />
               <div class="absolute right-0 top-0 h-full flex items-center gap-2 pr-2">
                 <button class="text-gray-500 mr-2" @click="handleSearchButton">
                   <i :class="searchQuery ? 'fa fa-times' : 'fas fa-search'"></i>

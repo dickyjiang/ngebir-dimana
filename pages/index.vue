@@ -420,6 +420,7 @@ onMounted(async () => {
     :locationLoading="locationLoading"
     :noResultsMessage="noResultsMessage"
     @search="handleSearch"
+    @submit="mainContent?.scrollIntoView({ behavior: 'smooth' })"
     @toggle-nearby="toggleNearbyFilter"
     @toggle-feature="handleFeatureToggle" />
 
