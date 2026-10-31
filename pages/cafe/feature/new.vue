@@ -165,7 +165,7 @@ definePageMeta({ layout: 'member' })
 
       // Navigate back to cafe details after a short delay
       setTimeout(() => {
-        router.push(`/cafe/${cafeId.value}`);
+        router.push(`/bars/${cafeId.value}`);
       }, 1500);
     } catch (error: any) {
       errorMsg.value = error.message || 'Failed to save features';

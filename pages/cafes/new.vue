@@ -74,7 +74,7 @@ definePageMeta({ layout: 'member' })
       // Navigate to the new cafe page
       if (data && data[0]) {
         setTimeout(() => {
-          router.push(`/cafe/${data[0].id}`);
+          router.push(`/bars/${data[0].id}`);
         }, 1500);
       }
     } catch (error: any) {
